@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 
+import { Category } from "@/types/supabase";
+
 interface CategoryFormValues {
     name: string;
     slug: string;
@@ -25,17 +27,22 @@ interface CategoryFormValues {
     is_visible: boolean;
 }
 
-export function CategoryForm() {
+interface CategoryFormProps {
+    defaultValues?: Category;
+}
+
+export function CategoryForm({ defaultValues }: CategoryFormProps) {
     const router = useRouter();
     const [error, setError] = useState("");
+    const isEditing = !!defaultValues;
 
     const form = useForm<CategoryFormValues>({
         defaultValues: {
-            name: "",
-            slug: "",
-            image_url: "",
-            sort_order: 0,
-            is_visible: true,
+            name: defaultValues?.name || "",
+            slug: defaultValues?.id || "", // ID is the slug
+            image_url: defaultValues?.image_url || "",
+            sort_order: defaultValues?.sort_order || 0,
+            is_visible: defaultValues?.is_visible ?? true,
         },
     });
 
@@ -53,20 +60,32 @@ export function CategoryForm() {
         setError("");
 
         const slug = values.slug || generateSlug(values.name);
-
-        const { error: insertError } = await supabase.from("categories").insert({
+        const payload = {
             name: values.name,
-            slug,
             image_url: values.image_url || null,
             sort_order: Number(values.sort_order),
             is_visible: values.is_visible,
-        });
+        };
 
-        if (insertError) {
-            if (insertError.code === '23505') {
+        let result;
+
+        if (isEditing) {
+            result = await supabase
+                .from("categories")
+                .update(payload)
+                .eq("id", defaultValues.id);
+        } else {
+            result = await supabase.from("categories").insert({
+                id: slug,
+                ...payload
+            });
+        }
+
+        if (result.error) {
+            if (result.error.code === '23505') {
                 setError("קטגוריה עם slug זה כבר קיימת במערכת");
             } else {
-                setError("אירעה שגיאה בשמירת הקטגוריה: " + insertError.message);
+                setError("אירעה שגיאה בשמירת הקטגוריה: " + result.error.message);
             }
             return;
         }

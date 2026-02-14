@@ -30,6 +30,10 @@ export function HeroSlider({ data }: HeroSliderProps) {
     return (
         <section className="w-full">
             <Carousel
+                opts={{
+                    loop: true,
+                    direction: 'rtl',
+                }}
                 plugins={[
                     Autoplay({
                         delay: 5000,
@@ -65,8 +69,8 @@ export function HeroSlider({ data }: HeroSliderProps) {
                         </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-4 bg-white/80 hover:bg-white" />
-                <CarouselNext className="right-4 bg-white/80 hover:bg-white" />
+                <CarouselNext className="left-4 bg-white/80 hover:bg-white rotate-180" />
+                <CarouselPrevious className="right-4 bg-white/80 hover:bg-white rotate-180" />
             </Carousel>
         </section>
     );

@@ -66,7 +66,6 @@ export interface Database {
                 Row: {
                     id: string
                     name: string
-                    slug: string
                     image_url: string | null
                     sort_order: number
                     is_visible: boolean
@@ -75,7 +74,6 @@ export interface Database {
                 Insert: {
                     id?: string
                     name: string
-                    slug: string
                     image_url?: string | null
                     sort_order?: number
                     is_visible?: boolean
@@ -84,7 +82,6 @@ export interface Database {
                 Update: {
                     id?: string
                     name?: string
-                    slug?: string
                     image_url?: string | null
                     sort_order?: number
                     is_visible?: boolean

@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { createClient } from "@/lib/supabase/client";
 import type { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "";
 
 export function useAuth() {
+    // Memoize the client so it doesn't recreate on every render, 
+    // though createBrowserClient is cheap.
+    const supabase = useMemo(() => createClient(), []);
+
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -15,20 +19,23 @@ export function useAuth() {
     useEffect(() => {
         let mounted = true;
 
-        supabase.auth
-            .getSession()
-            .then(({ data: { session } }: { data: { session: Session | null } }) => {
+        const getUser = async () => {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
                 if (mounted) {
+                    if (error) {
+                        console.error("Auth Error:", error);
+                    }
                     setUser(session?.user ?? null);
                     setLoading(false);
                 }
-            })
-            .catch(() => {
-                if (mounted) {
-                    setUser(null);
-                    setLoading(false);
-                }
-            });
+            } catch (err) {
+                console.error("Unexpected Auth Error:", err);
+                if (mounted) setLoading(false);
+            }
+        };
+
+        getUser();
 
         // Listen for auth changes
         const {
@@ -44,8 +51,7 @@ export function useAuth() {
             mounted = false;
             subscription.unsubscribe();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [supabase]);
 
     const signIn = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signInWithPassword({
@@ -53,12 +59,12 @@ export function useAuth() {
             password,
         });
         return { error };
-    }, []);
+    }, [supabase]);
 
     const signOut = useCallback(async () => {
         await supabase.auth.signOut();
         setUser(null);
-    }, []);
+    }, [supabase]);
 
     return { user, isAdmin, loading, signIn, signOut };
 }

@@ -1,17 +1,40 @@
+"use client";
+
 import Link from "next/link";
 import { MapPin, Phone, Mail, Clock, Truck } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
 
 export function Footer() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [settings, setSettings] = useState<any>({});
+
+    useEffect(() => {
+        async function fetchSettings() {
+            const supabase = createClient();
+            const { data } = await supabase.from("site_settings").select("*");
+            if (data) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const settingsMap = data.reduce((acc, curr) => {
+                    acc[curr.key] = curr.value;
+                    return acc;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                }, {} as any);
+                setSettings(settingsMap);
+            }
+        }
+        fetchSettings();
+    }, []);
+
     return (
-        <footer className="bg-slate-900 text-slate-300 mt-12">
+        <footer className="bg-slate-900 text-slate-300 mt-12" dir="rtl">
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {/* Brand */}
                     <div className="space-y-4">
-                        <h3 className="text-2xl font-bold text-white">🥬 שוק בשכונה</h3>
+                        <h3 className="text-2xl font-bold text-white">{settings.site_name || "🥬 שוק בשכונה"}</h3>
                         <p className="text-sm leading-relaxed">
-                            פירות וירקות טריים ישירות מהחקלאי אליכם הביתה.
-                            איכות ללא פשרות, טעם שמדבר בעד עצמו.
+                            {settings.footer_description || "פירות וירקות טריים ישירות מהחקלאי אליכם הביתה. איכות ללא פשרות, טעם שמדבר בעד עצמו."}
                         </p>
                     </div>
 
@@ -30,18 +53,24 @@ export function Footer() {
                     <div className="space-y-4">
                         <h4 className="text-lg font-bold text-white">צרו קשר</h4>
                         <div className="flex flex-col gap-3 text-sm">
-                            <a href="tel:03-1234567" className="flex items-center gap-2 hover:text-primary transition-colors">
-                                <Phone className="h-4 w-4 flex-shrink-0" />
-                                03-1234567
-                            </a>
-                            <a href="mailto:hello@shuk-bashehuna.co.il" className="flex items-center gap-2 hover:text-primary transition-colors" dir="ltr">
-                                <Mail className="h-4 w-4 flex-shrink-0" />
-                                hello@shuk-bashehuna.co.il
-                            </a>
-                            <div className="flex items-center gap-2">
-                                <MapPin className="h-4 w-4 flex-shrink-0" />
-                                <span>רחוב השוק 1, תל אביב</span>
-                            </div>
+                            {settings.contact_phone && (
+                                <a href={`tel:${settings.contact_phone}`} className="flex items-center gap-2 hover:text-primary transition-colors">
+                                    <Phone className="h-4 w-4 flex-shrink-0" />
+                                    {settings.contact_phone}
+                                </a>
+                            )}
+                            {settings.contact_email && (
+                                <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-2 hover:text-primary transition-colors">
+                                    <Mail className="h-4 w-4 flex-shrink-0" />
+                                    <span dir="ltr">{settings.contact_email}</span>
+                                </a>
+                            )}
+                            {settings.contact_address && (
+                                <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                                    <span>{settings.contact_address}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -49,10 +78,12 @@ export function Footer() {
                     <div className="space-y-4">
                         <h4 className="text-lg font-bold text-white">מידע</h4>
                         <div className="flex flex-col gap-3 text-sm">
-                            <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 flex-shrink-0" />
-                                <span>א-ה: 07:00–21:00 | ו: 07:00–14:00</span>
-                            </div>
+                            {settings.hours_weekdays && (
+                                <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4 flex-shrink-0" />
+                                    <span>{settings.hours_weekdays}</span>
+                                </div>
+                            )}
                             <div className="flex items-center gap-2">
                                 <Truck className="h-4 w-4 flex-shrink-0" />
                                 <span>משלוח חינם מעל ₪300</span>

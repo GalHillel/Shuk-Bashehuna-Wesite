@@ -16,21 +16,36 @@ import { useAuth } from "@/hooks/useAuth";
 export function SiteHeader() {
     const { user, isAdmin } = useAuth();
     const [categories, setCategories] = useState<Category[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [settings, setSettings] = useState<any>({});
     const [loginOpen, setLoginOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        async function fetchCategories() {
-            const { data } = await supabase
+        async function fetchData() {
+            // Fetch categories
+            const { data: cats } = await supabase
                 .from("categories")
                 .select("*")
                 .eq("is_visible", true)
                 .order("sort_order", { ascending: true });
 
-            if (data) setCategories(data);
+            if (cats) setCategories(cats);
+
+            // Fetch settings
+            const { data: sets } = await supabase.from("site_settings").select("*");
+            if (sets) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const settingsMap = sets.reduce((acc, curr) => {
+                    acc[curr.key] = curr.value;
+                    return acc;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                }, {} as any);
+                setSettings(settingsMap);
+            }
         }
-        fetchCategories();
+        fetchData();
     }, []);
 
     // Close user menu on outside click
@@ -51,9 +66,9 @@ export function SiteHeader() {
                 <div className="bg-gradient-to-r from-green-700 via-green-600 to-emerald-600 text-white text-center py-2.5 text-sm font-medium tracking-wide shadow-sm">
                     <div className="container flex items-center justify-center gap-2">
                         <span className="animate-bounce inline-block">🚚</span>
-                        <span>משלוח חינם בקנייה מעל 300 ₪</span>
+                        <span>{settings.top_bar_right || "משלוח חינם בקנייה מעל 300 ₪"}</span>
                         <span className="mx-2 text-green-300">|</span>
-                        <span>הזמינו היום — קבלו מחר!</span>
+                        <span>{settings.top_bar_left || "הזמינו היום — קבלו מחר!"}</span>
                         <span className="animate-pulse inline-block">✨</span>
                     </div>
                 </div>
@@ -71,10 +86,10 @@ export function SiteHeader() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-extrabold text-xl leading-none text-white tracking-tight">
-                                    שוק בשכונה
+                                    {settings.site_name || "שוק בשכונה"}
                                 </span>
                                 <span className="text-[11px] text-green-300/80 font-medium mt-0.5">
-                                    הכי טרי • הכי קרוב • הכי טעים
+                                    {settings.site_slogan || "הכי טרי • הכי קרוב • הכי טעים"}
                                 </span>
                             </div>
                         </Link>
@@ -161,7 +176,7 @@ export function SiteHeader() {
                                         {categories.map(cat => (
                                             <Link
                                                 key={cat.id}
-                                                href={`/category/${cat.slug}`}
+                                                href={`/category/${cat.id}`}
                                                 className="text-lg text-green-100 px-4 py-3 rounded-lg hover:bg-green-800 hover:text-white transition-colors"
                                             >
                                                 {cat.name}
@@ -190,10 +205,10 @@ export function SiteHeader() {
                             {categories.map((cat) => (
                                 <Link
                                     key={cat.id}
-                                    href={`/category/${cat.slug}`}
+                                    href={`/category/${cat.id}`}
                                     className={`
                                         px-5 py-3.5 text-sm font-medium transition-all border-b-2 border-transparent hover:border-yellow-400 hover:bg-green-700/30 rounded-t-lg
-                                        ${cat.slug === 'specials'
+                                        ${cat.id === 'specials'
                                             ? 'text-yellow-300 hover:text-yellow-200 font-bold'
                                             : 'text-green-100 hover:text-white'
                                         }
@@ -202,6 +217,13 @@ export function SiteHeader() {
                                     {cat.name}
                                 </Link>
                             ))}
+                            <Link
+                                href="/category/sale"
+                                className="px-5 py-3.5 text-sm font-medium text-yellow-300 hover:text-yellow-200 font-bold transition-all border-b-2 border-transparent hover:border-yellow-400 hover:bg-green-700/30 rounded-t-lg"
+                            >
+                                🔥 מבצעים
+                            </Link>
+
                             <Link
                                 href="/about"
                                 className="px-5 py-3.5 text-sm font-medium text-green-100 hover:text-white transition-all border-b-2 border-transparent hover:border-yellow-400 hover:bg-green-700/30 rounded-t-lg"

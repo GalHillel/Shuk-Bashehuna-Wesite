@@ -47,7 +47,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     let products: Product[] = [];
 
     // 1. Fetch Category Details
-    if (slug === 'specials') {
+    if (slug === 'specials' || slug === 'sale') {
         category = {
             id: 'specials',
             name: 'מבצעים',
@@ -77,7 +77,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         .eq("is_active", true)
         .order("created_at", { ascending: false });
 
-    if (slug === 'specials') {
+    if (slug === 'specials' || slug === 'sale') {
         query = query.eq("is_on_sale", true);
     } else {
         query = query.eq("category_id", slug);

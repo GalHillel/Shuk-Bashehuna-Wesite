@@ -54,8 +54,15 @@ export function ProductForm({ product }: ProductFormProps) {
 
     useEffect(() => {
         const fetchCats = async () => {
-            const { data } = await supabase.from("categories").select("*").order("name");
-            if (data) setCategories(data as Category[]);
+            console.log("Fetching categories...");
+            const { data, error } = await supabase.from("categories").select("*").order("name");
+            if (error) {
+                console.error("Error fetching categories:", JSON.stringify(error, null, 2));
+                // toast.error("Failed to load categories");
+            } else {
+                console.log("Categories loaded:", data);
+                if (data) setCategories(data as Category[]);
+            }
         };
         fetchCats();
     }, []);

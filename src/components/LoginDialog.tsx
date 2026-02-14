@@ -42,14 +42,50 @@ export function LoginDialog({ open, onClose }: LoginDialogProps) {
             return;
         }
 
-        // Check if admin
+        // Refresh the router to update server components and middleware with the new session
+        router.refresh();
+
+        // Check if admin (Sync with Admin Layout Logic)
+        let isAdmin = false;
         const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "";
+
+        // 1. Check Env Var
         if (email.toLowerCase() === adminEmail.toLowerCase()) {
+            isAdmin = true;
+        }
+
+        // 2. Check DB Profile (if not already admin from env)
+        if (!isAdmin) {
+            // We need to get the user to get the ID, but we just signed in. 
+            // We can check the session from the signIn result if returned, but useAuth just returns error.
+            // We'll rely on a quick fetch.
+            const { data: { user } } = await import("@/lib/supabase/client").then(m => m.supabase.auth.getUser());
+            if (user) {
+                const { data: profile } = await import("@/lib/supabase/client").then(m => m.supabase
+                    .from('profiles')
+                    .select('is_admin')
+                    .eq('id', user.id)
+                    .single());
+                if (profile?.is_admin) {
+                    isAdmin = true;
+                }
+            }
+        }
+
+        if (isAdmin) {
             router.push("/admin");
+        } else {
+            // If not admin, just close the dialog (user is now logged in)
+            onClose();
         }
 
         setLoading(false);
-        onClose();
+        // If we found they are admin, we pushed. 
+        // We can close the dialog now or let it close on navigation. 
+        // Closing it makes it feel snappier.
+        if (isAdmin) {
+            onClose();
+        }
     }
 
     return (
