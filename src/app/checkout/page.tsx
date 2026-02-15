@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle2, Loader2, MapPin, Truck } from "lucide-react";
 import { useForm } from "react-hook-form";
 import {
     Accordion,
@@ -18,6 +17,14 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { CheckCircle2, Loader2, MapPin, Truck, Clock } from "lucide-react";
 import { submitOrder } from "./actions";
 
 type CheckoutFormValues = {
@@ -29,6 +36,8 @@ type CheckoutFormValues = {
     apartment?: string;
     floor?: string;
     notes?: string;
+    deliveryDate: string;
+    deliveryTime: string;
 };
 
 export default function CheckoutPage() {
@@ -39,7 +48,11 @@ export default function CheckoutPage() {
     const [orderId, setOrderId] = useState<string | null>(null);
     const [isMounted, setIsMounted] = useState(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormValues>();
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm<CheckoutFormValues>({
+        defaultValues: {
+            deliveryTime: "16:00-20:00"
+        }
+    });
 
     useEffect(() => {
         setIsMounted(true);
@@ -59,6 +72,12 @@ export default function CheckoutPage() {
 
             const total = totalPriceEstimated();
 
+            // Calculate Delivery Slot
+            const [startHour, endHour] = values.deliveryTime.split("-").map(t => t.trim());
+            const deliveryStart = new Date(`${values.deliveryDate}T${startHour}:00`);
+            const deliveryEnd = new Date(`${values.deliveryDate}T${endHour}:00`);
+
+
             // 1. Prepare Data
             const orderPayload = {
                 user_id: user?.id || null,
@@ -66,8 +85,8 @@ export default function CheckoutPage() {
                 customer_phone: values.phone,
                 status: "pending",
                 total_price_estimated: total,
-                delivery_slot_start: new Date(Date.now() + 86400000).toISOString(),
-                delivery_slot_end: new Date(Date.now() + 86400000 + 7200000).toISOString(),
+                delivery_slot_start: deliveryStart.toISOString(),
+                delivery_slot_end: deliveryEnd.toISOString(),
                 shipping_address: {
                     city: values.city,
                     street: values.street,
@@ -280,10 +299,44 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
+                        <div className="flex items-center gap-3 mt-8 mb-4">
+                            <Clock className="w-5 h-5 text-slate-400" />
+                            <h3 className="text-lg font-bold text-slate-900">זמן משלוח מועדף</h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="deliveryDate" className="text-slate-700 font-bold">תאריך משלוח</Label>
+                                <Input
+                                    id="deliveryDate"
+                                    type="date"
+                                    min={new Date().toISOString().split("T")[0]}
+                                    className="bg-slate-50 border-slate-200 h-12 rounded-xl"
+                                    {...register("deliveryDate", { required: true })}
+                                />
+                                {errors.deliveryDate && <p className="text-red-500 text-sm font-medium">תאריך חובה</p>}
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="deliveryTime" className="text-slate-700 font-bold">חלון זמן</Label>
+                                <Select onValueChange={(value) => setValue("deliveryTime", value)} defaultValue="16:00-20:00">
+                                    <SelectTrigger className="bg-slate-50 border-slate-200 h-12 rounded-xl">
+                                        <SelectValue placeholder="בחר חלון זמן" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="08:00-12:00">08:00 - 12:00</SelectItem>
+                                        <SelectItem value="12:00-16:00">12:00 - 16:00</SelectItem>
+                                        <SelectItem value="16:00-20:00">16:00 - 20:00</SelectItem>
+                                        <SelectItem value="20:00-22:00">20:00 - 22:00</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <input type="hidden" {...register("deliveryTime", { required: true })} />
+                            </div>
+                        </div>
+
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full bg-slate-900 hover:bg-slate-800 text-white py-8 text-xl font-bold rounded-2xl shadow-lg shadow-slate-200 transition-all transform hover:scale-[1.01]"
+                            className="w-full bg-slate-900 hover:bg-slate-800 text-white py-8 text-xl font-bold rounded-2xl shadow-lg shadow-slate-200 transition-all transform hover:scale-[1.01] mt-8"
                         >
                             {isSubmitting ? (
                                 <>
