@@ -166,6 +166,19 @@ export function SiteHeader() {
                                         <span className="font-bold">דף הבית</span>
                                     </Link>
 
+                                    {hasSaleItems && (
+                                        <Link
+                                            href="/category/specials"
+                                            className="flex items-center gap-3 p-3 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all font-bold shadow-sm"
+                                        >
+                                            <span className="relative flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                            </span>
+                                            <span>מבצעים חמים</span>
+                                        </Link>
+                                    )}
+
                                     <div className="p-3">
                                         <h3 className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider">קטגוריות</h3>
                                         <div className="grid grid-cols-2 gap-2">
