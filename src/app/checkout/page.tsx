@@ -18,6 +18,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
+import { submitOrder } from "./actions";
 
 type CheckoutFormValues = {
     fullName: string;
@@ -58,36 +59,28 @@ export default function CheckoutPage() {
 
             const total = totalPriceEstimated();
 
-            // 1. Create Order
-            const { data: orderData, error: orderError } = await supabase
-                .from("orders")
-                .insert({
-                    user_id: user?.id || null,
-                    customer_name: values.fullName,
-                    customer_phone: values.phone,
-                    status: "pending",
-                    total_price_estimated: total,
-                    delivery_slot_start: new Date(Date.now() + 86400000).toISOString(),
-                    delivery_slot_end: new Date(Date.now() + 86400000 + 7200000).toISOString(),
-                    shipping_address: {
-                        city: values.city,
-                        street: values.street,
-                        house: values.houseNumber,
-                        apt: values.apartment,
-                        floor: values.floor,
-                        fullName: values.fullName,
-                        phone: values.phone,
-                        notes: values.notes
-                    }
-                })
-                .select()
-                .single();
+            // 1. Prepare Data
+            const orderPayload = {
+                user_id: user?.id || null,
+                customer_name: values.fullName,
+                customer_phone: values.phone,
+                status: "pending",
+                total_price_estimated: total,
+                delivery_slot_start: new Date(Date.now() + 86400000).toISOString(),
+                delivery_slot_end: new Date(Date.now() + 86400000 + 7200000).toISOString(),
+                shipping_address: {
+                    city: values.city,
+                    street: values.street,
+                    house: values.houseNumber,
+                    apt: values.apartment,
+                    floor: values.floor,
+                    fullName: values.fullName,
+                    phone: values.phone,
+                    notes: values.notes
+                }
+            };
 
-            if (orderError) throw orderError;
-
-            // 2. Create Order Items
-            const orderItems = items.map(item => ({
-                order_id: orderData.id,
+            const orderItemsPayload = items.map(item => ({
                 product_id: item.product.id,
                 quantity_ordered: item.quantity,
                 price_at_order: item.product.is_on_sale && item.product.sale_price
@@ -98,19 +91,20 @@ export default function CheckoutPage() {
                     : item.product.price)
             }));
 
-            const { error: itemsError } = await supabase
-                .from("order_items")
-                .insert(orderItems);
+            // 2. Submit via Server Action (Bypassing RLS)
+            const result = await submitOrder(orderPayload, orderItemsPayload);
 
-            if (itemsError) throw itemsError;
+            if (!result.success) {
+                throw new Error(result.error);
+            }
 
             // 3. Success
-            setOrderId(orderData.id);
+            setOrderId(result.orderId || null);
             setIsSuccess(true);
             clearCart();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Order error:", error);
-            alert("שגיאה בביצוע ההזמנה. נסה שנית.");
+            alert(`שגיאה בביצוע ההזמנה: ${error.message || "שגיאה לא ידועה"}`);
         } finally {
             setIsSubmitting(false);
         }
