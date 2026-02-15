@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, User, Store, LogOut, Shield } from "lucide-react";
+import { Menu as MenuIcon, User, Store, LogOut, Shield, ShoppingCart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useCart } from "@/store/useCart";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useRef } from "react";
 import { Category } from "@/types/supabase";
-import { GlobalSearch } from "@/components/GlobalSearch";
+import { FloatingSearch } from "@/components/FloatingSearch";
 import { LoginDialog } from "@/components/LoginDialog";
 import { useAuth } from "@/hooks/useAuth";
+import { Logo } from "@/components/ui/logo";
 
 export function SiteHeader() {
     const { user, isAdmin } = useAuth();
@@ -21,6 +24,10 @@ export function SiteHeader() {
     const [loginOpen, setLoginOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+
+    const { items } = useCart(); // Access cart items for length
+
+    const [hasSaleItems, setHasSaleItems] = useState(false);
 
     useEffect(() => {
         async function fetchData() {
@@ -44,6 +51,15 @@ export function SiteHeader() {
                 }, {} as any);
                 setSettings(settingsMap);
             }
+
+            // Check for sale items
+            const { count } = await supabase
+                .from("products")
+                .select("id", { count: 'exact', head: true })
+                .eq("is_active", true)
+                .eq("is_on_sale", true);
+
+            setHasSaleItems(!!count && count > 0);
         }
         fetchData();
     }, []);
@@ -61,178 +77,185 @@ export function SiteHeader() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 w-full">
-                {/* 1. Top Announcement Bar */}
-                <div className="bg-gradient-to-r from-green-700 via-green-600 to-emerald-600 text-white text-center py-2.5 text-sm font-medium tracking-wide shadow-sm">
-                    <div className="container flex items-center justify-center gap-2">
-                        <span className="animate-bounce inline-block">🚚</span>
-                        <span>{settings.top_bar_right || "משלוח חינם בקנייה מעל 300 ₪"}</span>
-                        <span className="mx-2 text-green-300">|</span>
-                        <span>{settings.top_bar_left || "הזמינו היום — קבלו מחר!"}</span>
-                        <span className="animate-pulse inline-block">✨</span>
-                    </div>
-                </div>
+            <header className="fixed top-0 left-0 right-0 z-50 w-full pointer-events-none h-24">
 
-                {/* 2. Main Header */}
-                <div className="bg-gradient-to-b from-green-900 via-green-800 to-green-900 border-b border-green-700/50 shadow-lg">
-                    <div className="container flex h-20 items-center justify-between gap-6">
-                        {/* Logo */}
-                        <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
+                {/* 1. Right Action: Cart (Floating Circle) - RTL: Right is Start */}
+                <div className="absolute top-4 right-4 pointer-events-auto z-50">
+                    <CartDrawer trigger={
+                        <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
+                        >
                             <div className="relative">
-                                <div className="bg-gradient-to-br from-yellow-400 via-yellow-300 to-amber-400 p-2.5 rounded-xl shadow-lg group-hover:shadow-yellow-400/30 transition-shadow duration-300">
-                                    <Store className="h-7 w-7 text-green-900" />
-                                </div>
-                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-green-900 animate-pulse" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-extrabold text-xl leading-none text-white tracking-tight">
-                                    {settings.site_name || "שוק בשכונה"}
-                                </span>
-                                <span className="text-[11px] text-green-300/80 font-medium mt-0.5">
-                                    {settings.site_slogan || "הכי טרי • הכי קרוב • הכי טעים"}
-                                </span>
-                            </div>
-                        </Link>
-
-                        {/* Search */}
-                        <div className="hidden md:block flex-1 max-w-xl mx-auto">
-                            <GlobalSearch />
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                            {/* Profile / Login */}
-                            <div className="relative" ref={menuRef}>
-                                {user ? (
-                                    <>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                            className="text-green-100 hover:text-white hover:bg-green-700/50 relative"
-                                        >
-                                            <User className="h-5 w-5" />
-                                            {isAdmin && (
-                                                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-yellow-400 rounded-full border-2 border-green-900" />
-                                            )}
-                                        </Button>
-
-                                        {/* User Dropdown */}
-                                        {userMenuOpen && (
-                                            <div className="absolute left-0 top-full mt-2 w-52 bg-white rounded-xl shadow-2xl border border-green-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                                                <div className="px-4 py-3 bg-green-50 border-b border-green-100">
-                                                    <p className="text-xs text-green-600 font-medium">מחובר</p>
-                                                    <p className="text-sm text-green-900 font-bold truncate">{user.email}</p>
-                                                </div>
-                                                {isAdmin && (
-                                                    <Link
-                                                        href="/admin"
-                                                        className="flex items-center gap-2 px-4 py-3 text-sm text-green-700 hover:bg-green-50 transition-colors font-medium"
-                                                        onClick={() => setUserMenuOpen(false)}
-                                                    >
-                                                        <Shield className="h-4 w-4" />
-                                                        פאנל ניהול
-                                                    </Link>
-                                                )}
-                                                <button
-                                                    onClick={async () => {
-                                                        await supabase.auth.signOut();
-                                                        window.location.href = '/'; // Force hard reload to clear memory
-                                                    }}
-                                                    className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
-                                                >
-                                                    <LogOut className="h-4 w-4" />
-                                                    התנתק
-                                                </button>
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-green-100 hover:text-white hover:bg-green-700/50"
-                                        onClick={() => setLoginOpen(true)}
-                                    >
-                                        <User className="h-5 w-5" />
-                                    </Button>
+                                <ShoppingCart className="h-5 w-5" />
+                                {items.length > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                                        {items.length}
+                                    </span>
                                 )}
                             </div>
-
-                            <CartDrawer />
-
-                            {/* Mobile Menu */}
-                            <Sheet>
-                                <SheetTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="lg:hidden text-green-100 hover:text-white hover:bg-green-700/50">
-                                        <Menu className="h-6 w-6" />
-                                    </Button>
-                                </SheetTrigger>
-                                <SheetContent side="right" className="w-[300px] bg-green-900 border-green-800">
-                                    <nav className="flex flex-col gap-1 mt-8">
-                                        <Link href="/" className="font-bold text-lg text-white px-4 py-3 rounded-lg hover:bg-green-800 transition-colors">
-                                            דף הבית
-                                        </Link>
-                                        {categories.map(cat => (
-                                            <Link
-                                                key={cat.id}
-                                                href={`/category/${cat.id}`}
-                                                className="text-lg text-green-100 px-4 py-3 rounded-lg hover:bg-green-800 hover:text-white transition-colors"
-                                            >
-                                                {cat.name}
-                                            </Link>
-                                        ))}
-                                        <Link href="/about" className="text-lg text-green-100 px-4 py-3 rounded-lg hover:bg-green-800 hover:text-white transition-colors">
-                                            אודות
-                                        </Link>
-                                    </nav>
-                                </SheetContent>
-                            </Sheet>
-                        </div>
-                    </div>
+                        </Button>
+                    } />
                 </div>
 
-                {/* 3. Category Navigation Bar */}
-                <div className="hidden lg:block bg-gradient-to-b from-green-800/95 to-green-900/90 backdrop-blur-md border-b border-green-700/30">
-                    <div className="container">
-                        <nav className="flex items-center justify-center gap-0.5">
-                            <Link
-                                href="/"
-                                className="px-5 py-3.5 text-sm font-medium text-green-100 hover:text-white transition-all border-b-2 border-transparent hover:border-yellow-400 hover:bg-green-700/30 rounded-t-lg"
-                            >
-                                🏠 דף הבית
-                            </Link>
-                            {categories.map((cat) => (
-                                <Link
-                                    key={cat.id}
-                                    href={`/category/${cat.id}`}
-                                    className={`
-                                        px-5 py-3.5 text-sm font-medium transition-all border-b-2 border-transparent hover:border-yellow-400 hover:bg-green-700/30 rounded-t-lg
-                                        ${cat.id === 'specials'
-                                            ? 'text-yellow-300 hover:text-yellow-200 font-bold'
-                                            : 'text-green-100 hover:text-white'
-                                        }
-                                    `}
+                {/* 2. Left Action: Menu (Floating Circle) - RTL: Left is End */}
+                <div className="absolute top-4 left-4 pointer-events-auto z-50 flex gap-2">
+                    {/* User Menu Trigger - HIDDEN ON MOBILE */}
+                    <div className="relative hidden md:block" ref={menuRef}>
+                        <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
+                            onClick={() => user ? setUserMenuOpen(!userMenuOpen) : setLoginOpen(true)}
+                        >
+                            <User className="h-5 w-5" />
+                        </Button>
+
+                        {/* User Dropdown */}
+                        {userMenuOpen && user && (
+                            <div className="absolute left-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-secondary overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 pointer-events-auto">
+                                <div className="px-4 py-3 bg-secondary/30 border-b border-secondary">
+                                    <p className="text-xs text-muted-foreground font-medium">מחובר</p>
+                                    <p className="text-sm font-bold truncate">{user.email}</p>
+                                </div>
+                                {isAdmin && (
+                                    <Link
+                                        href="/admin"
+                                        className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-secondary/50 transition-colors font-medium"
+                                        onClick={() => setUserMenuOpen(false)}
+                                    >
+                                        <Shield className="h-4 w-4" />
+                                        פאנל ניהול
+                                    </Link>
+                                )}
+                                <button
+                                    onClick={async () => {
+                                        await supabase.auth.signOut();
+                                        window.location.reload();
+                                    }}
+                                    className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                                 >
-                                    {cat.name}
-                                </Link>
-                            ))}
-                            <Link
-                                href="/category/sale"
-                                className="px-5 py-3.5 text-sm font-medium text-yellow-300 hover:text-yellow-200 font-bold transition-all border-b-2 border-transparent hover:border-yellow-400 hover:bg-green-700/30 rounded-t-lg"
-                            >
-                                🔥 מבצעים
-                            </Link>
-
-                            <Link
-                                href="/about"
-                                className="px-5 py-3.5 text-sm font-medium text-green-100 hover:text-white transition-all border-b-2 border-transparent hover:border-yellow-400 hover:bg-green-700/30 rounded-t-lg"
-                            >
-                                אודות
-                            </Link>
-                        </nav>
+                                    <LogOut className="h-4 w-4" />
+                                    התנתק
+                                </button>
+                            </div>
+                        )}
                     </div>
+
+                    {/* Hamburger Menu Trigger */}
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button
+                                size="icon"
+                                variant="secondary"
+                                className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
+                            >
+                                <MenuIcon className="h-5 w-5" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right" className="w-[85vw] sm:w-[380px] overflow-y-auto pt-10">
+                            <div className="flex flex-col gap-6 font-medium">
+                                <div className="flex items-center justify-center mb-6">
+                                    <Logo src={settings.site_logo} />
+                                </div>
+
+                                <nav className="flex flex-col gap-2">
+                                    <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                                        <span className="text-lg">🏠</span>
+                                        <span className="font-bold">דף הבית</span>
+                                    </Link>
+
+                                    <div className="p-3">
+                                        <h3 className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider">קטגוריות</h3>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {categories.map((cat) => (
+                                                <Link
+                                                    key={cat.id}
+                                                    href={`/category/${cat.id}`}
+                                                    className={cn(
+                                                        "p-2 rounded-lg text-sm bg-slate-50 border border-slate-100 hover:border-slate-300 transition-all text-center",
+                                                        cat.id === 'specials' && "bg-red-50 text-red-600 border-red-100"
+                                                    )}
+                                                >
+                                                    {cat.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <Link href="/about" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                                        <span className="text-lg">ℹ️</span>
+                                        <span className="font-bold">אודות</span>
+                                    </Link>
+                                </nav>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
                 </div>
+
+                {/* 3. CENTER: The "Floating Drop" (Interactive) */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-auto z-[60]">
+                    <FloatingSearch logoSrc={settings.site_logo} />
+                </div>
+
+                {/* 4. Desktop Navigation (Centered below search) - Desktop Only */}
+                <nav className="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-auto z-40 hidden md:flex items-center gap-1 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full shadow-sm border border-white/20">
+
+                    <Link
+                        href="/"
+                        className="px-3 py-1 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all"
+                    >
+                        דף הבית
+                    </Link>
+                    <div className="w-[1px] h-3 bg-slate-300 mx-1" />
+                    {categories.slice(0, 5).map((cat) => (
+                        <Link
+                            key={cat.id}
+                            href={`/category/${cat.id}`}
+                            className={cn(
+                                "px-3 py-1 text-sm font-medium hover:bg-slate-100 rounded-full transition-all whitespace-nowrap",
+                                cat.id === 'specials' ? "text-red-600 hover:bg-red-50 hover:text-red-700" : "text-slate-600 hover:text-green-700 hover:bg-green-50"
+                            )}
+                        >
+                            {cat.name}
+                        </Link>
+                    ))}
+                    {categories.length > 5 && (
+                        <Link
+                            href="/categories"
+                            className="px-3 py-1 text-sm font-medium text-slate-500 hover:text-green-700 hover:bg-green-50 rounded-full transition-all"
+                        >
+                            עוד...
+                        </Link>
+                    )}
+
+                    {/* Sales Tab - Moved to end of categories */}
+                    {hasSaleItems && (
+                        <>
+                            <div className="w-[1px] h-3 bg-slate-300 mx-1" />
+                            <Link
+                                href="/category/specials"
+                                className="px-3 py-1 text-sm font-bold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full transition-all flex items-center gap-1"
+                            >
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                </span>
+                                מבצעים
+                            </Link>
+                        </>
+                    )}
+
+                    <div className="w-[1px] h-3 bg-slate-300 mx-1" />
+                    <Link
+                        href="/about"
+                        className="px-3 py-1 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all"
+                    >
+                        אודות
+                    </Link>
+                </nav>
+
             </header>
 
             {/* Login Dialog */}

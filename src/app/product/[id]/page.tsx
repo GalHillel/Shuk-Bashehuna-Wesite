@@ -3,14 +3,6 @@ import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/Footer";
 import { createClient } from "@/lib/supabase/client";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/supabase";
 import { ProductCard } from "@/components/ProductCard";
@@ -79,27 +71,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <SiteHeader />
             <main className="flex-1 container py-8">
                 <div className="flex flex-col gap-6">
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem>
-                                <BreadcrumbLink href="/">דף הבית</BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            {product.category_id && (
-                                <>
-                                    <BreadcrumbItem>
-                                        <BreadcrumbLink href={`/category/${product.category_id}`}>
-                                            בחזרה לקטגוריה
-                                        </BreadcrumbLink>
-                                    </BreadcrumbItem>
-                                    <BreadcrumbSeparator />
-                                </>
-                            )}
-                            <BreadcrumbItem>
-                                <BreadcrumbPage>{product.name}</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
                         {/* Image Gallery (Single Image for now) */}

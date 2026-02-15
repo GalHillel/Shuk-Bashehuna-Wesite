@@ -70,7 +70,7 @@ export function ProductCarousel({ title, data }: ProductCarouselProps) {
 
             <div
                 ref={scrollContainerRef}
-                className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide snap-x -mx-4 px-4 scroll-p-4"
+                className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide snap-x -mx-4 px-4 scroll-p-4 w-[100vw] sm:w-auto"
             >
                 {products.map((product) => (
                     <div key={product.id} className="min-w-[260px] md:min-w-[280px] snap-start">

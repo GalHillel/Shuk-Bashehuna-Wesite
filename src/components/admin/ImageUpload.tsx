@@ -5,11 +5,14 @@ import { createClient } from "@/lib/supabase/client";
 import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 import Image from "next/image";
 
+import { ImageCropper } from "./ImageCropper";
+
 interface ImageUploadProps {
     value: string;
     onChange: (url: string) => void;
     bucket?: string;
     folder?: string;
+    cropAspect?: number;
 }
 
 export function ImageUpload({
@@ -17,6 +20,7 @@ export function ImageUpload({
     onChange,
     bucket = "product-images",
     folder = "uploads",
+    cropAspect,
 }: ImageUploadProps) {
     const [uploading, setUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
@@ -24,8 +28,11 @@ export function ImageUpload({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const supabase = createClient();
 
+    const [cropperOpen, setCropperOpen] = useState(false);
+    const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+
     const uploadFile = useCallback(
-        async (file: File) => {
+        async (file: File | Blob) => {
             setError("");
             setUploading(true);
 
@@ -36,15 +43,15 @@ export function ImageUpload({
                 return;
             }
 
-            // Validate file type
-            if (!file.type.startsWith("image/")) {
+            // Validate file type (only if it's a File object, Blobs might vary)
+            if (file instanceof File && !file.type.startsWith("image/")) {
                 setError("ניתן להעלות תמונות בלבד");
                 setUploading(false);
                 return;
             }
 
             // Generate unique filename
-            const ext = file.name.split(".").pop() || "jpg";
+            const ext = file instanceof File ? (file.name.split(".").pop() || "jpg") : "png";
             const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
 
             const { error: uploadError } = await supabase.storage
@@ -52,6 +59,7 @@ export function ImageUpload({
                 .upload(fileName, file, {
                     cacheControl: "3600",
                     upsert: false,
+                    contentType: file.type || 'image/png'
                 });
 
             if (uploadError) {
@@ -64,20 +72,40 @@ export function ImageUpload({
             const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
             onChange(data.publicUrl);
             setUploading(false);
+            setCropperOpen(false);
+            setImageToCrop(null);
         },
         [supabase, bucket, folder, onChange]
     );
+
+    function handleFileSelect(file: File) {
+        if (cropAspect) {
+            // Read file as data URL for cropper
+            const reader = new FileReader();
+            reader.addEventListener("load", () => {
+                setImageToCrop(reader.result?.toString() || null);
+                setCropperOpen(true);
+            });
+            reader.readAsDataURL(file);
+        } else {
+            uploadFile(file);
+        }
+    }
 
     function handleDrop(e: React.DragEvent) {
         e.preventDefault();
         setDragOver(false);
         const file = e.dataTransfer.files[0];
-        if (file) uploadFile(file);
+        if (file) handleFileSelect(file);
     }
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
-        if (file) uploadFile(file);
+        if (file) {
+            handleFileSelect(file);
+            // Reset input so same file can be selected again if needed
+            e.target.value = "";
+        }
     }
 
     function removeImage() {
@@ -169,6 +197,15 @@ export function ImageUpload({
                 accept="image/*"
                 onChange={handleFileChange}
                 className="hidden"
+            />
+
+            {/* Cropper Modal */}
+            <ImageCropper
+                open={cropperOpen}
+                onClose={() => setCropperOpen(false)}
+                imageSrc={imageToCrop}
+                aspect={cropAspect}
+                onCropComplete={(blob) => uploadFile(blob)}
             />
         </div>
     );

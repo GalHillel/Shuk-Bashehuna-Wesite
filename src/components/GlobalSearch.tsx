@@ -78,7 +78,7 @@ export function GlobalSearch() {
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => query.length >= 2 && setIsOpen(true)}
                     className="w-full bg-secondary/30 border border-transparent focus:border-primary rounded-full py-2.5 pr-12 pl-10 outline-none transition-all placeholder:text-muted-foreground"
-                    placeholder="מה בא לכם לבשל היום? (עגבניות, לחם, חלב...)"
+                    placeholder="מה בא לך לחפש?"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
                     {isLoading ? (

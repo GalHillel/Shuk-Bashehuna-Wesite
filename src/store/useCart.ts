@@ -17,7 +17,7 @@ interface CartState {
     clearCart: () => void;
 
     // Computed (helper)
-    totalItems: () => number;
+    itemsCount: () => number;
     totalPriceEstimated: () => number;
 }
 
@@ -69,8 +69,8 @@ export const useCart = create<CartState>()(
 
             clearCart: () => set({ items: [] }),
 
-            totalItems: () => {
-                return get().items.length;
+            itemsCount: () => {
+                return get().items.reduce((acc, item) => acc + item.quantity, 0);
             },
 
             totalPriceEstimated: () => {

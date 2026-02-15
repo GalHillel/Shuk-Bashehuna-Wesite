@@ -42,14 +42,6 @@ export default async function AdminLayout({
         }
     }
 
-    console.log("Admin Layout Debug:", {
-        email: user.email,
-        id: user.id,
-        isAdminDb: profile?.is_admin,
-        isAdminEnv: user.email?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase(),
-        finalDecision: isAdmin
-    });
-
     // 5. Gatekeeper: Not Admin -> Home
     if (!isAdmin) {
         redirect("/");

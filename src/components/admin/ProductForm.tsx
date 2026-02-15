@@ -26,6 +26,7 @@ import { useState, useEffect } from "react";
 import { Category, Product } from "@/types/supabase";
 import { Loader2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 interface ProductFormProps {
     product?: Product;
@@ -113,6 +114,11 @@ export function ProductForm({ product }: ProductFormProps) {
         let result;
 
         if (isEditing) {
+            // Check if image changed
+            if (product.image_url && values.image_url !== product.image_url) {
+                await deleteImageFromStorage(product.image_url);
+            }
+
             result = await supabase
                 .from("products")
                 .update(productData)

@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="he" dir="rtl">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-background font-sans antialiased w-full max-w-[100vw] overflow-x-hidden pt-36",
           rubik.variable
         )}
       >

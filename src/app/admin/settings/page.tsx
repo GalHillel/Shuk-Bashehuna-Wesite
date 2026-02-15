@@ -124,22 +124,37 @@ export default function SettingsPage() {
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold">שם האתר</label>
-                                    <Input
-                                        placeholder="שוק בשכונה"
-                                        value={settings.site_name || ""}
-                                        onChange={(e) => handleChange("site_name", e.target.value)}
-                                        className="h-11"
-                                    />
+                                    <label className="text-sm font-bold">לוגו האתר (משמאל לימין)</label>
+                                    <div className="max-w-[200px]">
+                                        <ImageUpload
+                                            value={settings.site_logo || ""}
+                                            onChange={(url) => handleChange("site_logo", url)}
+                                            bucket="banners"
+                                            folder="branding"
+                                            cropAspect={1} // Force square crop for round logo
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">מומלץ: PNG שקוף או SVG. גודל מומלץ: 120x40 פיקסלים.</p>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold">סלוגן (מתחת לשם)</label>
-                                    <Input
-                                        placeholder="הכי טרי • הכי קרוב • הכי טעים"
-                                        value={settings.site_slogan || ""}
-                                        onChange={(e) => handleChange("site_slogan", e.target.value)}
-                                        className="h-11"
-                                    />
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">שם האתר</label>
+                                        <Input
+                                            placeholder="שוק בשכונה"
+                                            value={settings.site_name || ""}
+                                            onChange={(e) => handleChange("site_name", e.target.value)}
+                                            className="h-11"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">סלוגן (מתחת לשם)</label>
+                                        <Input
+                                            placeholder="הכי טרי • הכי קרוב • הכי טעים"
+                                            value={settings.site_slogan || ""}
+                                            onChange={(e) => handleChange("site_slogan", e.target.value)}
+                                            className="h-11"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>

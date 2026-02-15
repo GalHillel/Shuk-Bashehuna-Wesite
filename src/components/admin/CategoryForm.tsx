@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 import { Category } from "@/types/supabase";
 
@@ -70,6 +71,11 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
         let result;
 
         if (isEditing) {
+            // Check if image changed
+            if (defaultValues.image_url && values.image_url !== defaultValues.image_url) {
+                await deleteImageFromStorage(defaultValues.image_url);
+            }
+
             result = await supabase
                 .from("categories")
                 .update(payload)

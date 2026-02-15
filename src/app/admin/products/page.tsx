@@ -25,6 +25,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -67,9 +68,14 @@ export default function AdminProductsPage() {
         return () => clearTimeout(timer);
     }, [fetchProducts]);
 
-    async function deleteProduct(id: string) {
+    async function deleteProduct(product: Product) {
         if (!confirm("האם אתה בטוח שברצונך למחוק מוצר זה?")) return;
-        await supabase.from("products").delete().eq("id", id);
+
+        if (product.image_url) {
+            await deleteImageFromStorage(product.image_url);
+        }
+
+        await supabase.from("products").delete().eq("id", product.id);
         fetchProducts();
     }
 
@@ -131,13 +137,13 @@ export default function AdminProductsPage() {
                             products.map((product) => (
                                 <TableRow key={product.id}>
                                     <TableCell>
-                                        <div className="relative w-10 h-10 rounded-md overflow-hidden bg-slate-100">
+                                        <Link href={`/admin/products/${product.id}`} className="block relative w-10 h-10 rounded-md overflow-hidden bg-slate-100 hover:ring-2 hover:ring-green-500 transition-all cursor-pointer">
                                             {product.image_url ? (
                                                 <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">אין</div>
                                             )}
-                                        </div>
+                                        </Link>
                                     </TableCell>
                                     <TableCell className="font-medium">
                                         {product.name}
@@ -169,7 +175,7 @@ export default function AdminProductsPage() {
                                                 <Edit className="h-4 w-4" />
                                             </Link>
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => deleteProduct(product.id)}>
+                                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => deleteProduct(product)}>
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </TableCell>

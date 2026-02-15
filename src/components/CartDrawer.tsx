@@ -21,25 +21,33 @@ const UNIT_LABELS: Record<string, string> = {
     pack: "מארז",
 };
 
-export function CartDrawer() {
+interface CartDrawerProps {
+    trigger?: React.ReactNode;
+}
+
+export function CartDrawer({ trigger }: CartDrawerProps) {
     const { items, removeItem, updateQuantity, totalPriceEstimated } = useCart();
     const total = totalPriceEstimated();
 
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {items.length > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                            {items.length}
-                        </span>
-                    )}
-                </Button>
+                {trigger ? (
+                    trigger
+                ) : (
+                    <Button variant="ghost" size="icon" className="relative">
+                        <ShoppingCart className="h-5 w-5" />
+                        {items.length > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                {items.length}
+                            </span>
+                        )}
+                    </Button>
+                )}
             </SheetTrigger>
             <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
                 <SheetHeader>
-                    <SheetTitle className="text-xl flex items-center gap-2">
+                    <SheetTitle className="text-xl flex items-center justify-center gap-2">
                         <ShoppingBag className="h-5 w-5 text-primary" />
                         סל הקניות שלך
                     </SheetTitle>

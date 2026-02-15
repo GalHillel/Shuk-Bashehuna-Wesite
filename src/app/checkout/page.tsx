@@ -12,6 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle2, Loader2, MapPin, Truck } from "lucide-react";
 import { useForm } from "react-hook-form";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type CheckoutFormValues = {
     fullName: string;
@@ -30,14 +36,19 @@ export default function CheckoutPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [orderId, setOrderId] = useState<string | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormValues>();
 
     useEffect(() => {
-        if (items.length === 0 && !isSuccess) {
+        setIsMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (isMounted && items.length === 0 && !isSuccess) {
             router.push("/");
         }
-    }, [items, isSuccess, router]);
+    }, [items, isSuccess, router, isMounted]);
 
     const onSubmit = async (values: CheckoutFormValues) => {
         setIsSubmitting(true);
@@ -144,12 +155,58 @@ export default function CheckoutPage() {
                     {/* Form Section */}
                     <form id="checkout-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                         {/* Summary for Mobile */}
-                        <div className="lg:hidden bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-200 mb-8">
-                            <h2 className="font-bold text-slate-900 mb-2">סיכום ביניים</h2>
-                            <div className="flex justify-between items-center text-xl">
-                                <span className="font-black text-slate-900">₪{totalPriceEstimated().toFixed(2)}</span>
-                                <span className="text-slate-500 text-sm">סה״כ לתשלום (משוער)</span>
-                            </div>
+                        {/* Summary for Mobile */}
+                        <div className="lg:hidden bg-slate-50 rounded-2xl border border-dashed border-slate-200 mb-8 overflow-hidden">
+                            <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="item-1" className="border-b-0">
+                                    <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                                        <div className="flex flex-1 justify-between items-center text-xl w-full">
+                                            <div className="flex flex-col items-start gap-1">
+                                                <span className="font-bold text-slate-900 text-base">סיכום ביניים</span>
+                                                <span className="text-slate-500 text-xs font-normal">לחץ לפירוט</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-xl">
+                                                <span className="font-black text-slate-900">
+                                                    {isMounted ? `₪${totalPriceEstimated().toFixed(2)}` : "..."}
+                                                </span>
+                                                <span className="text-slate-500 text-sm">סה״כ לתשלום (משוער)</span>
+                                            </div>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6 bg-white/50">
+                                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                                            {items.map((item) => (
+                                                <div key={item.product.id} className="flex justify-between items-start text-sm">
+                                                    <div className="flex gap-3">
+                                                        <div className="font-bold text-slate-500 min-w-[24px]">
+                                                            {item.quantity}x
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium text-slate-900">{item.product.name}</p>
+                                                            <p className="text-xs text-slate-400">
+                                                                ₪{(item.product.is_on_sale && item.product.sale_price
+                                                                    ? item.product.sale_price
+                                                                    : item.product.price
+                                                                ).toFixed(2)} ליחידה
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <span className="font-bold text-slate-900">
+                                                        ₪{(item.quantity * (item.product.is_on_sale && item.product.sale_price
+                                                            ? item.product.sale_price
+                                                            : item.product.price
+                                                        )).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                            <div className="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-sm font-medium text-slate-500">
+                                                <span>משלוח</span>
+                                                <span className="text-green-600">חינם</span>
+                                            </div>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
                         </div>
 
                         <div className="space-y-6">
@@ -281,7 +338,7 @@ export default function CheckoutPage() {
                         <div className="space-y-3">
                             <div className="flex justify-between text-slate-600">
                                 <span>סה״כ מוצרים</span>
-                                <span className="font-mono">₪{totalPriceEstimated().toFixed(2)}</span>
+                                <span className="font-mono">{isMounted ? `₪${totalPriceEstimated().toFixed(2)}` : "..."}</span>
                             </div>
                             <div className="flex justify-between text-slate-600">
                                 <span>משלוח</span>
@@ -290,7 +347,9 @@ export default function CheckoutPage() {
                             <Separator className="bg-slate-200" />
                             <div className="flex justify-between items-center pt-2">
                                 <span className="text-xl font-black text-slate-900">סה״כ לתשלום</span>
-                                <span className="text-3xl font-black text-slate-900 tracking-tighter">₪{totalPriceEstimated().toFixed(2)}</span>
+                                <span className="text-3xl font-black text-slate-900 tracking-tighter">
+                                    {isMounted ? `₪${totalPriceEstimated().toFixed(2)}` : "..."}
+                                </span>
                             </div>
                             <p className="text-xs text-slate-400 mt-4 leading-relaxed">* המחיר הסופי עשוי להשתנות בהתאם למשקל המדויק של המוצרים השקילים (לפי גרם). התשלום יתבצע מול השליח בעת האספקה.</p>
                         </div>

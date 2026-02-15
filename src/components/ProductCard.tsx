@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ShoppingCart, Plus, Minus } from "lucide-react"
+import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,132 +13,122 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/store/useCart"
 import { Product } from "@/types/supabase"
-import { useState } from "react"
 
 interface ProductCardProps {
     product: Product
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-    const { addItem } = useCart()
-    const [quantity, setQuantity] = useState(1)
-    const [customWeight, setCustomWeight] = useState("")
+    const { items, addItem, removeItem, updateQuantity } = useCart()
 
-    const handleAddToCart = () => {
-        const finalQuantity =
-            product.unit_type === "kg" && customWeight ? parseFloat(customWeight) : quantity
+    // Check if item is in cart and get its quantity
+    const cartItem = items.find(item => item.product.id === product.id)
+    const quantity = cartItem ? cartItem.quantity : 0
 
-        if (finalQuantity <= 0) return
-
-        addItem(product, finalQuantity)
-        setQuantity(product.unit_type === "kg" ? 1 : 1) // Reset
-        setCustomWeight("")
+    const handleIncrement = (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        addItem(product, 1) // Add 1 unit/kg
     }
 
-    const increment = () => setQuantity((prev) => prev + 1)
-    const decrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
+    const handleDecrement = (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (quantity > 1) {
+            updateQuantity(product.id, quantity - 1)
+        } else {
+            removeItem(product.id)
+        }
+    }
+
+    const imageSrc = (product.image_url && product.image_url.trim().length > 0)
+        ? product.image_url
+        : "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=80&w=800";
 
     return (
-        <Card className="overflow-hidden h-full flex flex-col group hover:shadow-lg transition-shadow duration-300 border-none shadow-sm bg-card">
-            <div className="relative aspect-square overflow-hidden bg-secondary/10">
+        <Card className="group h-full flex flex-col overflow-hidden border-none shadow-sm hover:shadow-md transition-all duration-300 bg-white rounded-3xl">
+            {/* Image Container - Square Aspect Ratio */}
+            <div className="relative aspect-square w-full overflow-hidden bg-secondary/20">
                 <Link href={`/product/${product.id}`} className="block w-full h-full">
                     <Image
-                        src={product.image_url || "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=80&w=800"}
+                        src={imageSrc}
                         alt={product.name}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
                     />
                 </Link>
+
                 {/* Badges */}
-                <div className="absolute top-2 right-2 flex flex-col gap-2">
+                <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
                     {product.is_on_sale && (
-                        <Badge variant="destructive" className="font-bold">מבצע</Badge>
+                        <Badge variant="destructive" className="font-bold shadow-sm px-2.5 py-1 text-xs">מבצע</Badge>
                     )}
-                    {/* Example of 'New' badge logic if we had a field for it */}
-                    {/* <Badge className="bg-primary text-primary-foreground">חדש</Badge> */}
                 </div>
+
+                {/* Floating Add Button (Visible when quantity is 0) */}
+                {quantity === 0 && (
+                    <Button
+                        size="icon"
+                        className="absolute bottom-3 right-3 h-10 w-10 rounded-full shadow-lg bg-white hover:bg-white text-primary hover:scale-110 transition-all duration-300 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 translate-y-0 md:translate-y-2 md:group-hover:translate-y-0"
+                        onClick={handleIncrement}
+                    >
+                        <Plus className="h-5 w-5 stroke-[3]" />
+                    </Button>
+                )}
             </div>
 
-            <CardContent className="flex-1 p-4 flex flex-col gap-2">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h3 className="font-bold text-lg leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+            {/* Content Content */}
+            <CardContent className="flex-1 p-3.5 flex flex-col gap-1.5">
+                <div className="flex-1">
+                    <Link href={`/product/${product.id}`} className="block">
+                        <h3 className="font-bold text-base leading-tight text-foreground line-clamp-2 min-h-[2.5rem]" title={product.name}>
                             {product.name}
                         </h3>
-                        <p className="text-sm text-muted-foreground">
-                            {product.unit_type === 'kg' ? 'מחיר לק"ג' : 'מחיר ליחידה'}
-                        </p>
-                    </div>
-                    <div className="text-left">
-                        {product.is_on_sale && product.sale_price ? (
-                            <div className="flex flex-col items-end">
-                                <span className="font-bold text-xl text-red-600">₪{product.sale_price.toFixed(2)}</span>
-                                <span className="text-sm text-muted-foreground line-through decoration-red-500/50">₪{product.price.toFixed(2)}</span>
-                            </div>
-                        ) : (
-                            <span className="font-bold text-xl text-primary">₪{product.price.toFixed(2)}</span>
-                        )}
-                    </div>
+                    </Link>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        {product.unit_type === 'kg' ? 'מחיר לק"ג' : 'מחיר ליחידה'}
+                    </p>
+                </div>
+
+                <div className="flex items-baseline gap-2 mt-1">
+                    {product.is_on_sale && product.sale_price ? (
+                        <>
+                            <span className="font-bold text-lg text-red-600">₪{product.sale_price.toFixed(2)}</span>
+                            <span className="text-sm text-muted-foreground line-through decoration-red-500/50">₪{product.price.toFixed(2)}</span>
+                        </>
+                    ) : (
+                        <span className="font-bold text-lg text-primary">₪{product.price.toFixed(2)}</span>
+                    )}
                 </div>
             </CardContent>
 
-            <CardFooter className="p-4 pt-0">
-                {/* Simple Add to Cart logic for the card redesign - keeping it efficient */}
-                <div className="w-full flex items-center justify-between gap-2">
-
-                    {product.unit_type === 'kg' ? (
-                        // Kg Logic: Simple Input or Buttons? Let's use standard quantity for now to keep UI clean 
-                        // but allow a dialog or expanded view for exact weight in future.
-                        // For now, defaulting to 1kg increments or 0.5kg toggles is common.
-                        <div className="flex items-center border rounded-md overflow-hidden bg-background shadow-sm w-full">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-none hover:bg-secondary"
-                                onClick={decrement}
-                                disabled={quantity <= 1}
-                            >
-                                <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="flex-1 text-center text-sm font-medium">{quantity} ק&quot;ג</span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-none hover:bg-secondary"
-                                onClick={increment}
-                            >
-                                <Plus className="h-3 w-3" />
-                            </Button>
-                        </div>
-                    ) : (
-                        // Unit Logic
-                        <div className="flex items-center border rounded-md overflow-hidden bg-background shadow-sm w-full">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-none hover:bg-secondary"
-                                onClick={decrement}
-                                disabled={quantity <= 1}
-                            >
-                                <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="flex-1 text-center text-sm font-medium">{quantity} יח&apos;</span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-9 w-9 rounded-none hover:bg-secondary"
-                                onClick={increment}
-                            >
-                                <Plus className="h-3 w-3" />
-                            </Button>
-                        </div>
-                    )}
-
-                    <Button size="icon" className="h-9 w-9 shrink-0 shadow-sm" onClick={handleAddToCart}>
-                        <ShoppingCart className="h-4 w-4" />
-                    </Button>
-                </div>
-            </CardFooter>
+            {/* Footer / Controls */}
+            {quantity > 0 && (
+                <CardFooter className="p-3.5 pt-0 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                    <div className="flex items-center justify-between w-full bg-secondary/50 rounded-full p-1 h-10">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full hover:bg-white shadow-sm text-destructive hover:text-destructive"
+                            onClick={handleDecrement}
+                        >
+                            {quantity === 1 ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
+                        </Button>
+                        <span className="font-bold text-sm w-8 text-center tabular-nums">
+                            {quantity}{product.unit_type === 'kg' ? 'ק"ג' : ''}
+                        </span>
+                        <Button
+                            variant="default" // Primary color
+                            size="icon"
+                            className="h-8 w-8 rounded-full hover:scale-105 transition-transform shadow-sm"
+                            onClick={handleIncrement}
+                        >
+                            <Plus className="h-4 w-4 text-white" />
+                        </Button>
+                    </div>
+                </CardFooter>
+            )}
         </Card>
     )
 }

@@ -16,6 +16,7 @@ import Link from "next/link";
 import { Plus, Trash2, Eye, EyeOff, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import { deleteImageFromStorage } from "@/lib/storage-utils";
 
 export default function AdminCategoriesPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -43,9 +44,14 @@ export default function AdminCategoriesPage() {
         fetchCategories();
     }
 
-    async function deleteCategory(id: string) {
+    async function deleteCategory(category: Category) {
         if (!confirm("האם אתה בטוח שברצונך למחוק קטגוריה זו? כל המוצרים שמשויכים אליה ישארו ללא קטגוריה.")) return;
-        await supabase.from("categories").delete().eq("id", id);
+
+        if (category.image_url) {
+            await deleteImageFromStorage(category.image_url);
+        }
+
+        await supabase.from("categories").delete().eq("id", category.id);
         fetchCategories();
     }
 
@@ -122,7 +128,7 @@ export default function AdminCategoriesPage() {
                                                 variant="ghost"
                                                 size="icon"
                                                 className="text-red-500 hover:text-red-700"
-                                                onClick={() => deleteCategory(category.id)}
+                                                onClick={() => deleteCategory(category)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
