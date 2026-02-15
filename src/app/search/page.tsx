@@ -49,7 +49,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 <div className="flex flex-col gap-6">
 
                     <div className="flex flex-col gap-2 items-center">
-                        <h1 className="text-3xl font-bold tracking-tight text-center">תוצאות חיפוש: "{query}"</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-center">תוצאות חיפוש: &quot;{query}&quot;</h1>
                         <p className="text-muted-foreground text-center">
                             נמצאו {products.length} מוצרים
                         </p>
