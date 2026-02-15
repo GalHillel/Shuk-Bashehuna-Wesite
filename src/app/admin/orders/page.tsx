@@ -28,7 +28,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
-import { ShoppingBag, Eye, RefreshCw, CheckCircle } from "lucide-react";
+import { ShoppingBag, Eye, RefreshCw, CheckCircle, Trash2 } from "lucide-react";
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState<any[]>([]);
@@ -62,6 +62,26 @@ export default function AdminOrdersPage() {
         const { error } = await supabase.from("orders").update({ status: "completed" }).eq("id", orderId);
         if (error) {
             alert("שגיאה בעדכון ההזמנה");
+        } else {
+            fetchOrders();
+        }
+    };
+
+    const handleDeleteOrder = async (orderId: string) => {
+        if (!confirm("פעולה זו תמחק את ההזמנה לצמיתות! האם להמשיך?")) return;
+
+        // 1. Delete associated order items first (to be safe if no cascade)
+        const { error: itemsError } = await supabase.from("order_items").delete().eq("order_id", orderId);
+        if (itemsError) {
+            console.error("Error deleting items:", itemsError);
+            // We continue to try deleting the order even if items fail, though usually it means FK issue
+        }
+
+        // 2. Delete the order itself
+        const { error } = await supabase.from("orders").delete().eq("id", orderId);
+        if (error) {
+            console.error("Delete error:", error);
+            alert("שגיאה במחיקת ההזמנה: " + error.message);
         } else {
             fetchOrders();
         }
@@ -158,6 +178,15 @@ export default function AdminOrdersPage() {
                                                         <CheckCircle className="h-4 w-4" />
                                                     </Button>
                                                 )}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                    title="מחק הזמנה"
+                                                    onClick={() => handleDeleteOrder(order.id)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
                                                 <Dialog>
                                                     <DialogTrigger asChild>
                                                         <Button variant="ghost" size="sm" className="gap-2">

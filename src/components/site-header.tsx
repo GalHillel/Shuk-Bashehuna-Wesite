@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu as MenuIcon, User, Store, LogOut, Shield, ShoppingCart } from "lucide-react";
+import { Menu as MenuIcon, User, Store, LogOut, Shield, ShoppingCart, ChevronLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -155,52 +155,73 @@ export function SiteHeader() {
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="right" className="w-[85vw] sm:w-[380px] overflow-y-auto pt-10">
-                            <div className="flex flex-col gap-6 font-medium">
-                                <div className="flex items-center justify-center mb-6">
+                            <div className="flex flex-col h-full">
+                                <div className="flex items-center justify-center py-6 border-b border-slate-100">
                                     <Logo src={settings.site_logo} />
                                 </div>
 
-                                <nav className="flex flex-col gap-2">
-                                    <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                                        <span className="text-lg">🏠</span>
-                                        <span className="font-bold">דף הבית</span>
+                                <nav className="flex-1 overflow-y-auto py-6 px-2 space-y-1">
+                                    <Link
+                                        href="/"
+                                        className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-2xl bg-slate-100 p-2 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">🏠</span>
+                                            <span className="font-bold text-lg text-slate-800">דף הבית</span>
+                                        </div>
+                                        <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
                                     </Link>
 
                                     {hasSaleItems && (
                                         <Link
                                             href="/category/specials"
-                                            className="flex items-center gap-3 p-3 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all font-bold shadow-sm"
+                                            className="flex items-center justify-between p-4 rounded-xl bg-red-50/50 border border-red-100 hover:bg-red-50 transition-colors group mt-2 mb-4"
                                         >
-                                            <span className="relative flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                            </span>
-                                            <span>מבצעים חמים</span>
+                                            <div className="flex items-center gap-4">
+                                                <span className="relative flex h-10 w-10 items-center justify-center bg-white rounded-lg shadow-sm border border-red-100">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                                </span>
+                                                <span className="font-bold text-lg text-red-600">מבצעים חמים</span>
+                                            </div>
+                                            <ChevronLeft className="h-5 w-5 text-red-300 group-hover:text-red-600 transition-colors" />
                                         </Link>
                                     )}
 
-                                    <div className="p-3">
-                                        <h3 className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-wider">קטגוריות</h3>
-                                        <div className="grid grid-cols-2 gap-2">
+                                    <div className="py-4">
+                                        <h3 className="px-4 text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">קטגוריות</h3>
+                                        <div className="space-y-1">
                                             {categories.map((cat) => (
                                                 <Link
                                                     key={cat.id}
                                                     href={`/category/${cat.id}`}
                                                     className={cn(
-                                                        "p-2 rounded-lg text-sm bg-slate-50 border border-slate-100 hover:border-slate-300 transition-all text-center",
-                                                        cat.id === 'specials' && "bg-red-50 text-red-600 border-red-100"
+                                                        "flex items-center justify-between p-4 rounded-xl transition-all group",
+                                                        "hover:bg-slate-50 hover:shadow-sm border border-transparent hover:border-slate-100",
+                                                        cat.id === 'specials' && "hidden" // Hide specials from regular list as it's already shown above
                                                     )}
                                                 >
-                                                    {cat.name}
+                                                    <span className="font-medium text-lg text-slate-700 group-hover:text-slate-900 group-hover:translate-x-1 transition-all">
+                                                        {cat.name}
+                                                    </span>
+                                                    <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
                                                 </Link>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <Link href="/about" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                                        <span className="text-lg">ℹ️</span>
-                                        <span className="font-bold">אודות</span>
-                                    </Link>
+                                    <div className="border-t border-slate-100 pt-4 mt-auto">
+                                        <Link
+                                            href="/about"
+                                            className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-2xl bg-slate-100 p-2 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">ℹ️</span>
+                                                <span className="font-bold text-lg text-slate-800">אודות</span>
+                                            </div>
+                                            <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                                        </Link>
+                                    </div>
                                 </nav>
                             </div>
                         </SheetContent>

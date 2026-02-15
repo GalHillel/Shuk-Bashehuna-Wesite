@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Accessibility Utilities */
+.grayscale-mode {
+  filter: grayscale(100%);
+}
+
+.high-contrast {
+  color: #000 !important;
+  background-color: #fff !important;
+}
+
+.high-contrast * {
+  color: #000 !important;
+  background-color: #fff !important;
+  border-color: #000 !important;
+}
+
+.highlight-links a {
+  text-decoration: underline !important;
+  text-decoration-color: yellow !important;
+  text-decoration-thickness: 2px !important;
+  background-color: #000 !important;
+  color: #FFFF00 !important;
+  padding: 0 2px;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

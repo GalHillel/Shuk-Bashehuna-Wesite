@@ -24,6 +24,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 import { CheckCircle2, Loader2, MapPin, Truck, Clock } from "lucide-react";
 import { submitOrder } from "./actions";
 
@@ -38,6 +40,7 @@ type CheckoutFormValues = {
     notes?: string;
     deliveryDate: string;
     deliveryTime: string;
+    agreeToTerms: boolean;
 };
 
 export default function CheckoutPage() {

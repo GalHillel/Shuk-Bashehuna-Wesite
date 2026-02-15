@@ -29,7 +29,7 @@ export function Footer() {
     return (
         <footer className="bg-slate-900 text-slate-300 mt-12" dir="rtl">
             <div className="container mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
                     {/* Brand */}
                     <div className="space-y-4">
                         <h3 className="text-2xl font-bold text-white">{settings.site_name || "🥬 שוק בשכונה"}</h3>
@@ -89,6 +89,16 @@ export function Footer() {
                                 <span>משלוח חינם מעל ₪300</span>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Legal */}
+                    <div className="space-y-4">
+                        <h4 className="text-lg font-bold text-white">משפטי</h4>
+                        <nav className="flex flex-col gap-2 text-sm">
+                            <Link href="/terms" className="hover:text-primary transition-colors">תקנון האתר</Link>
+                            <Link href="/privacy" className="hover:text-primary transition-colors">מדיניות פרטיות</Link>
+                            <Link href="/accessibility" className="hover:text-primary transition-colors">הצהרת נגישות</Link>
+                        </nav>
                     </div>
                 </div>
 

@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import React from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminRealtimeListener } from "@/components/admin/AdminRealtimeListener";
+import { Toaster } from "sonner";
 
 export default async function AdminLayout({
     children,
@@ -50,6 +52,9 @@ export default async function AdminLayout({
     // 6. Access Granted
     return (
         <div className="min-h-screen bg-gray-50 flex" dir="rtl">
+            <AdminRealtimeListener />
+            <Toaster position="top-center" richColors />
+
             {/* Sidebar */}
             <AdminSidebar />
 
