@@ -17,6 +17,9 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
 
+import { revalidateHomepage } from "@/app/actions/revalidate";
+import { toast } from "sonner";
+
 const BLOCK_TYPE_LABELS: Record<string, string> = {
     hero_slider: "סליידר ראשי",
     category_grid: "רשת קטגוריות",
@@ -52,13 +55,20 @@ export default function AdminContentPage() {
             .from("content_blocks")
             .update({ is_active: !currentStatus, updated_at: new Date().toISOString() })
             .eq("id", id);
+
+        await revalidateHomepage();
         fetchBlocks();
+        toast.success("סטטוס עודכן בהצלחה");
     }
 
-    async function deleteBlock(id: number) {
+    async function deleteBlock(e: React.MouseEvent, id: number) {
+        e.stopPropagation();
         if (!confirm("האם אתה בטוח שברצונך למחוק בלוק זה?")) return;
+
         await supabase.from("content_blocks").delete().eq("id", id);
+        await revalidateHomepage();
         fetchBlocks();
+        toast.success("הבלוק נמחק בהצלחה");
     }
 
     async function moveBlock(id: number, direction: "up" | "down") {
@@ -76,6 +86,7 @@ export default function AdminContentPage() {
             supabase.from("content_blocks").update({ sort_order: currentOrder }).eq("id", blocks[swapIndex].id),
         ]);
 
+        await revalidateHomepage();
         fetchBlocks();
     }
 
@@ -167,7 +178,7 @@ export default function AdminContentPage() {
                                                 variant="ghost"
                                                 size="icon"
                                                 className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                onClick={() => deleteBlock(block.id)}
+                                                onClick={(e) => deleteBlock(e, block.id)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

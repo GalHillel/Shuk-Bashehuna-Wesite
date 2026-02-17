@@ -27,6 +27,7 @@ import { HeroSliderEditor } from "./editors/HeroSliderEditor";
 import { ProductCarouselEditor } from "./editors/ProductCarouselEditor";
 import { BannersGridEditor } from "./editors/BannersGridEditor";
 import { TextBannerEditor } from "./editors/TextBannerEditor";
+import { revalidateHomepage } from "@/app/actions/revalidate";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function BlockEditor({ defaultValues }: { defaultValues?: any }) {
@@ -87,6 +88,9 @@ export function BlockEditor({ defaultValues }: { defaultValues?: any }) {
             if (result.error) {
                 throw result.error;
             }
+
+            // Revalidate homepage
+            await revalidateHomepage();
 
             // Redirect back to content list
             router.push("/admin/content");

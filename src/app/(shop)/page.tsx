@@ -5,6 +5,10 @@ import { ProductCarousel } from "@/components/cms/ProductCarousel";
 import { BannersGrid } from "@/components/cms/BannersGrid";
 import { ContentBlock } from "@/types/supabase";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 
 
 interface HeroSliderData {
