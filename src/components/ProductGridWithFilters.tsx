@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { Product, Category } from "@/types/supabase";
 import { ProductCard } from "@/components/ProductCard";
+import { EmptyState } from "@/components/EmptyState";
+import { PackageOpen, SearchX } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ProductGridWithFiltersProps {
@@ -33,8 +35,12 @@ export function ProductGridWithFilters({ products, categories, showFilters = fal
 
     if (products.length === 0) {
         return (
-            <div className="py-12 text-center text-muted-foreground">
-                <p className="text-lg">בקרוב יעלו מוצרים לקטגוריה זו...</p>
+            <div className="py-12">
+                <EmptyState
+                    icon={PackageOpen}
+                    title="בקרוב נמלא את המדפים..."
+                    description="כרגע אין מוצרים בקטגוריה זו. שווה לחזור מאוחר יותר!"
+                />
             </div>
         );
     }
@@ -73,7 +79,7 @@ export function ProductGridWithFilters({ products, categories, showFilters = fal
             )}
 
             {/* Product Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-4">
                 {filteredProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                 ))}
@@ -81,8 +87,16 @@ export function ProductGridWithFilters({ products, categories, showFilters = fal
 
             {/* Empty State for Filter */}
             {filteredProducts.length === 0 && (
-                <div className="py-12 text-center text-muted-foreground">
-                    <p className="text-lg">לא נמצאו מוצרים בקטגוריה זו.</p>
+                <div className="py-12">
+                    <EmptyState
+                        icon={SearchX}
+                        title="לא מצאנו מה שחיפשת"
+                        description="נסה לבחור קטגוריה אחרת או להסיר את הסינון."
+                        action={{
+                            label: "הצג את כל המוצרים",
+                            onClick: () => setSelectedCategory("all")
+                        }}
+                    />
                 </div>
             )}
         </div>

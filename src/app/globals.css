@@ -21,10 +21,26 @@
 .highlight-links a {
   text-decoration: underline !important;
   text-decoration-color: yellow !important;
-  text-decoration-thickness: 2px !important;
+  text-decoration-thickness: 3px !important;
   background-color: #000 !important;
   color: #FFFF00 !important;
-  padding: 0 2px;
+  padding: 0 4px;
+}
+
+.negative-contrast {
+  filter: invert(100%);
+  background-color: #fff;
+  /* Ensure bg exists to invert */
+}
+
+.readable-font {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+
+.readable-font * {
+  font-family: Arial, Helvetica, sans-serif !important;
 }
 
 @layer utilities {
@@ -44,59 +60,107 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    /* #F9FAFB - Alabaster */
-    --foreground: 142 72% 15%;
-    /* Deep Green/Black for text */
+    --background: 138 76% 97%;
+    /* #f0fdf4 - Mint Cream/Alabaster */
+    --foreground: 145 80% 10%;
+    /* #052e16 - Dark Green-Black */
+
     --card: 0 0% 100%;
-    --card-foreground: 142 72% 15%;
+    --card-foreground: 145 80% 10%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 142 72% 15%;
-    --primary: 142 72% 29%;
-    /* #15803d - Deep Forest Green */
-    --primary-foreground: 210 20% 98%;
-    --secondary: 150 10% 94%;
-    /* Light Greenish Grey */
-    --secondary-foreground: 142 72% 29%;
+    --popover-foreground: 145 80% 10%;
+
+    --primary: 145 61% 20%;
+    /* #14532d - Deep Forest Green */
+    --primary-foreground: 138 76% 97%;
+
+    --secondary: 142 69% 58%;
+    /* #4ade80 - Fresh Sage */
+    --secondary-foreground: 145 61% 20%;
+
     --muted: 150 10% 94%;
-    --muted-foreground: 142 20% 45%;
-    --accent: 142 72% 29%;
-    --accent-foreground: 210 20% 98%;
+    --muted-foreground: 145 20% 45%;
+
+    --accent: 145 61% 20%;
+    --accent-foreground: 138 76% 97%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
+
     --border: 142 20% 90%;
     --input: 142 20% 90%;
-    --ring: 142 72% 29%;
-    --radius: 1rem;
-    /* 16px for rounded-2xl look */
+    --ring: 145 61% 20%;
+    --radius: 1.5rem;
+    /* 24px - Super rounded */
   }
 
   .dark {
-    --background: 142 72% 5%;
-    --foreground: 210 20% 98%;
-    --card: 142 72% 8%;
-    --card-foreground: 210 20% 98%;
-    --popover: 142 72% 8%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 142 72% 29%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 142 30% 15%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 142 30% 15%;
-    --muted-foreground: 142 20% 65%;
-    --accent: 142 30% 15%;
-    --accent-foreground: 210 20% 98%;
+    --background: 145 61% 5%;
+    --foreground: 138 76% 97%;
+
+    --card: 145 61% 8%;
+    --card-foreground: 138 76% 97%;
+
+    --popover: 145 61% 8%;
+    --popover-foreground: 138 76% 97%;
+
+    --primary: 145 61% 20%;
+    --primary-foreground: 138 76% 97%;
+
+    --secondary: 145 61% 15%;
+    --secondary-foreground: 138 76% 97%;
+
+    --muted: 145 61% 15%;
+    --muted-foreground: 145 20% 65%;
+
+    --accent: 145 61% 15%;
+    --accent-foreground: 138 76% 97%;
+
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 142 30% 15%;
-    --input: 142 30% 15%;
-    --ring: 142 72% 29%;
+    --destructive-foreground: 138 76% 97%;
+
+    --border: 145 61% 15%;
+    --input: 145 61% 15%;
+    --ring: 145 61% 20%;
+  }
+
+  /* Noise Texture */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.4;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+  }
+
+  @media (max-width: 640px) {
+
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-[#0f391e];
   }
 
   body {
@@ -110,4 +174,51 @@
     overflow-x: hidden;
     max-width: 100vw;
   }
+}
+
+/* Custom WhatsApp Pulse Animation */
+@keyframes pulse-green {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+.animate-pulse-green {
+  animation: pulse-green 2.5s ease infinite;
+}
+
+.negative-contrast {
+  filter: invert(100%);
+  background-color: #fff;
+}
+
+.readable-font {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+
+.readable-font * {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+
+.highlight-links a {
+  text-decoration: underline !important;
+  text-decoration-color: yellow !important;
+  text-decoration-thickness: 3px !important;
+  background-color: #000 !important;
+  color: #FFFF00 !important;
+  padding: 0 4px;
 }

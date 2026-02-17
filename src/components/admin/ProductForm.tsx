@@ -27,6 +27,7 @@ import { Category, Product } from "@/types/supabase";
 import { Loader2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
+import { generateSlug } from "@/lib/slug-utils";
 
 interface ProductFormProps {
     product?: Product;
@@ -55,13 +56,10 @@ export function ProductForm({ product }: ProductFormProps) {
 
     useEffect(() => {
         const fetchCats = async () => {
-            console.log("Fetching categories...");
             const { data, error } = await supabase.from("categories").select("*").order("name");
             if (error) {
                 console.error("Error fetching categories:", JSON.stringify(error, null, 2));
-                // toast.error("Failed to load categories");
             } else {
-                console.log("Categories loaded:", data);
                 if (data) setCategories(data as Category[]);
             }
         };
@@ -84,22 +82,17 @@ export function ProductForm({ product }: ProductFormProps) {
         },
     });
 
-    function generateSlug(name: string): string {
-        return name
-            .toLowerCase()
-            .replace(/[^a-z0-9\u0590-\u05FF\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-")
-            .trim();
-    }
+
 
     async function onSubmit(values: ProductFormValues) {
         setError("");
         setSubmitting(true);
 
+        const slug = values.slug || generateSlug(values.name);
+
         const productData = {
             name: values.name,
-            slug: values.slug || generateSlug(values.name),
+            slug: slug,
             description: values.description || null,
             price: parseFloat(values.price),
             sale_price: values.sale_price ? parseFloat(values.sale_price) : null,
@@ -130,7 +123,11 @@ export function ProductForm({ product }: ProductFormProps) {
         }
 
         if (result.error) {
-            setError("אירעה שגיאה בשמירת המוצר: " + result.error.message);
+            if (result.error.code === '23505') {
+                setError("קיים כבר מוצר עם שם דומה, אנא שנה את השם מעט");
+            } else {
+                setError("אירעה שגיאה בשמירת המוצר: " + result.error.message);
+            }
             setSubmitting(false);
             return;
         }
@@ -141,7 +138,7 @@ export function ProductForm({ product }: ProductFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white p-8 rounded-2xl border shadow-sm max-w-3xl mx-auto">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white p-4 md:p-8 rounded-2xl border shadow-sm max-w-3xl mx-auto pb-24 md:pb-8">
                 {error && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-bold">
                         {error}
@@ -161,33 +158,13 @@ export function ProductForm({ product }: ProductFormProps) {
                                         placeholder="למשל: תפוח עץ מוזהב"
                                         {...field}
                                         className="h-12 rounded-xl"
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            if (!isEditing && !form.getValues("slug")) {
-                                                form.setValue("slug", generateSlug(e.target.value));
-                                            }
-                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-
-                    <FormField
-                        control={form.control}
-                        name="slug"
-                        rules={{ required: "Slug חובה" }}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-slate-900 font-bold">מזהה ייחודי (Slug)</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="golden-apple" {...field} className="h-12 rounded-xl" dir="ltr" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Slug input removed */}
                 </div>
 
                 <FormField
@@ -344,11 +321,11 @@ export function ProductForm({ product }: ProductFormProps) {
                     />
                 </div>
 
-                <div className="flex justify-end gap-4 pt-4 border-t">
-                    <Button variant="outline" type="button" onClick={() => router.back()} className="h-12 px-8 rounded-xl font-bold">
+                <div className="flex items-center gap-4 pt-4 border-t md:justify-end fixed bottom-0 left-0 right-0 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-10 md:static md:shadow-none md:bg-transparent md:border-t md:p-0 md:pt-4">
+                    <Button variant="outline" type="button" onClick={() => router.back()} className="flex-1 md:flex-none h-12 px-8 rounded-xl font-bold">
                         ביטול
                     </Button>
-                    <Button type="submit" className="h-12 px-12 rounded-xl font-bold bg-slate-900" disabled={submitting}>
+                    <Button type="submit" className="flex-1 md:flex-none h-12 px-12 rounded-xl font-bold bg-slate-900 shadow-lg shadow-slate-900/20 md:shadow-none" disabled={submitting}>
                         {submitting ? (
                             <>
                                 <Loader2 className="animate-spin ml-2 h-4 w-4" />

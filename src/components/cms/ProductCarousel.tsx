@@ -55,25 +55,25 @@ export function ProductCarousel({ title, data }: ProductCarouselProps) {
     if (products.length === 0) return null;
 
     return (
-        <section className="container py-8 border-t">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-primary">{title}</h3>
+        <section className="container py-12">
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-3xl font-bold text-[#14532d]">{title}</h3>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => scroll('right')}>
-                        <ChevronRight className="h-4 w-4" />
+                    <Button variant="outline" size="icon" onClick={() => scroll('right')} className="rounded-full h-10 w-10 border-green-200 hover:bg-green-50 text-green-800">
+                        <ChevronRight className="h-5 w-5" />
                     </Button>
-                    <Button variant="outline" size="icon" onClick={() => scroll('left')}>
-                        <ChevronLeft className="h-4 w-4" />
+                    <Button variant="outline" size="icon" onClick={() => scroll('left')} className="rounded-full h-10 w-10 border-green-200 hover:bg-green-50 text-green-800">
+                        <ChevronLeft className="h-5 w-5" />
                     </Button>
                 </div>
             </div>
 
             <div
                 ref={scrollContainerRef}
-                className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide snap-x -mx-4 px-4 scroll-p-4 w-[100vw] sm:w-auto"
+                className="flex overflow-x-auto gap-4 pb-8 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory"
             >
                 {products.map((product) => (
-                    <div key={product.id} className="min-w-[260px] md:min-w-[280px] snap-start">
+                    <div key={product.id} className="min-w-[220px] md:min-w-[280px] snap-start">
                         <ProductCard product={product} />
                     </div>
                 ))}

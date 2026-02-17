@@ -26,7 +26,6 @@ export function AdminRealtimeListener() {
             await audioRef.current.play();
             setIsAudioBlocked(false);
         } catch (error) {
-            console.warn("Audio autoplay blocked by browser:", error);
             setIsAudioBlocked(true);
         }
     };
@@ -42,8 +41,6 @@ export function AdminRealtimeListener() {
                     table: 'orders',
                 },
                 (payload) => {
-                    console.log('New Order Received!', payload);
-
                     // 1. Play Sound (safely)
                     playNotificationSound();
 

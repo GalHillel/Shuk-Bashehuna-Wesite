@@ -78,7 +78,7 @@ export default function SettingsPage() {
             </div>
 
             <Tabs defaultValue="general" dir="rtl" className="w-full">
-                <TabsList className="bg-slate-100 p-1 rounded-xl h-auto">
+                <TabsList className="bg-slate-100 p-1 rounded-xl h-auto flex flex-wrap justify-start">
                     <TabsTrigger value="general" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">כללי (Header)</TabsTrigger>
                     <TabsTrigger value="footer" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">תחתית האתר (Footer)</TabsTrigger>
                     <TabsTrigger value="about" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">אודות (About)</TabsTrigger>

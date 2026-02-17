@@ -14,9 +14,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
+import { generateSlug } from "@/lib/slug-utils";
 
 import { Category } from "@/types/supabase";
 
@@ -40,29 +41,43 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
     const form = useForm<CategoryFormValues>({
         defaultValues: {
             name: defaultValues?.name || "",
-            slug: defaultValues?.id || "", // ID is the slug
+            slug: (defaultValues as any)?.slug || "", // Use 'any' to bypass missing type definition for slug
             image_url: defaultValues?.image_url || "",
             sort_order: defaultValues?.sort_order || 0,
             is_visible: defaultValues?.is_visible ?? true,
         },
     });
 
-    // Auto-generate slug from name
-    function generateSlug(name: string) {
-        return name
-            .toLowerCase()
-            .replace(/[^a-z0-9\u0590-\u05FF\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-")
-            .trim();
-    }
+
+
+    // Auto-fetch max sort_order for new categories
+    useEffect(() => {
+        if (!isEditing) {
+            const fetchMaxOrder = async () => {
+                const { data } = await supabase
+                    .from("categories")
+                    .select("sort_order")
+                    .order("sort_order", { ascending: false })
+                    .limit(1);
+
+                if (data && data.length > 0) {
+                    form.setValue("sort_order", (data[0].sort_order || 0) + 10);
+                } else {
+                    form.setValue("sort_order", 10);
+                }
+            };
+            fetchMaxOrder();
+        }
+    }, [isEditing, form]);
 
     async function onSubmit(values: CategoryFormValues) {
         setError("");
 
         const slug = values.slug || generateSlug(values.name);
+
         const payload = {
             name: values.name,
+            slug: slug,
             image_url: values.image_url || null,
             sort_order: Number(values.sort_order),
             is_visible: values.is_visible,
@@ -81,15 +96,13 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
                 .update(payload)
                 .eq("id", defaultValues.id);
         } else {
-            result = await supabase.from("categories").insert({
-                id: slug,
-                ...payload
-            });
+            // Insert WITHOUT setting 'id' manually - let Postgres generate the UUID
+            result = await supabase.from("categories").insert(payload);
         }
 
         if (result.error) {
             if (result.error.code === '23505') {
-                setError("קטגוריה עם slug זה כבר קיימת במערכת");
+                setError("קיים כבר קטגוריה עם שם דומה, אנא שנה את השם מעט");
             } else {
                 setError("אירעה שגיאה בשמירת הקטגוריה: " + result.error.message);
             }
@@ -102,7 +115,7 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white p-8 rounded-2xl border shadow-sm max-w-2xl mx-auto">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 bg-white p-4 md:p-8 rounded-2xl border shadow-sm max-w-2xl mx-auto pb-24 md:pb-8">
                 {error && (
                     <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-bold">
                         {error}
@@ -122,33 +135,13 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
                                         placeholder="למשל: פירות וירקות"
                                         {...field}
                                         className="h-12 rounded-xl"
-                                        onChange={(e) => {
-                                            field.onChange(e);
-                                            if (!form.getValues("slug")) {
-                                                form.setValue("slug", generateSlug(e.target.value));
-                                            }
-                                        }}
                                     />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-
-                    <FormField
-                        control={form.control}
-                        name="slug"
-                        rules={{ required: "Slug חובה" }}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-slate-900 font-bold">מזהה ייחודי (Slug)</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="fruits-vegetables" {...field} className="h-12 rounded-xl" dir="ltr" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    {/* Slug input removed */}
                 </div>
 
                 <FormField
@@ -203,9 +196,9 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
                     />
                 </div>
 
-                <div className="flex justify-end gap-4 pt-4">
-                    <Button variant="outline" type="button" onClick={() => router.back()} className="h-12 px-8 rounded-xl font-bold">ביטול</Button>
-                    <Button type="submit" className="h-12 px-12 rounded-xl font-bold bg-slate-900">שמור קטגוריה</Button>
+                <div className="flex items-center gap-4 pt-4 border-t md:justify-end fixed bottom-0 left-0 right-0 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-10 md:static md:shadow-none md:bg-transparent md:border-t md:p-0 md:pt-4">
+                    <Button variant="outline" type="button" onClick={() => router.back()} className="flex-1 md:flex-none h-12 px-8 rounded-xl font-bold">ביטול</Button>
+                    <Button type="submit" className="flex-1 md:flex-none h-12 px-12 rounded-xl font-bold bg-slate-900 shadow-lg shadow-slate-900/20 md:shadow-none">שמור קטגוריה</Button>
                 </div>
             </form>
         </Form>

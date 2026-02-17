@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import React from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminMobileHeader } from "@/components/admin/AdminMobileHeader";
 import { AdminRealtimeListener } from "@/components/admin/AdminRealtimeListener";
 import { Toaster } from "sonner";
 
@@ -55,15 +56,18 @@ export default async function AdminLayout({
             <AdminRealtimeListener />
             <Toaster position="top-center" richColors />
 
-            {/* Sidebar */}
+            {/* Desktop Sidebar */}
             <AdminSidebar />
 
-            {/* Main Content */}
-            <main className="flex-1 md:mr-64 min-h-screen">
-                <div className="p-8 max-w-7xl mx-auto space-y-8">
+            <div className="flex-1 flex flex-col min-h-screen md:mr-64 transition-all duration-300">
+                {/* Mobile Header */}
+                <AdminMobileHeader />
+
+                {/* Main Content */}
+                <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6 md:space-y-8">
                     {children}
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 }

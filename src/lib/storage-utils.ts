@@ -33,7 +33,7 @@ export async function deleteImageFromStorage(imageUrl: string) {
         const bucket = fullPath.substring(0, firstSlashIndex);
         const filePath = fullPath.substring(firstSlashIndex + 1);
 
-        console.log(`Deleting image. Bucket: ${bucket}, Path: ${filePath}`);
+
 
         const { error } = await supabase.storage
             .from(bucket)
@@ -42,7 +42,7 @@ export async function deleteImageFromStorage(imageUrl: string) {
         if (error) {
             console.error("Error deleting image from storage:", error);
         } else {
-            console.log("Image deleted successfully");
+            // Image deleted successfully
         }
 
     } catch (err) {

@@ -14,6 +14,8 @@ import { ShoppingCart, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useCart } from "@/store/useCart";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { EmptyState } from "@/components/EmptyState";
 
 const UNIT_LABELS: Record<string, string> = {
     kg: 'ק"ג',
@@ -29,8 +31,10 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
     const { items, removeItem, updateQuantity, totalPriceEstimated } = useCart();
     const total = totalPriceEstimated();
 
+    const [open, setOpen] = useState(false);
+
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
                 {trigger ? (
                     trigger
@@ -45,7 +49,7 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                     </Button>
                 )}
             </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
+            <SheetContent side="left" className="w-full sm:max-w-md flex flex-col">
                 <SheetHeader>
                     <SheetTitle className="text-xl flex items-center justify-center gap-2">
                         <ShoppingBag className="h-5 w-5 text-primary" />
@@ -54,12 +58,16 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                 </SheetHeader>
 
                 {items.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-4">
-                        <ShoppingCart className="h-16 w-16 opacity-30" />
-                        <div className="text-center">
-                            <p className="text-lg font-medium">הסל ריק</p>
-                            <p className="text-sm">הוסיפו מוצרים מהחנות</p>
-                        </div>
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                        <EmptyState
+                            icon={ShoppingCart}
+                            title="הסל שלך ריק..."
+                            description="בוא נמלא אותו בכל טוב!"
+                            action={{
+                                label: "התחל לקנות",
+                                onClick: () => setOpen(false)
+                            }}
+                        />
                     </div>
                 ) : (
                     <>
@@ -89,7 +97,7 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                                             </p>
 
                                             <div className="flex items-center gap-2 mt-2">
-                                                <div className="flex items-center border rounded-md overflow-hidden bg-background h-8">
+                                                <div className="flex items-center border rounded-lg overflow-hidden bg-background h-8">
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
@@ -138,7 +146,7 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                                 <span className="font-medium">סה&quot;כ משוער:</span>
                                 <span className="font-bold text-xl text-primary">₪{total.toFixed(2)}</span>
                             </div>
-                            <Button asChild size="lg" className="w-full h-12 text-lg font-bold rounded-xl">
+                            <Button asChild size="lg" className="w-full h-12 text-lg font-bold rounded-xl" onClick={() => setOpen(false)}>
                                 <Link href="/checkout">לתשלום</Link>
                             </Button>
                         </SheetFooter>

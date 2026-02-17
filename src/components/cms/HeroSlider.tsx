@@ -46,7 +46,7 @@ export function HeroSlider({ data }: HeroSliderProps) {
                         {data.slides.map((slide, index) => {
                             const imageSrc = (slide.image_url && slide.image_url.trim().length > 0)
                                 ? slide.image_url
-                                : "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600";
+                                : "/placeholder.png";
 
                             return (
                                 <CarouselItem key={index} className="relative h-[50vh] min-h-[400px] max-h-[600px] w-full">
@@ -55,22 +55,23 @@ export function HeroSlider({ data }: HeroSliderProps) {
                                             src={imageSrc}
                                             alt={slide.title}
                                             fill
-                                            className="object-cover brightness-[0.85] md:rounded-3xl"
+                                            className="object-cover brightness-[0.9] md:rounded-3xl"
                                             priority={index === 0}
+                                            sizes="100vw"
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent md:rounded-3xl" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#14532d] via-[#14532d]/30 to-transparent md:rounded-3xl opacity-90" />
                                     </div>
                                     <div className="relative h-full flex flex-col items-center justify-center text-center p-6 text-white pb-16 md:pb-6">
-                                        <div className="max-w-3xl animate-in fade-in slide-in-from-bottom-6 duration-700">
-                                            <h2 className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight text-white drop-shadow-md">
+                                        <div className="max-w-3xl animate-in fade-in slide-in-from-bottom-6 duration-700 flex flex-col items-center">
+                                            <h2 className="text-4xl md:text-7xl font-extrabold mb-4 tracking-tight text-white drop-shadow-lg leading-tight">
                                                 {slide.title}
                                             </h2>
-                                            <p className="text-lg md:text-2xl text-white/90 mb-8 font-medium drop-shadow leading-relaxed max-w-2xl mx-auto">
+                                            <p className="text-lg md:text-2xl text-white/90 mb-8 font-medium drop-shadow-md leading-relaxed max-w-2xl">
                                                 {slide.subtitle}
                                             </p>
                                             <Button
                                                 size="lg"
-                                                className="rounded-full px-10 py-6 text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground border-2 border-transparent hover:border-white/20 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                                                className="rounded-full px-12 py-7 text-xl font-bold bg-[#4ade80] text-[#052e16] hover:bg-[#22c55e] hover:text-white border-2 border-transparent transition-all shadow-[0_0_20px_rgba(74,222,128,0.4)] hover:shadow-[0_0_30px_rgba(74,222,128,0.6)] hover:scale-105"
                                                 asChild
                                             >
                                                 <Link href={slide.link}>{slide.button_text}</Link>

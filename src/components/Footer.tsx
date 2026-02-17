@@ -27,83 +27,51 @@ export function Footer() {
     }, []);
 
     return (
-        <footer className="bg-slate-900 text-slate-300 mt-12" dir="rtl">
-            <div className="container mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-                    {/* Brand */}
-                    <div className="space-y-4">
-                        <h3 className="text-2xl font-bold text-white">{settings.site_name || "🥬 שוק בשכונה"}</h3>
-                        <p className="text-sm leading-relaxed">
-                            {settings.footer_description || "פירות וירקות טריים ישירות מהחקלאי אליכם הביתה. איכות ללא פשרות, טעם שמדבר בעד עצמו."}
-                        </p>
-                    </div>
+        // Super Compact Footer V3 (Max 3 Lines)
+        <footer className="bg-[#14532d] text-green-100 mt-auto border-t border-green-800 text-xs" dir="rtl">
+            <div className="container mx-auto px-4 py-4">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-3">
 
-                    {/* Quick Links */}
-                    <div className="space-y-4">
-                        <h4 className="text-lg font-bold text-white">קישורים מהירים</h4>
-                        <nav className="flex flex-col gap-2 text-sm">
-                            <Link href="/" className="hover:text-primary transition-colors">דף הבית</Link>
-                            <Link href="/about" className="hover:text-primary transition-colors">אודות</Link>
-                            <Link href="/category/specials" className="hover:text-primary transition-colors">מבצעים</Link>
-                            <Link href="/checkout" className="hover:text-primary transition-colors">עגלת קניות</Link>
-                        </nav>
-                    </div>
-
-                    {/* Contact */}
-                    <div className="space-y-4">
-                        <h4 className="text-lg font-bold text-white">צרו קשר</h4>
-                        <div className="flex flex-col gap-3 text-sm">
+                    {/* Line 1 (Desktop Left): Contact Only */}
+                    <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 w-full md:w-auto">
+                        {/* Contact (Inline) */}
+                        <div className="flex items-center gap-4">
                             {settings.contact_phone && (
-                                <a href={`tel:${settings.contact_phone}`} className="flex items-center gap-2 hover:text-primary transition-colors">
-                                    <Phone className="h-4 w-4 flex-shrink-0" />
-                                    {settings.contact_phone}
+                                <a href={`tel:${settings.contact_phone}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                    <Phone className="h-3.5 w-3.5 text-green-300" />
+                                    <span>{settings.contact_phone}</span>
                                 </a>
                             )}
                             {settings.contact_email && (
-                                <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-2 hover:text-primary transition-colors">
-                                    <Mail className="h-4 w-4 flex-shrink-0" />
+                                <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                    <Mail className="h-3.5 w-3.5 text-green-300" />
                                     <span dir="ltr">{settings.contact_email}</span>
                                 </a>
                             )}
                             {settings.contact_address && (
-                                <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                                <div className="flex items-center gap-1.5 hover:text-white transition-colors">
+                                    <MapPin className="h-3.5 w-3.5 text-green-300" />
                                     <span>{settings.contact_address}</span>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Info */}
-                    <div className="space-y-4">
-                        <h4 className="text-lg font-bold text-white">מידע</h4>
-                        <div className="flex flex-col gap-3 text-sm">
-                            {settings.hours_weekdays && (
-                                <div className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4 flex-shrink-0" />
-                                    <span>{settings.hours_weekdays}</span>
-                                </div>
-                            )}
-                            <div className="flex items-center gap-2">
-                                <Truck className="h-4 w-4 flex-shrink-0" />
-                                <span>משלוח חינם מעל ₪300</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Legal */}
-                    <div className="space-y-4">
-                        <h4 className="text-lg font-bold text-white">משפטי</h4>
-                        <nav className="flex flex-col gap-2 text-sm">
-                            <Link href="/terms" className="hover:text-primary transition-colors">תקנון האתר</Link>
-                            <Link href="/privacy" className="hover:text-primary transition-colors">מדיניות פרטיות</Link>
-                            <Link href="/accessibility" className="hover:text-primary transition-colors">הצהרת נגישות</Link>
+                    {/* Line 1 (Desktop Right): Legal & Copyright */}
+                    <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 w-full md:w-auto mt-2 md:mt-0">
+                        <nav className="flex items-center gap-3 md:gap-4">
+                            <Link href="/terms" className="hover:text-white transition-colors">תקנון</Link>
+                            <Link href="/privacy" className="hover:text-white transition-colors">פרטיות</Link>
+                            <Link href="/accessibility" className="hover:text-white transition-colors">נגישות</Link>
                         </nav>
-                    </div>
-                </div>
 
-                <div className="border-t border-slate-800 mt-8 pt-6 text-center text-xs text-slate-500">
-                    <p>© {new Date().getFullYear()} שוק בשכונה. כל הזכויות שמורות.</p>
+                        <div className="hidden md:block w-px h-4 bg-green-700"></div>
+
+                        <p className="text-green-200/60">
+                            © {new Date().getFullYear()} שוק בשכונה
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </footer>

@@ -70,7 +70,7 @@ export function FloatingSearch({ logoSrc }: FloatingSearchProps) {
     };
 
     return (
-        <div className="relative mx-auto flex w-fit max-w-2xl items-center justify-center transition-all duration-500 ease-out" ref={containerRef}>
+        <div className="relative mx-auto flex w-fit max-w-2xl max-w-[95vw] items-center justify-center transition-all duration-500 ease-out" ref={containerRef}>
             <div className={cn(
                 "group flex h-12 items-center gap-3 rounded-full bg-white/90 px-4 py-2 shadow-sm backdrop-blur-md transition-all duration-500 border border-white/20",
                 "hover:w-[350px] md:hover:w-[500px] hover:bg-white hover:shadow-md",

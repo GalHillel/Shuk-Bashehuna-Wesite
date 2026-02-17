@@ -29,7 +29,7 @@ export function ProductActions({ product }: ProductActionsProps) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-                <div className="flex items-center border rounded-md overflow-hidden bg-background shadow-sm w-full sm:w-40 h-12">
+                <div className="flex items-center border rounded-2xl overflow-hidden bg-background shadow-sm w-full sm:w-40 h-12">
                     <Button
                         variant="ghost"
                         size="icon"

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu as MenuIcon, User, Store, LogOut, Shield, ShoppingCart, ChevronLeft } from "lucide-react";
+import { Menu as MenuIcon, User, Store, LogOut, Shield, ShoppingCart, ChevronLeft, Percent, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,10 @@ export function SiteHeader() {
     const [settings, setSettings] = useState<any>({});
     const [loginOpen, setLoginOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [moreMenuOpen, setMoreMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const moreMenuRef = useRef<HTMLDivElement>(null);
 
     const { items } = useCart(); // Access cart items for length
 
@@ -70,6 +73,9 @@ export function SiteHeader() {
             if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
                 setUserMenuOpen(false);
             }
+            if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+                setMoreMenuOpen(false);
+            }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -79,27 +85,7 @@ export function SiteHeader() {
         <>
             <header className="fixed top-0 left-0 right-0 z-50 w-full pointer-events-none h-24">
 
-                {/* 1. Right Action: Cart (Floating Circle) - RTL: Right is Start */}
-                <div className="absolute top-4 right-4 pointer-events-auto z-50">
-                    <CartDrawer trigger={
-                        <Button
-                            size="icon"
-                            variant="secondary"
-                            className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
-                        >
-                            <div className="relative">
-                                <ShoppingCart className="h-5 w-5" />
-                                {items.length > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
-                                        {items.length}
-                                    </span>
-                                )}
-                            </div>
-                        </Button>
-                    } />
-                </div>
-
-                {/* 2. Left Action: Menu (Floating Circle) - RTL: Left is End */}
+                {/* 1. Left Action: Cart (Floating Circle) & User */}
                 <div className="absolute top-4 left-4 pointer-events-auto z-50 flex gap-2">
                     {/* User Menu Trigger - HIDDEN ON MOBILE */}
                     <div className="relative hidden md:block" ref={menuRef}>
@@ -143,8 +129,28 @@ export function SiteHeader() {
                         )}
                     </div>
 
+                    <CartDrawer trigger={
+                        <Button
+                            size="icon"
+                            variant="secondary"
+                            className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
+                        >
+                            <div className="relative">
+                                <ShoppingCart className="h-5 w-5" />
+                                {items.length > 0 && (
+                                    <span className="absolute -top-2 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                                        {items.length}
+                                    </span>
+                                )}
+                            </div>
+                        </Button>
+                    } />
+                </div>
+
+                {/* 2. Right Action: Menu (Floating Circle) */}
+                <div className="absolute top-4 right-4 pointer-events-auto z-50">
                     {/* Hamburger Menu Trigger */}
-                    <Sheet>
+                    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                         <SheetTrigger asChild>
                             <Button
                                 size="icon"
@@ -154,72 +160,81 @@ export function SiteHeader() {
                                 <MenuIcon className="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[85vw] sm:w-[380px] overflow-y-auto pt-10">
-                            <div className="flex flex-col h-full">
-                                <div className="flex items-center justify-center py-6 border-b border-slate-100">
-                                    <Logo src={settings.site_logo} />
+                        <SheetContent side="right" className="w-[85vw] sm:w-[320px] p-0 flex flex-col border-l-0 gap-0 [&>button]:top-4 [&>button]:right-4 [&>button]:h-8 [&>button]:w-8 [&>button]:bg-white/90 [&>button]:backdrop-blur [&>button]:text-slate-700 [&>button]:shadow-sm [&>button]:border [&>button]:border-white/20 [&>button]:hover:bg-white [&>button]:hover:scale-105 [&>button]:rounded-full [&>button]:z-[100] [&>button]:p-2 transition-all">
+                            {/* Header Area - Soft & Light (Glassmorphism) */}
+                            <div className="bg-gradient-to-b from-green-50/50 to-white/50 p-6 pt-12 flex flex-col items-center justify-center relative border-b border-green-50/50">
+                                <div className="relative z-10 scale-125 mb-2">
+                                    <Logo src={settings.site_logo} className="[&_span]:inline [&_span]:text-2xl [&_span]:text-green-900" />
                                 </div>
+                                <p className="text-green-800/80 text-sm mt-3 font-bold tracking-wide uppercase">הכי טרי • הכי קרוב • הכי טעים</p>
+                            </div>
 
-                                <nav className="flex-1 overflow-y-auto py-6 px-2 space-y-1">
+                            {/* Body Area - White */}
+                            <div className="flex-1 bg-white overflow-y-auto">
+                                <nav className="flex flex-col p-3 space-y-1 pb-20">
                                     <Link
                                         href="/"
-                                        className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100"
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-2xl bg-slate-100 p-2 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">🏠</span>
-                                            <span className="font-bold text-lg text-slate-800">דף הבית</span>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-bold text-sm text-slate-700 group-hover:text-[#14532d] transition-colors">דף הבית</span>
                                         </div>
-                                        <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                                        <ChevronLeft className="h-4 w-4 text-slate-300 group-hover:text-green-600 transition-colors" />
                                     </Link>
 
                                     {hasSaleItems && (
                                         <Link
                                             href="/category/specials"
-                                            className="flex items-center justify-between p-4 rounded-xl bg-red-50/50 border border-red-100 hover:bg-red-50 transition-colors group mt-2 mb-4"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="flex items-center justify-between p-3 rounded-xl bg-red-50/50 border border-red-100/50 hover:bg-red-50 transition-all group mt-1 mb-3"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <span className="relative flex h-10 w-10 items-center justify-center bg-white rounded-lg shadow-sm border border-red-100">
-                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20"></span>
-                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="flex h-8 w-8 items-center justify-center bg-white rounded-lg shadow-sm text-rose-500 text-xs">
+                                                    <Percent className="h-3.5 w-3.5" />
                                                 </span>
-                                                <span className="font-bold text-lg text-red-600">מבצעים חמים</span>
+                                                <span className="font-bold text-sm text-rose-600">מבצעים חמים</span>
                                             </div>
-                                            <ChevronLeft className="h-5 w-5 text-red-300 group-hover:text-red-600 transition-colors" />
+                                            <ChevronLeft className="h-4 w-4 text-red-300 group-hover:text-red-600 transition-colors" />
                                         </Link>
                                     )}
 
-                                    <div className="py-4">
-                                        <h3 className="px-4 text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">קטגוריות</h3>
-                                        <div className="space-y-1">
+                                    <div className="py-2">
+                                        <h3 className="px-3 text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider flex items-center gap-2">
+                                            <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                            קטגוריות
+                                        </h3>
+                                        <div className="space-y-0.5">
                                             {categories.map((cat) => (
                                                 <Link
                                                     key={cat.id}
                                                     href={`/category/${cat.id}`}
+                                                    onClick={() => setMobileMenuOpen(false)}
                                                     className={cn(
-                                                        "flex items-center justify-between p-4 rounded-xl transition-all group",
-                                                        "hover:bg-slate-50 hover:shadow-sm border border-transparent hover:border-slate-100",
-                                                        cat.id === 'specials' && "hidden" // Hide specials from regular list as it's already shown above
+                                                        "flex items-center justify-between p-2.5 px-3 rounded-lg transition-all group",
+                                                        "hover:bg-slate-50 hover:pl-1",
+                                                        cat.id === 'specials' && "hidden"
                                                     )}
                                                 >
-                                                    <span className="font-medium text-lg text-slate-700 group-hover:text-slate-900 group-hover:translate-x-1 transition-all">
+                                                    <span className="font-medium text-sm text-slate-600 group-hover:text-[#14532d] transition-colors">
                                                         {cat.name}
                                                     </span>
-                                                    <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                                                    <ChevronLeft className="h-3.5 w-3.5 text-slate-200 group-hover:text-green-600 transition-colors opacity-0 group-hover:opacity-100" />
                                                 </Link>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <div className="border-t border-slate-100 pt-4 mt-auto">
+                                    <div className="border-t border-slate-50 pt-4 mt-2">
                                         <Link
                                             href="/about"
-                                            className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 transition-colors group"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-all group"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <span className="text-2xl bg-slate-100 p-2 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">ℹ️</span>
-                                                <span className="font-bold text-lg text-slate-800">אודות</span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="font-bold text-sm text-slate-700">אודות</span>
                                             </div>
-                                            <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+                                            <ChevronLeft className="h-4 w-4 text-slate-300 group-hover:text-slate-600 transition-colors" />
                                         </Link>
                                     </div>
                                 </nav>
@@ -234,16 +249,18 @@ export function SiteHeader() {
                 </div>
 
                 {/* 4. Desktop Navigation (Centered below search) - Desktop Only */}
-                <nav className="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-auto z-40 hidden md:flex items-center gap-1 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full shadow-sm border border-white/20">
+                <nav className="absolute top-20 left-1/2 -translate-x-1/2 pointer-events-auto z-40 hidden md:flex items-center gap-1 bg-white/60 backdrop-blur-xl px-4 py-1.5 rounded-full shadow-lg shadow-green-900/5 border border-white/40">
 
                     <Link
                         href="/"
-                        className="px-3 py-1 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all"
+                        className="px-3 py-1 text-sm font-bold text-[#052e16] hover:text-[#14532d] hover:bg-green-100/50 rounded-full transition-all"
                     >
                         דף הבית
                     </Link>
                     <div className="w-[1px] h-3 bg-slate-300 mx-1" />
-                    {categories.slice(0, 5).map((cat) => (
+
+                    {/* Visible Categories */}
+                    {categories.slice(0, 6).map((cat) => (
                         <Link
                             key={cat.id}
                             href={`/category/${cat.id}`}
@@ -255,13 +272,40 @@ export function SiteHeader() {
                             {cat.name}
                         </Link>
                     ))}
-                    {categories.length > 5 && (
-                        <Link
-                            href="/categories"
-                            className="px-3 py-1 text-sm font-medium text-slate-500 hover:text-green-700 hover:bg-green-50 rounded-full transition-all"
-                        >
-                            עוד...
-                        </Link>
+
+                    {/* "More" Dropdown */}
+                    {categories.length > 6 && (
+                        <div className="relative" ref={moreMenuRef}>
+                            <button
+                                onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                                className={cn(
+                                    "flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full transition-all",
+                                    moreMenuOpen
+                                        ? "bg-green-100 text-[#14532d]"
+                                        : "text-[#052e16]/80 hover:text-[#14532d] hover:bg-green-100/50"
+                                )}
+                            >
+                                עוד...
+                                <ChevronDown className={cn("h-3 w-3 transition-transform", moreMenuOpen && "rotate-180")} />
+                            </button>
+
+                            {moreMenuOpen && (
+                                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="py-1">
+                                        {categories.slice(6).map((cat) => (
+                                            <Link
+                                                key={cat.id}
+                                                href={`/category/${cat.id}`}
+                                                onClick={() => setMoreMenuOpen(false)}
+                                                className="block px-4 py-2.5 text-sm text-green-950 hover:bg-green-50 hover:text-green-800 transition-colors text-right"
+                                            >
+                                                {cat.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {/* Sales Tab - Moved to end of categories */}
@@ -269,13 +313,10 @@ export function SiteHeader() {
                         <>
                             <div className="w-[1px] h-3 bg-slate-300 mx-1" />
                             <Link
-                                href="/category/specials"
-                                className="px-3 py-1 text-sm font-bold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full transition-all flex items-center gap-1"
+                                href={`/category/specials`}
+                                className="px-3 py-1 text-sm font-bold text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-full transition-all flex items-center gap-1"
                             >
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                                </span>
+                                <Percent className="w-4 h-4 text-rose-500" />
                                 מבצעים
                             </Link>
                         </>
