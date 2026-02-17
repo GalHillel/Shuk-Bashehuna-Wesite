@@ -51,6 +51,7 @@ export default function CheckoutPage() {
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
+    const [paymentMethod, setPaymentMethod] = useState<'cash' | 'bit'>('cash');
 
     const { register, handleSubmit, setValue, watch, formState: { errors }, clearErrors } = useForm<CheckoutFormValues>({
         defaultValues: {
@@ -93,6 +94,7 @@ export default function CheckoutPage() {
                 delivery_slot_start: deliveryStart.toISOString(),
                 delivery_slot_end: deliveryEnd.toISOString(),
                 delivery_method: deliveryMethod,
+                payment_method: paymentMethod,
                 shipping_address: deliveryMethod === 'delivery' ? {
                     city: values.city,
                     street: values.street,
@@ -150,7 +152,14 @@ export default function CheckoutPage() {
                             <CheckCircle2 className="w-10 h-10" />
                         </div>
                         <h1 className="text-3xl font-bold mb-2 text-slate-900">ההזמנה בוצעה בהצלחה!</h1>
-                        <p className="text-slate-600 mb-6 text-lg">תודה שבחרת בנו. ההזמנה שלך (# {orderNumber || orderId?.slice(0, 8)}) {deliveryMethod === 'pickup' ? 'תחכה לך בחנות כשתהיה מוכנה' : 'תשלח אליך בהקדם'}.</p>
+                        <p className="text-slate-600 mb-6 text-lg">
+                            תודה שבחרת בנו. ההזמנה שלך (# {orderNumber || orderId?.slice(0, 8)}) {deliveryMethod === 'pickup' ? 'תחכה לך בחנות כשתהיה מוכנה' : 'תשלח אליך בהקדם'}.
+                            {paymentMethod === 'bit' && (
+                                <span className="block mt-2 font-bold text-[#0083DA]">
+                                    אם טרם שילמת בביט, אנא בצע העברה למספר 054-663-7558
+                                </span>
+                            )}
+                        </p>
                         <Button
                             onClick={() => router.push("/")}
                             className="w-full max-w-xs py-6 text-lg rounded-2xl"
@@ -369,6 +378,71 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mt-8 mb-4">
+                                <span className="p-2 bg-green-50 rounded-lg text-green-700 font-bold">₪</span>
+                                <h3 className="text-lg font-bold text-slate-900">אמצעי תשלום</h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                <div
+                                    onClick={() => setPaymentMethod('cash')}
+                                    className={`cursor-pointer p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${paymentMethod === 'cash' ? 'border-green-600 bg-green-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+                                >
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cash' ? 'border-green-600' : 'border-slate-300'}`}>
+                                        {paymentMethod === 'cash' && <div className="w-2.5 h-2.5 rounded-full bg-green-600" />}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-slate-900">מזומן</p>
+                                        <p className="text-sm text-slate-500">תשלום ל{deliveryMethod === 'delivery' ? 'שליח' : 'קופאי'} במועד קבלת ההזמנה</p>
+                                    </div>
+                                </div>
+
+                                <div
+                                    onClick={() => setPaymentMethod('bit')}
+                                    className={`cursor-pointer p-4 rounded-xl border-2 transition-all ${paymentMethod === 'bit' ? 'border-[#0083DA] bg-blue-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+                                >
+                                    <div className="flex items-center gap-4 mb-3">
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'bit' ? 'border-[#0083DA]' : 'border-slate-300'}`}>
+                                            {paymentMethod === 'bit' && <div className="w-2.5 h-2.5 rounded-full bg-[#0083DA]" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-900">Bit (ביט)</p>
+                                            <p className="text-sm text-slate-500">העברה מהירה ומאובטחת</p>
+                                        </div>
+                                    </div>
+
+                                    {paymentMethod === 'bit' && (
+                                        <div className="mr-9 space-y-3 animate-in fade-in slide-in-from-top-2">
+                                            <div className="bg-white p-3 rounded-lg border border-blue-100 text-sm">
+                                                <p className="mb-1 text-slate-600">מספר העסק:</p>
+                                                <p className="font-mono font-bold text-lg text-slate-900 tracking-wider">054-663-7558</p>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    const total = totalPriceEstimated().toFixed(2);
+                                                    navigator.clipboard.writeText(total);
+                                                    import("sonner").then(({ toast }) => toast.success("הסכום הועתק! עובר לאפליקציית ביט..."));
+                                                    setTimeout(() => {
+                                                        window.location.href = "https://bitpay.co.il/app/me/0546637558";
+                                                    }, 1500);
+                                                }}
+                                                className="w-full bg-[#0083DA] hover:bg-[#006bb3] text-white font-bold h-12 rounded-xl"
+                                            >
+                                                העתק סכום (₪{totalPriceEstimated().toFixed(2)}) ופתח את ביט
+                                            </Button>
+                                            <p className="text-xs text-slate-400 text-center">
+                                                * לאחר התשלום בביט, זכור לחזור לכאן וללחוץ על "שלח הזמנה"
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="flex items-start gap-3 mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
                             <Checkbox
                                 id="terms"
@@ -405,7 +479,7 @@ export default function CheckoutPage() {
                                     שולח הזמנה...
                                 </>
                             ) : (
-                                `שלח הזמנה (תשלום מול ה${deliveryMethod === 'delivery' ? 'שליח' : 'קופאי'})`
+                                `שלח הזמנה סיים רכישה`
                             )}
                         </Button>
                     </form>

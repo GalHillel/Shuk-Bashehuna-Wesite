@@ -101,6 +101,7 @@ export interface Database {
                     delivery_slot_start: string | null
                     delivery_slot_end: string | null
                     delivery_method?: 'delivery' | 'pickup'
+                    payment_method?: 'cash' | 'bit'
                     order_number?: string
                     shipping_address: Json
                     notes: string | null
@@ -116,6 +117,8 @@ export interface Database {
                     total_price_final?: number | null
                     delivery_slot_start?: string | null
                     delivery_slot_end?: string | null
+                    delivery_method?: 'delivery' | 'pickup'
+                    payment_method?: 'cash' | 'bit'
                     shipping_address: Json
                     notes?: string | null
                     created_at?: string
