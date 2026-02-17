@@ -19,6 +19,7 @@ import Link from "next/link";
 
 import { revalidateHomepage } from "@/app/actions/revalidate";
 import { toast } from "sonner";
+import { deleteContentBlock } from "./actions";
 
 const BLOCK_TYPE_LABELS: Record<string, string> = {
     hero_slider: "סליידר ראשי",
@@ -62,13 +63,18 @@ export default function AdminContentPage() {
     }
 
     async function deleteBlock(e: React.MouseEvent, id: number) {
-        e.stopPropagation();
+        e.stopPropagation(); // Stop row click
+
         if (!confirm("האם אתה בטוח שברצונך למחוק בלוק זה?")) return;
 
-        await supabase.from("content_blocks").delete().eq("id", id);
-        await revalidateHomepage();
-        fetchBlocks();
-        toast.success("הבלוק נמחק בהצלחה");
+        const result = await deleteContentBlock(id);
+
+        if (result.success) {
+            toast.success("הבלוק נמחק בהצלחה");
+            fetchBlocks(); // Refresh list
+        } else {
+            toast.error("שגיאה במחיקת הבלוק: " + result.error);
+        }
     }
 
     async function moveBlock(id: number, direction: "up" | "down") {
