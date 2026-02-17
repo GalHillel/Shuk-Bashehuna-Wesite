@@ -123,54 +123,25 @@ export default function CheckoutPage() {
                     : item.product.price)
             }));
 
-            // 2. Submit via Server Action (Bypassing RLS)
+            // 2. Submit via Server Action (Logic includes Redirect)
             const result = await submitOrder(orderPayload, orderItemsPayload);
 
-            if (!result.success) {
+            // If we are here, it means NO redirect happened, so check for error
+            if (result && !result.success) {
                 throw new Error(result.error);
             }
 
-            // 3. Success
-            setOrderId(result.orderId || null);
-            setOrderNumber(result.orderNumber || null);
-            setIsSuccess(true);
-            clearCart();
         } catch (error: any) {
             console.error("Order error:", error);
-            alert(`שגיאה בביצוע ההזמנה: ${error.message || "שגיאה לא ידועה"}`);
-        } finally {
-            setIsSubmitting(false);
+            // Ignore redirect error if it bubbled up somehow, though server action usually handles it
+            if (error.message !== "NEXT_REDIRECT") {
+                alert(`שגיאה בביצוע ההזמנה: ${error.message || "שגיאה לא ידועה"}`);
+                setIsSubmitting(false);
+            }
         }
     };
 
-    if (isSuccess) {
-        return (
-            <div className="min-h-screen bg-slate-50 flex flex-col">
-                <main className="flex-1 max-w-2xl mx-auto px-4 py-20 text-center">
-                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
-                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-                            <CheckCircle2 className="w-10 h-10" />
-                        </div>
-                        <h1 className="text-3xl font-bold mb-2 text-slate-900">ההזמנה בוצעה בהצלחה!</h1>
-                        <p className="text-slate-600 mb-6 text-lg">
-                            תודה שבחרת בנו. ההזמנה שלך (# {orderNumber || orderId?.slice(0, 8)}) {deliveryMethod === 'pickup' ? 'תחכה לך בחנות כשתהיה מוכנה' : 'תשלח אליך בהקדם'}.
-                            {paymentMethod === 'bit' && (
-                                <span className="block mt-2 font-bold text-[#0083DA]">
-                                    אם טרם שילמת בביט, אנא בצע העברה למספר 054-663-7558
-                                </span>
-                            )}
-                        </p>
-                        <Button
-                            onClick={() => router.push("/")}
-                            className="w-full max-w-xs py-6 text-lg rounded-2xl"
-                        >
-                            חזרה לדף הבית
-                        </Button>
-                    </div>
-                </main >
-            </div >
-        );
-    }
+
 
     return (
         <div className="min-h-screen bg-white flex flex-col">

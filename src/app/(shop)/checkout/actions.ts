@@ -15,7 +15,11 @@ const supabaseAdmin = createClient<Database>(
     }
 )
 
+import { redirect } from 'next/navigation';
+
 export async function submitOrder(orderData: any, orderItems: any[]) {
+    let orderId = null;
+
     try {
         // 1. Create Order
         const { data: order, error: orderError } = await supabaseAdmin
@@ -45,20 +49,20 @@ export async function submitOrder(orderData: any, orderItems: any[]) {
             .insert(itemsWithOrderId);
 
         if (itemsError) {
-            // Optional: Delete the order if items fail? 
-            // For now, just throw, but in production consider cleanup.
             console.error("Order items failed:", itemsError);
             throw new Error(`Order items creation failed: ${itemsError.message}`);
         }
 
-        return {
-            success: true,
-            orderId: order.id,
-            orderNumber: (order.shipping_address as any)?.order_number
-        };
+        orderId = order.id;
 
     } catch (error: any) {
         console.error("Server Action Error:", error);
         return { success: false, error: error.message };
     }
+
+    if (orderId) {
+        redirect(`/checkout/success?order_id=${orderId}`);
+    }
+
+    return { success: false, error: "Unknown error" };
 }
