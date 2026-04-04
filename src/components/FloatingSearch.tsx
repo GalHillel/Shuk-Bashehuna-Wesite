@@ -75,7 +75,7 @@ export function FloatingSearch({ logoSrc }: FloatingSearchProps) {
                 "group flex h-12 items-center gap-3 rounded-full bg-white/90 px-4 py-2 shadow-sm backdrop-blur-md transition-all duration-500 border border-white/20",
                 "hover:w-[350px] md:hover:w-[500px] hover:bg-white hover:shadow-md",
                 "focus-within:w-[350px] md:focus-within:w-[500px] focus-within:bg-white focus-within:shadow-md",
-                isOpen ? "w-[350px] md:w-[500px] bg-white rounded-b-none rounded-t-2xl shadow-none border-b-0" : "w-[180px]"
+                isOpen ? "w-[350px] md:w-[500px] bg-white rounded-b-none rounded-t-2xl shadow-none border-b-0" : "w-[130px] md:w-[180px]"
             )}>
 
                 {/* Logo Icon (Always visible) */}

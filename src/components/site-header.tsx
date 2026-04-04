@@ -86,13 +86,13 @@ export function SiteHeader() {
             <header className="fixed top-0 left-0 right-0 z-50 w-full pointer-events-none h-24">
 
                 {/* 1. Left Action: Cart (Floating Circle) & User */}
-                <div className="absolute top-4 left-4 pointer-events-auto z-50 flex gap-2">
-                    {/* User Menu Trigger - HIDDEN ON MOBILE */}
-                    <div className="relative hidden md:block" ref={menuRef}>
+                <div className="absolute top-4 left-4 pointer-events-auto z-50 flex gap-1.5 md:gap-2">
+                    {/* User Menu Trigger */}
+                    <div className="relative" ref={menuRef}>
                         <Button
                             size="icon"
                             variant="secondary"
-                            className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
+                            className="h-10 w-10 md:h-12 md:w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
                             onClick={() => user ? setUserMenuOpen(!userMenuOpen) : setLoginOpen(true)}
                         >
                             <User className="h-5 w-5" />
@@ -133,7 +133,7 @@ export function SiteHeader() {
                         <Button
                             size="icon"
                             variant="secondary"
-                            className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
+                            className="h-10 w-10 md:h-12 md:w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
                         >
                             <div className="relative">
                                 <ShoppingCart className="h-5 w-5" />
@@ -155,7 +155,7 @@ export function SiteHeader() {
                             <Button
                                 size="icon"
                                 variant="secondary"
-                                className="h-12 w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
+                                className="h-10 w-10 md:h-12 md:w-12 rounded-full shadow-sm bg-white/90 backdrop-blur hover:bg-white hover:scale-105 transition-all text-slate-700 border border-white/20"
                             >
                                 <MenuIcon className="h-5 w-5" />
                             </Button>
