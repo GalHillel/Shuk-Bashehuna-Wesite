@@ -25,7 +25,7 @@ export function CategoryCircles() {
     }, [supabase]);
 
     return (
-        <section className="container mx-auto px-4 py-8">
+        <section className="container mx-auto px-4 py-8 md:hidden">
             <h3 className="text-xl font-bold mb-6 text-right">קטגוריות</h3>
             <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x px-2">
                 {categories.map((cat) => (
