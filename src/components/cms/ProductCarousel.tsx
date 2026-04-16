@@ -55,14 +55,14 @@ export function ProductCarousel({ title, data }: ProductCarouselProps) {
     if (products.length === 0) return null;
 
     return (
-        <section className="container py-12">
-            <div className="flex items-center justify-between mb-8">
-                <h3 className="text-3xl font-bold text-[#14532d]">{title}</h3>
+        <section className="container py-4 md:py-6">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl font-extrabold text-slate-800 tracking-tight">{title}</h3>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => scroll('right')} className="rounded-full h-10 w-10 border-green-200 hover:bg-green-50 text-green-800">
+                    <Button variant="outline" size="icon" onClick={() => scroll('right')} className="rounded-full h-10 w-10 border-slate-200 hover:bg-slate-50 text-slate-700 bg-white shadow-sm">
                         <ChevronRight className="h-5 w-5" />
                     </Button>
-                    <Button variant="outline" size="icon" onClick={() => scroll('left')} className="rounded-full h-10 w-10 border-green-200 hover:bg-green-50 text-green-800">
+                    <Button variant="outline" size="icon" onClick={() => scroll('left')} className="rounded-full h-10 w-10 border-slate-200 hover:bg-slate-50 text-slate-700 bg-white shadow-sm">
                         <ChevronLeft className="h-5 w-5" />
                     </Button>
                 </div>
@@ -70,17 +70,17 @@ export function ProductCarousel({ title, data }: ProductCarouselProps) {
 
             <div
                 ref={scrollContainerRef}
-                className="flex overflow-x-auto gap-4 pb-8 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory"
+                className="flex flex-row overflow-x-auto gap-3 md:gap-4 pb-4 md:pb-4 -mx-4 md:-mx-4 px-4 md:px-4 scrollbar-hide snap-x snap-mandatory"
             >
                 {products.map((product) => (
-                    <div key={product.id} className="min-w-[220px] md:min-w-[280px] snap-start">
+                    <div key={product.id} className="w-[165px] sm:w-[180px] md:w-[190px] lg:w-[200px] xl:w-[220px] shrink-0 snap-start">
                         <ProductCard product={product} />
                     </div>
                 ))}
             </div>
             {data.category_id && (
                 <div className="text-center mt-2">
-                    <Button variant="link" asChild className="text-primary text-lg">
+                    <Button variant="link" asChild className="text-primary text-lg font-bold">
                         <Link href={`/category/${data.category_id}`}>לכל המוצרים בקטגוריה &larr;</Link>
                     </Button>
                 </div>

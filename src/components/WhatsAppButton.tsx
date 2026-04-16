@@ -10,7 +10,7 @@ export function WhatsAppButton() {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-                "fixed bottom-16 left-0 z-40 flex items-center gap-2",
+                "fixed bottom-14 left-0 z-40 flex items-center gap-2",
                 "bg-[#00E785] text-white shadow-[4px_5px_10px_rgba(0,0,0,0.4)]",
                 "h-8 pr-2 pl-3 rounded-r-full", // Compact size (32px)
                 "transition-transform duration-300 ease-out",

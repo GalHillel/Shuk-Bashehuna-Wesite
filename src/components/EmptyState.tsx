@@ -17,27 +17,30 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
     return (
-        <div className={cn("flex flex-col items-center justify-center py-16 text-center animate-in fade-in zoom-in duration-300", className)}>
-            <div className="bg-slate-50 p-6 rounded-full mb-6 relative">
-                <Icon className="h-12 w-12 text-slate-300" />
-                <div className="absolute inset-0 bg-green-100/50 rounded-full blur-xl -z-10 animate-pulse" />
+        <div className={cn("flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500", className)}>
+            <div className="relative mb-8">
+                <div className="bg-[#f6fbe8] p-8 rounded-[40px] relative z-10 border-2 border-dashed border-[#d7f59d]/60">
+                    <Icon className="h-16 w-16 text-[#AADB56] stroke-[1.5]" />
+                </div>
+                {/* Decorative background elements */}
+                <div className="absolute -top-4 -right-4 w-12 h-12 bg-[#d7f59d]/30 rounded-full blur-xl -z-0" />
+                <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-[#AADB56]/10 rounded-full blur-2xl -z-0" />
             </div>
 
-            <h3 className="text-xl font-bold text-slate-900 mb-2">{title}</h3>
-            <p className="text-slate-500 max-w-sm mx-auto mb-8 text-base">
+            <h3 className="text-[32px] font-black text-[#1b3626] mb-3 tracking-tight leading-tight">{title}</h3>
+            <p className="text-slate-500 max-w-sm mx-auto mb-10 text-[17px] font-medium leading-relaxed">
                 {description}
             </p>
 
             {action && (
                 action.href ? (
-                    <Button asChild size="lg" className="rounded-full font-bold px-8 shadow-lg shadow-green-900/10 hover:shadow-green-900/20 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 transition-all hover:-translate-y-1">
+                    <Button asChild className="h-14 rounded-full font-black px-10 text-[18px] shadow-xl shadow-[#1b3626]/10 bg-[#1b3626] hover:bg-black text-white transition-all transform hover:scale-105 active:scale-95">
                         <Link href={action.href}>{action.label}</Link>
                     </Button>
                 ) : (
                     <Button
-                        size="lg"
                         onClick={action.onClick}
-                        className="rounded-full font-bold px-8 shadow-lg shadow-green-900/10 hover:shadow-green-900/20 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 transition-all hover:-translate-y-1"
+                        className="h-14 rounded-full font-black px-10 text-[18px] shadow-xl shadow-[#1b3626]/10 bg-[#1b3626] hover:bg-black text-white transition-all transform hover:scale-105 active:scale-95"
                     >
                         {action.label}
                     </Button>

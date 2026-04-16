@@ -54,35 +54,52 @@ export default async function Home() {
   const blocks = await getHomepageBlocks();
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-transparent">
       <main className="flex-1">
-        {blocks.map((block: ContentBlock) => {
+        {blocks.map((block: ContentBlock, index: number) => {
+          let content = null;
           switch (block.type) {
             case 'hero_slider':
-              return <HeroSlider key={block.id} data={block.data as unknown as HeroSliderData} />;
+              content = <HeroSlider data={block.data as unknown as HeroSliderData} />;
+              break;
             case 'category_grid':
-              return <CategoryCircles key={block.id} />;
+              content = <CategoryCircles />;
+              break;
             case 'banners_grid':
-              return <BannersGrid key={block.id} data={block.data as unknown as BannersGridData} />;
+              content = <BannersGrid data={block.data as unknown as BannersGridData} />;
+              break;
             case 'product_carousel':
-              return (
+              content = (
                 <ProductCarousel
-                  key={block.id}
                   title={block.title || 'מוצרים נבחרים'}
                   data={block.data as unknown as ProductCarouselData}
                 />
               );
+              break;
             case 'text_banner': {
               const bannerData = block.data as unknown as { text?: string; bg_color?: string };
-              return (
-                <div key={block.id} className="py-6 px-4 text-center text-lg font-medium" style={{ backgroundColor: bannerData.bg_color || '#f0fdf4' }}>
+              content = (
+                <div className="py-6 px-4 text-center text-lg font-medium" style={{ backgroundColor: bannerData.bg_color || '#f0fdf4' }}>
                   {bannerData.text || ''}
                 </div>
               );
+              break;
             }
-            default:
-              return null;
           }
+          
+          if (!content) return null;
+
+          // Hero shouldn't have artificial wrapper padding/bg if it's supposed to be edge-to-edge
+          if (block.type === 'hero_slider' || block.type === 'text_banner') {
+            return <div key={block.id}>{content}</div>;
+          }
+
+          // Uniform background handles the styling now
+          return (
+             <div key={block.id} className="py-2 md:py-3 px-4 md:px-6">
+                 {content}
+             </div>
+          );
         })}
       </main>
     </div>

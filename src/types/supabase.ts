@@ -19,6 +19,7 @@ export interface Database {
                     unit_type: 'kg' | 'unit' | 'pack'
                     image_url: string | null
                     category_id: string | null
+                    subcategory_id: string | null
                     is_active: boolean
                     is_on_sale: boolean
                     sale_price: number | null
@@ -33,6 +34,7 @@ export interface Database {
                     unit_type: 'kg' | 'unit' | 'pack'
                     image_url?: string | null
                     category_id?: string | null
+                    subcategory_id?: string | null
                     is_active?: boolean
                     is_on_sale?: boolean
                     sale_price?: number | null
@@ -47,6 +49,7 @@ export interface Database {
                     unit_type?: 'kg' | 'unit' | 'pack'
                     image_url?: string | null
                     category_id?: string | null
+                    subcategory_id?: string | null
                     is_active?: boolean
                     is_on_sale?: boolean
                     sale_price?: number | null
@@ -63,6 +66,7 @@ export interface Database {
                 Row: {
                     id: string
                     name: string
+                    parent_id: string | null
                     image_url: string | null
                     sort_order: number
                     is_visible: boolean
@@ -71,6 +75,7 @@ export interface Database {
                 Insert: {
                     id?: string
                     name: string
+                    parent_id?: string | null
                     image_url?: string | null
                     sort_order?: number
                     is_visible?: boolean
@@ -79,6 +84,7 @@ export interface Database {
                 Update: {
                     id?: string
                     name?: string
+                    parent_id?: string | null
                     image_url?: string | null
                     sort_order?: number
                     is_visible?: boolean

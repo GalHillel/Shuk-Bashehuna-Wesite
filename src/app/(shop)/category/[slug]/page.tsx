@@ -39,6 +39,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     if (slug === 'specials' || slug === 'sale') {
         category = {
             id: 'specials',
+            parent_id: null,
             name: 'מבצעים',
             slug: 'specials',
             image_url: null,
@@ -59,6 +60,32 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         notFound();
     }
 
+    // Fetch related subcategories
+    let subCategories: Category[] = [];
+    let parentCategory: Category | null = null;
+    if (slug !== 'specials' && slug !== 'sale') {
+        const parentIdToLookup = category.parent_id ? category.parent_id : category.id;
+        
+        // Fetch parent category details if current is a sub
+        if (category.parent_id) {
+            const { data: pData } = await supabase.from("categories").select("*").eq("id", category.parent_id).single();
+            parentCategory = pData;
+        } else {
+            parentCategory = category;
+        }
+
+        const { data: subsData } = await supabase
+            .from("categories")
+            .select("*")
+            .eq("parent_id", parentIdToLookup)
+            .eq("is_visible", true)
+            .order("sort_order", { ascending: true });
+        
+        if (subsData) {
+            subCategories = subsData;
+        }
+    }
+
     // 2. Fetch Products
     let query = supabase
         .from("products")
@@ -69,7 +96,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     if (slug === 'specials' || slug === 'sale') {
         query = query.eq("is_on_sale", true);
     } else {
-        query = query.eq("category_id", slug);
+        query = query.or(`category_id.eq.${slug},subcategory_id.eq.${slug}`);
     }
 
     const { data: productsData } = await query;
@@ -78,17 +105,18 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     }
 
     return (
-        <div className="flex min-h-screen flex-col bg-slate-50/50">
-            <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="flex min-h-screen flex-col bg-transparent overflow-x-hidden">
+            <main className="flex-1 container mx-auto px-6 md:px-8 py-8">
                 <div className="flex flex-col gap-6">
-                    <div className="flex flex-col gap-2 items-center mb-6">
-                        <h1 className="text-4xl font-extrabold tracking-tight text-center text-[#052e16] drop-shadow-sm">{category.name}</h1>
-                        <p className="text-slate-500 text-center font-medium">
-                            {products.length} מוצרים בקטגוריה
-                        </p>
-                    </div>
 
-                    <CategoryPageClient initialProducts={products} />
+
+                    <CategoryPageClient 
+                        initialProducts={products} 
+                        subCategories={subCategories} 
+                        currentSlug={slug}
+                        parentCategorySlug={category.parent_id ? category.parent_id : category.id}
+                        parentCategoryName={parentCategory?.name || category.name}
+                    />
                 </div>
             </main>
         </div>

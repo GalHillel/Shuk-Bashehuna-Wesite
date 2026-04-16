@@ -7,6 +7,7 @@ import { Product } from "@/types/supabase";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/store/useCart";
 
 export function GlobalSearch() {
     const [query, setQuery] = useState("");
@@ -69,6 +70,16 @@ export function GlobalSearch() {
         setIsOpen(false);
     };
 
+    const { addItem } = useCart();
+
+    const handleAdd = (e: React.MouseEvent, product: Product) => {
+        e.stopPropagation();
+        e.preventDefault();
+        addItem(product, 1);
+        setIsOpen(false);
+        setQuery("");
+    };
+
     return (
         <div className="relative w-full" ref={dropdownRef}>
             <div className="relative">
@@ -77,72 +88,81 @@ export function GlobalSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => query.length >= 2 && setIsOpen(true)}
-                    className="w-full bg-secondary/30 border border-transparent focus:border-primary rounded-full py-2.5 pr-12 pl-10 outline-none transition-all placeholder:text-muted-foreground"
-                    placeholder="מה בא לך לחפש?"
+                    className="w-full bg-white text-slate-800 focus:ring-4 focus:ring-white/30 border-none rounded-full py-4 pr-14 pl-14 shadow-md outline-none transition-all placeholder:text-slate-400 font-bold"
+                    placeholder="מה תרצו להזמין היום?"
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400">
                     {isLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                        <Search className="h-5 w-5" />
+                        <Search className="h-6 w-6" />
                     )}
                 </div>
                 {query && (
                     <button
                         onClick={clearSearch}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary rounded-full transition-colors"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
                     >
-                        <X className="h-4 w-4 text-muted-foreground" />
+                        <X className="h-4 w-4 text-slate-600" />
                     </button>
                 )}
             </div>
 
             {/* Results Dropdown */}
             {isOpen && (
-                <div className="absolute top-full mt-2 w-full bg-background border rounded-2xl shadow-xl overflow-hidden z-[60]">
+                <div className="absolute top-[calc(100%+8px)] w-full bg-white border border-slate-100 rounded-2xl shadow-xl overflow-hidden z-[60] animate-in fade-in slide-in-from-top-2">
                     {results.length > 0 ? (
                         <div className="flex flex-col">
-                            <div className="p-3 bg-secondary/20 text-xs font-semibold text-muted-foreground">מוצרים שנמצאו</div>
+                            <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">מוצרים שנמצאו</div>
                             {results.map((product) => (
-                                <button
+                                <div
                                     key={product.id}
                                     onClick={() => handleSelect(product.id)}
-                                    className="flex items-center gap-3 p-3 hover:bg-secondary/50 transition-colors text-right w-full"
+                                    role="button"
+                                    tabIndex={0}
+                                    className="group flex items-center gap-4 p-3 hover:bg-slate-50 transition-colors text-right w-full border-b border-slate-50 last:border-0 cursor-pointer"
                                 >
-                                    <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-secondary/20">
+                                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-white shadow-sm border border-slate-100">
                                         <Image
-                                            src={product.image_url || "/placeholder.svg"}
+                                            src={product.image_url || "/placeholder.png"}
                                             alt={product.name}
                                             fill
-                                            className="object-cover"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                     </div>
-                                    <div className="flex flex-col flex-1">
-                                        <span className="font-bold text-sm">{product.name}</span>
+                                    <div className="flex flex-col flex-1 justify-center gap-1">
+                                        <span className="font-bold text-[15px] text-slate-800 leading-tight">{product.name}</span>
                                         <div className="flex items-center gap-2">
                                             {product.is_on_sale && product.sale_price ? (
                                                 <>
-                                                    <span className="text-red-600 font-bold text-xs">₪{product.sale_price.toFixed(2)}</span>
-                                                    <span className="text-muted-foreground line-through text-[10px]">₪{product.price.toFixed(2)}</span>
+                                                    <span className="text-red-600 font-bold text-sm">₪{product.sale_price.toFixed(2)}</span>
+                                                    <span className="text-slate-400 line-through text-xs">₪{product.price.toFixed(2)}</span>
                                                 </>
                                             ) : (
-                                                <span className="text-primary font-bold text-xs">₪{product.price.toFixed(2)}</span>
+                                                <span className="text-primary font-bold text-sm">₪{product.price.toFixed(2)}</span>
                                             )}
                                         </div>
                                     </div>
-                                </button>
+                                    <button
+                                        onClick={(e) => handleAdd(e, product)}
+                                        className="h-10 w-10 flex-shrink-0 bg-green-50 hover:bg-primary text-primary hover:text-white rounded-full flex items-center justify-center transition-all shadow-sm"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    </button>
+                                </div>
                             ))}
                             <Link
                                 href={`/search?q=${query}`}
                                 onClick={() => setIsOpen(false)}
-                                className="p-3 text-center text-sm font-medium text-primary hover:bg-primary/5 transition-colors border-t"
+                                className="p-3 text-center text-sm font-bold text-primary hover:bg-green-50 transition-colors bg-slate-50"
                             >
                                 לכל התוצאות עבור &quot;{query}&quot;
                             </Link>
                         </div>
                     ) : query.length >= 2 && !isLoading ? (
-                        <div className="p-8 text-center">
-                            <p className="text-muted-foreground">לא נמצאו מוצרים עבור &quot;{query}&quot;</p>
+                        <div className="p-8 text-center flex flex-col items-center gap-3">
+                            <span className="bg-slate-100 p-3 rounded-full"><Search className="h-6 w-6 text-slate-400" /></span>
+                            <p className="text-slate-500 font-medium">לא נמצאו מוצרים עבור &quot;{query}&quot;</p>
                         </div>
                     ) : null}
                 </div>

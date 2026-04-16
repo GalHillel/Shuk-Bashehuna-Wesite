@@ -45,6 +45,7 @@ interface ProductFormValues {
     unit_type: string;
     image_url: string;
     category_id: string;
+    subcategory_id: string;
     is_active: boolean;
 }
 
@@ -78,9 +79,14 @@ export function ProductForm({ product }: ProductFormProps) {
             unit_type: product?.unit_type || "kg",
             image_url: product?.image_url || "",
             category_id: product?.category_id || "",
+            subcategory_id: product?.subcategory_id || "none",
             is_active: product?.is_active ?? true,
         },
     });
+
+    const selectedCategoryId = form.watch("category_id");
+    const parentCategories = categories.filter(c => !c.parent_id);
+    const availableSubCategories = categories.filter(c => c.parent_id === selectedCategoryId);
 
 
 
@@ -101,6 +107,7 @@ export function ProductForm({ product }: ProductFormProps) {
             unit_type: values.unit_type as "kg" | "unit" | "pack",
             image_url: values.image_url || null,
             category_id: values.category_id || null,
+            subcategory_id: values.subcategory_id === "none" ? null : values.subcategory_id,
             is_active: values.is_active,
         };
 
@@ -229,7 +236,7 @@ export function ProductForm({ product }: ProductFormProps) {
                     )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <FormField
                         control={form.control}
                         name="price"
@@ -274,15 +281,39 @@ export function ProductForm({ product }: ProductFormProps) {
                         rules={{ required: "קטגוריה חובה" }}
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-slate-900 font-bold">קטגוריה</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormLabel className="text-slate-900 font-bold">קטגוריה ראשית</FormLabel>
+                                <Select onValueChange={(val) => { field.onChange(val); form.setValue("subcategory_id", "none"); }} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger className="h-12 rounded-xl">
                                             <SelectValue placeholder="בחר קטגוריה" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {categories.map(cat => (
+                                        {parentCategories.map(cat => (
+                                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="subcategory_id"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-slate-900 font-bold">תת-קטגוריה</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value} disabled={availableSubCategories.length === 0}>
+                                    <FormControl>
+                                        <SelectTrigger className="h-12 rounded-xl">
+                                            <SelectValue placeholder={availableSubCategories.length === 0 ? "אין תתי-קטגוריות" : "ללא תת-קטגוריה"} />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="none">ללא תת-קטגוריה</SelectItem>
+                                        {availableSubCategories.map(cat => (
                                             <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                                         ))}
                                     </SelectContent>
@@ -376,7 +407,7 @@ export function ProductForm({ product }: ProductFormProps) {
                     <Button variant="outline" type="button" onClick={() => router.back()} className="flex-1 md:flex-none h-12 px-8 rounded-xl font-bold" disabled={submitting}>
                         ביטול
                     </Button>
-                    <Button type="submit" className="flex-1 md:flex-none h-12 px-12 rounded-xl font-bold bg-slate-900 shadow-lg shadow-slate-900/20 md:shadow-none" disabled={submitting}>
+                    <Button type="submit" className="flex-1 md:flex-none h-12 px-12 rounded-xl font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 md:shadow-none transition-all" disabled={submitting}>
                         {submitting ? (
                             <>
                                 <Loader2 className="animate-spin ml-2 h-4 w-4" />

@@ -77,7 +77,7 @@ export function AccessibilityToolbar() {
 
             {/* Accessibility Panel */}
             {isOpen && (
-                <div className="fixed bottom-16 left-4 z-[90] w-[300px] bg-[#18181b] text-white rounded-2xl shadow-2xl border border-white/10 overflow-hidden animate-in slide-in-from-left-5 fade-in duration-300 backdrop-blur-sm">
+                <div className="fixed bottom-[90px] left-4 z-[90] w-[300px] bg-[#18181b] text-white rounded-2xl shadow-2xl border border-white/10 overflow-hidden animate-in slide-in-from-left-5 fade-in duration-300 backdrop-blur-sm">
                     {/* Header */}
                     <div className="p-4 bg-white/5 border-b border-white/10 flex items-center justify-between">
                         <h3 className="font-bold flex items-center gap-2">

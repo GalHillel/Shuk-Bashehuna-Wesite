@@ -27,51 +27,95 @@ export function Footer() {
     }, []);
 
     return (
-        // Super Compact Footer V3 (Max 3 Lines)
-        <footer className="bg-[#14532d] text-green-100 mt-auto border-t border-green-800 text-xs" dir="rtl">
-            <div className="container mx-auto px-4 py-4">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+        <footer className="bg-[#112a1e] text-green-100 mt-auto border-t border-[#AADB56] py-16" dir="rtl">
+            <div className="container mx-auto px-6 md:px-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+                    
+                    {/* Column 1: בואו להכיר */}
+                    <div>
+                        <h4 className="text-white font-black text-2xl mb-6 tracking-tight relative inline-block">
+                            בואו להכיר
+                            <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-[#AADB56] rounded-full"></span>
+                        </h4>
+                        <ul className="space-y-3.5 font-bold text-[#ebf3db]/80">
+                            <li><Link href="/about" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> אודות</Link></li>
+                            <li><Link href="/kosher" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> תעודת כשרות</Link></li>
+                            <li><Link href="/faq" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> שאלות נפוצות</Link></li>
+                            <li><Link href="/terms" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> תנאי שימוש באתר</Link></li>
+                            <li><Link href="/accessibility" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> הצהרת נגישות</Link></li>
+                        </ul>
+                    </div>
 
-                    {/* Line 1 (Desktop Left): Contact Only */}
-                    <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 w-full md:w-auto">
-                        {/* Contact (Inline) */}
-                        <div className="flex items-center gap-4">
+                    {/* Column 2: החנות */}
+                    <div>
+                        <h4 className="text-white font-black text-2xl mb-6 tracking-tight relative inline-block">
+                            החנות
+                            <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-[#AADB56] rounded-full"></span>
+                        </h4>
+                        <ul className="grid grid-cols-2 gap-x-4 gap-y-3.5 font-bold text-[#ebf3db]/80">
+                            <li><Link href="/category/fruits" className="hover:text-[#AADB56] transition-colors">פירות השוק</Link></li>
+                            <li><Link href="/category/vegetables" className="hover:text-[#AADB56] transition-colors">ירקות השוק</Link></li>
+                            <li><Link href="/category/greens" className="hover:text-[#AADB56] transition-colors">ירוקים וחסות</Link></li>
+                            <li><Link href="/category/platters" className="hover:text-[#AADB56] transition-colors">מגשי אירוח</Link></li>
+                            <li><Link href="/category/nuts" className="hover:text-[#AADB56] transition-colors">אגוזים ופירות יבשים</Link></li>
+                            <li><Link href="/category/juices" className="hover:text-[#AADB56] transition-colors">מיצים טבעיים</Link></li>
+                            <li><Link href="/category/pantry" className="hover:text-[#AADB56] transition-colors">המזווה שלנו</Link></li>
+                            <li><Link href="/category/dairy" className="hover:text-[#AADB56] transition-colors">מוצרי חלב וביצים</Link></li>
+                            <li><Link href="/category/breads" className="hover:text-[#AADB56] transition-colors">לחמים</Link></li>
+                            <li><Link href="/category/drinks" className="hover:text-[#AADB56] transition-colors">משקאות ויינות</Link></li>
+                            <li><Link href="/category/home" className="hover:text-[#AADB56] transition-colors">לבית ולמטבח</Link></li>
+                        </ul>
+                    </div>
+
+                    {/* Column 3: שירות לקוחות */}
+                    <div>
+                        <h4 className="text-white font-black text-2xl mb-6 tracking-tight relative inline-block">
+                            שירות לקוחות
+                            <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-[#AADB56] rounded-full"></span>
+                        </h4>
+                        <div className="space-y-5 text-[#ebf3db] font-bold">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-[#1a4222] p-2.5 rounded-xl border border-[#2c6136]">
+                                    <Clock className="w-6 h-6 text-[#AADB56]" />
+                                </div>
+                                <div className="leading-relaxed mt-1 tracking-wide">
+                                    <p>ראשון - חמישי: 7:00 - 20:00</p>
+                                    <p>שישי: 7:00 - 16:00</p>
+                                </div>
+                            </div>
+                            
                             {settings.contact_phone && (
-                                <a href={`tel:${settings.contact_phone}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
-                                    <Phone className="h-3.5 w-3.5 text-green-300" />
-                                    <span>{settings.contact_phone}</span>
-                                </a>
+                                <div className="flex items-start gap-4 mt-6">
+                                    <div className="bg-[#1a4222] p-2.5 rounded-xl border border-[#2c6136]">
+                                        <Phone className="w-6 h-6 text-[#AADB56]" />
+                                    </div>
+                                    <div className="leading-relaxed mt-2 tracking-wide font-black text-xl flex items-center gap-2" dir="ltr">
+                                        <a href={`tel:${settings.contact_phone}`} className="hover:text-[#AADB56] transition-colors">{settings.contact_phone}</a>
+                                    </div>
+                                </div>
                             )}
+
                             {settings.contact_email && (
-                                <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
-                                    <Mail className="h-3.5 w-3.5 text-green-300" />
-                                    <span dir="ltr">{settings.contact_email}</span>
-                                </a>
-                            )}
-                            {settings.contact_address && (
-                                <div className="flex items-center gap-1.5 hover:text-white transition-colors">
-                                    <MapPin className="h-3.5 w-3.5 text-green-300" />
-                                    <span>{settings.contact_address}</span>
+                                <div className="flex items-start gap-4 mt-2">
+                                    <div className="bg-[#1a4222] p-2.5 rounded-xl border border-[#2c6136]">
+                                        <Mail className="w-6 h-6 text-[#AADB56]" />
+                                    </div>
+                                    <div className="leading-relaxed mt-2 tracking-wide font-bold" dir="ltr">
+                                        <a href={`mailto:${settings.contact_email}`} className="hover:text-[#AADB56] transition-colors">{settings.contact_email}</a>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Line 1 (Desktop Right): Legal & Copyright */}
-                    <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 w-full md:w-auto mt-2 md:mt-0">
-                        <nav className="flex items-center gap-3 md:gap-4">
-                            <Link href="/terms" className="hover:text-white transition-colors">תקנון</Link>
-                            <Link href="/privacy" className="hover:text-white transition-colors">פרטיות</Link>
-                            <Link href="/accessibility" className="hover:text-white transition-colors">נגישות</Link>
-                        </nav>
-
-                        <div className="hidden md:block w-px h-4 bg-green-700"></div>
-
-                        <p className="text-green-200/60">
-                            © {new Date().getFullYear()} שוק בשכונה
-                        </p>
+                </div>
+                
+                <div className="mt-16 pt-8 border-t border-[#1a4222] flex flex-col md:flex-row justify-between items-center gap-4 text-[#ebf3db]/40 text-sm font-bold tracking-wider">
+                    <p>© {new Date().getFullYear()} שוק בשכונה. כל הזכויות שמורות.</p>
+                    <div className="flex items-center gap-4">
+                       <MapPin className="h-4 w-4" />
+                       {settings.contact_address || "ישראל"}
                     </div>
-
                 </div>
             </div>
         </footer>

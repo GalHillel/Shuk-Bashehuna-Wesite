@@ -12,8 +12,8 @@ export function Logo({ className, variant = "desktop", src }: LogoProps) {
 
     if (showImage && src) {
         return (
-            <div className={cn("flex items-center gap-2", className)}>
-                <div className="relative h-10 w-10 flex-shrink-0">
+            <div className={cn("flex items-center gap-2 h-full w-full", className)}>
+                <div className={cn("relative flex-shrink-0", variant === "icon" ? "w-full h-full" : "h-10 w-10")}>
                     <Image
                         src={src}
                         alt="Shuk Bashehuna Logo"

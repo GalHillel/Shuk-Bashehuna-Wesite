@@ -11,6 +11,13 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -24,6 +31,7 @@ import { Category } from "@/types/supabase";
 interface CategoryFormValues {
     name: string;
     slug: string;
+    parent_id: string;
     image_url: string;
     sort_order: number;
     is_visible: boolean;
@@ -36,12 +44,14 @@ interface CategoryFormProps {
 export function CategoryForm({ defaultValues }: CategoryFormProps) {
     const router = useRouter();
     const [error, setError] = useState("");
+    const [parentCategories, setParentCategories] = useState<Category[]>([]);
     const isEditing = !!defaultValues;
 
     const form = useForm<CategoryFormValues>({
         defaultValues: {
             name: defaultValues?.name || "",
-            slug: (defaultValues as any)?.slug || "", // Use 'any' to bypass missing type definition for slug
+            slug: (defaultValues as any)?.slug || "", 
+            parent_id: defaultValues?.parent_id || "none",
             image_url: defaultValues?.image_url || "",
             sort_order: defaultValues?.sort_order || 0,
             is_visible: defaultValues?.is_visible ?? true,
@@ -49,6 +59,19 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
     });
 
 
+
+    // Fetch eligible parent categories
+    useEffect(() => {
+        const fetchParents = async () => {
+            let query = supabase.from("categories").select("*").is("parent_id", null);
+            if (isEditing && (defaultValues as any)?.id) {
+                 query = query.neq("id", (defaultValues as any).id);
+            }
+            const { data } = await query;
+            if (data) setParentCategories(data as Category[]);
+        };
+        fetchParents();
+    }, [isEditing, defaultValues]);
 
     // Auto-fetch max sort_order for new categories
     useEffect(() => {
@@ -78,6 +101,7 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
         const payload = {
             name: values.name,
             slug: slug,
+            parent_id: values.parent_id === "none" ? null : values.parent_id,
             image_url: values.image_url || null,
             sort_order: Number(values.sort_order),
             is_visible: values.is_visible,
@@ -141,7 +165,30 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
                             </FormItem>
                         )}
                     />
-                    {/* Slug input removed */}
+                    <FormField
+                        control={form.control}
+                        name="parent_id"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-slate-900 font-bold">קטגוריית אב (תת-קטגוריה)</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger className="h-12 rounded-xl">
+                                            <SelectValue placeholder="ללא (קטגוריה ראשית)" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="none">ללא (קטגוריה ראשית)</SelectItem>
+                                        {parentCategories.map(cat => (
+                                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                <p className="text-xs text-muted-foreground mt-1">בחירת קטגוריית אב תהפוך קטגוריה זו לתת-קטגוריה.</p>
+                            </FormItem>
+                        )}
+                    />
                 </div>
 
                 <FormField
@@ -157,6 +204,7 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
                                     folder="categories"
                                 />
                             </FormControl>
+                            <p className="text-xs text-muted-foreground mt-2 font-medium">✨ מומלץ להעלות תמונה אנכית (לדוגמה: פוסטר) במידות 400x500 פיקסלים. התמונה תוצג בפאנל הצדדי בתפריט הראשי.</p>
                             <FormMessage />
                         </FormItem>
                     )}

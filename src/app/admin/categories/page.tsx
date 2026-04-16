@@ -89,7 +89,14 @@ export default function AdminCategoriesPage() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-center mb-1">
-                                        <h3 className="font-bold">{category.name}</h3>
+                                        <h3 className="font-bold">
+                                            {category.name}
+                                            {category.parent_id && (
+                                                <span className="text-xs text-muted-foreground mr-1 font-normal">
+                                                    (תת-קטגוריה של: {categories.find(c => c.id === category.parent_id)?.name || 'לא ידוע'})
+                                                </span>
+                                            )}
+                                        </h3>
                                         <Badge variant={category.is_visible ? "outline" : "secondary"} className="text-[10px]">
                                             {category.is_visible ? "פעיל" : "נסתר"}
                                         </Badge>
@@ -151,7 +158,14 @@ export default function AdminCategoriesPage() {
                                                 )}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-medium">{category.name}</TableCell>
+                                        <TableCell className="font-medium">
+                                            {category.name}
+                                            {category.parent_id && (
+                                                <span className="text-xs text-muted-foreground block font-normal">
+                                                    תת-קטגוריה של: {categories.find(c => c.id === category.parent_id)?.name || 'לא ידוע'}
+                                                </span>
+                                            )}
+                                        </TableCell>
                                         <TableCell className="text-sm text-muted-foreground">{category.sort_order}</TableCell>
                                         <TableCell>
                                             <Badge variant={category.is_visible ? "outline" : "secondary"}>

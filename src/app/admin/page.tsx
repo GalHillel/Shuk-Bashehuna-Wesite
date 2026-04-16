@@ -2,7 +2,7 @@
 
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useCallback } from "react";
-import { Package, ShoppingCart, FolderTree, TrendingUp, AlertCircle } from "lucide-react";
+import { Package, ShoppingCart, FolderTree, TrendingUp, AlertCircle, FileText } from "lucide-react";
 import Link from "next/link";
 
 interface DashboardStats {
@@ -120,6 +120,10 @@ export default function AdminDashboard() {
                 <Link href="/admin/content" className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition-all text-center">
                     <TrendingUp className="h-8 w-8 mx-auto mb-2 text-primary" />
                     <p className="font-medium">ערוך דף הבית</p>
+                </Link>
+                <Link href="/admin/pages" className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition-all text-center">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-primary" />
+                    <p className="font-medium">ערוך עמודי תוכן</p>
                 </Link>
                 <Link href="/admin/orders" className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition-all text-center">
                     <ShoppingCart className="h-8 w-8 mx-auto mb-2 text-primary" />
