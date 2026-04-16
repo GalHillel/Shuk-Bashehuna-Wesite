@@ -180,6 +180,15 @@ export default function AdminProductsPage() {
                                                 ערוך
                                             </Link>
                                         </Button>
+                                        <Button 
+                                            variant="outline" 
+                                            size="sm" 
+                                            className="h-8 text-red-600 border-red-100 bg-red-50 hover:bg-red-100 hover:text-red-700 hover:border-red-200"
+                                            onClick={() => deleteProduct(product)}
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5 ml-1.5" />
+                                            מחק
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
