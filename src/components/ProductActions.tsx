@@ -25,7 +25,7 @@ export function ProductActions({ product }: ProductActionsProps) {
     return (
         <div className="flex flex-col gap-4 w-full md:w-auto">
             <p className="text-sm text-muted-foreground mb-1">
-                כמות ({product.unit_type === 'kg' ? 'ק"ג' : 'יחידות'})
+                כמות
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">

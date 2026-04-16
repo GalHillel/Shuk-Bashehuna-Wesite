@@ -27,6 +27,8 @@ import { Category, Product } from "@/types/supabase";
 import { Loader2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
+import { toast } from "sonner";
+import { safeDeleteProduct } from "@/lib/product-service";
 import { generateSlug } from "@/lib/slug-utils";
 
 interface ProductFormProps {
@@ -41,7 +43,6 @@ interface ProductFormValues {
     sale_price: string;
     is_on_sale: boolean;
     unit_type: string;
-    stock_quantity: string;
     image_url: string;
     category_id: string;
     is_active: boolean;
@@ -75,12 +76,12 @@ export function ProductForm({ product }: ProductFormProps) {
             sale_price: product?.sale_price?.toString() || "",
             is_on_sale: product?.is_on_sale || false,
             unit_type: product?.unit_type || "kg",
-            stock_quantity: product?.stock_quantity?.toString() || "100",
             image_url: product?.image_url || "",
             category_id: product?.category_id || "",
             is_active: product?.is_active ?? true,
         },
     });
+
 
 
 
@@ -98,7 +99,6 @@ export function ProductForm({ product }: ProductFormProps) {
             sale_price: values.sale_price ? parseFloat(values.sale_price) : null,
             is_on_sale: values.is_on_sale,
             unit_type: values.unit_type as "kg" | "unit" | "pack",
-            stock_quantity: parseInt(values.stock_quantity, 10),
             image_url: values.image_url || null,
             category_id: values.category_id || null,
             is_active: values.is_active,
@@ -123,6 +123,7 @@ export function ProductForm({ product }: ProductFormProps) {
         }
 
         if (result.error) {
+            console.error("Supabase error saving product:", result.error);
             if (result.error.code === '23505') {
                 setError("קיים כבר מוצר עם שם דומה, אנא שנה את השם מעט");
             } else {
@@ -134,6 +135,35 @@ export function ProductForm({ product }: ProductFormProps) {
 
         router.push("/admin/products");
         router.refresh();
+    }
+    async function handleDelete() {
+        if (!product || !confirm(`האם אתה בטוח שברצונך למחוק את "${product.name}"?`)) return;
+
+        setSubmitting(true);
+        try {
+            const result = await safeDeleteProduct(product);
+
+            if (result.type === 'deactivated') {
+                toast.error("לא ניתן למחוק מוצר המופיע בהזמנות. המוצר הועבר לסטטוס 'לא פעיל'.", {
+                    description: "הסטטוס עודכן בהצלחה",
+                });
+                router.push("/admin/products");
+                router.refresh();
+            } else if (result.type === 'deleted') {
+                toast.success("המוצר נמחק לצמיתות בהצלחה");
+                router.push("/admin/products");
+                router.refresh();
+            } else if (result.type === 'error') {
+                setError(result.message);
+                toast.error("שגיאה במחיקה", { description: result.message });
+            }
+        } catch (err: any) {
+            console.error("Error in handleDelete UI:", err);
+            setError("אירעה שגיאה בלתי צפויה במחיקה");
+            toast.error("שגיאה בלתי צפויה", { description: err.message });
+        } finally {
+            setSubmitting(false);
+        }
     }
 
     return (
@@ -266,26 +296,28 @@ export function ProductForm({ product }: ProductFormProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                         control={form.control}
-                        name="stock_quantity"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-slate-900 font-bold">כמות במלאי</FormLabel>
-                                <FormControl>
-                                    <Input type="number" {...field} className="h-12 rounded-xl" dir="ltr" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
                         name="sale_price"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel className="text-slate-900 font-bold">מחיר מבצע (₪)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" step="0.1" placeholder="השאר ריק אם אין מבצע" {...field} className="h-12 rounded-xl" dir="ltr" />
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        placeholder="השאר ריק אם אין מבצע"
+                                        {...field}
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            const val = e.target.value;
+                                            if (val && val !== "0") {
+                                                form.setValue("is_on_sale", true);
+                                            } else {
+                                                form.setValue("is_on_sale", false);
+                                            }
+                                        }}
+                                        className="h-12 rounded-xl"
+                                        dir="ltr"
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -313,7 +345,15 @@ export function ProductForm({ product }: ProductFormProps) {
                         render={({ field }) => (
                             <FormItem className="flex items-center gap-3">
                                 <FormControl>
-                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={(checked) => {
+                                            field.onChange(checked);
+                                            if (!checked) {
+                                                form.setValue("sale_price", "");
+                                            }
+                                        }}
+                                    />
                                 </FormControl>
                                 <FormLabel className="!mt-0 font-bold">מוצר במבצע</FormLabel>
                             </FormItem>
@@ -322,7 +362,18 @@ export function ProductForm({ product }: ProductFormProps) {
                 </div>
 
                 <div className="flex items-center gap-4 pt-4 border-t md:justify-end fixed bottom-0 left-0 right-0 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-10 md:static md:shadow-none md:bg-transparent md:border-t md:p-0 md:pt-4">
-                    <Button variant="outline" type="button" onClick={() => router.back()} className="flex-1 md:flex-none h-12 px-8 rounded-xl font-bold">
+                    {isEditing && (
+                        <Button
+                            variant="ghost"
+                            type="button"
+                            onClick={handleDelete}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-12 px-4 rounded-xl font-bold ml-auto"
+                            disabled={submitting}
+                        >
+                            מחק מוצר
+                        </Button>
+                    )}
+                    <Button variant="outline" type="button" onClick={() => router.back()} className="flex-1 md:flex-none h-12 px-8 rounded-xl font-bold" disabled={submitting}>
                         ביטול
                     </Button>
                     <Button type="submit" className="flex-1 md:flex-none h-12 px-12 rounded-xl font-bold bg-slate-900 shadow-lg shadow-slate-900/20 md:shadow-none" disabled={submitting}>

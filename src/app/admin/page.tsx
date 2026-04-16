@@ -11,7 +11,6 @@ interface DashboardStats {
     totalCategories: number;
     totalOrders: number;
     pendingOrders: number;
-    lowStockProducts: { id: string; name: string; stock_quantity: number }[];
 }
 
 export default function AdminDashboard() {
@@ -21,11 +20,10 @@ export default function AdminDashboard() {
     const fetchStats = useCallback(async () => {
         setLoading(true);
 
-        const [productsRes, categoriesRes, ordersRes, lowStockRes] = await Promise.all([
+        const [productsRes, categoriesRes, ordersRes] = await Promise.all([
             supabase.from("products").select("id, is_active"),
             supabase.from("categories").select("id"),
             supabase.from("orders").select("id, status"),
-            supabase.from("products").select("id, name, stock_quantity").lt("stock_quantity", 10).eq("is_active", true).order("stock_quantity", { ascending: true }).limit(5),
         ]);
 
         setStats({
@@ -34,7 +32,6 @@ export default function AdminDashboard() {
             totalCategories: categoriesRes.data?.length || 0,
             totalOrders: ordersRes.data?.length || 0,
             pendingOrders: ordersRes.data?.filter((o: { status: string }) => o.status === "pending").length || 0,
-            lowStockProducts: (lowStockRes.data as DashboardStats["lowStockProducts"]) || [],
         });
         setLoading(false);
     }, []);
@@ -47,9 +44,9 @@ export default function AdminDashboard() {
         return (
             <div className="space-y-6">
                 <h1 className="text-3xl font-bold">לוח בקרה</h1>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="flex flex-wrap justify-center gap-6">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="bg-white p-6 rounded-xl border shadow-sm animate-pulse">
+                        <div key={i} className="bg-white p-6 rounded-xl border shadow-sm animate-pulse w-[240px]">
                             <div className="h-4 bg-slate-200 rounded w-24 mb-4" />
                             <div className="h-8 bg-slate-200 rounded w-16" />
                         </div>
@@ -84,14 +81,6 @@ export default function AdminDashboard() {
             color: "text-purple-600 bg-purple-50",
             href: "/admin/orders",
         },
-        {
-            label: "מוצרים במלאי נמוך",
-            value: stats?.lowStockProducts.length || 0,
-            sub: "דורשים תשומת לב",
-            icon: AlertCircle,
-            color: "text-orange-600 bg-orange-50",
-            href: "/admin/products",
-        },
     ];
 
     return (
@@ -101,11 +90,11 @@ export default function AdminDashboard() {
                 <p className="text-muted-foreground mt-1">שוק בשכונה - סקירה כללית</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex flex-wrap justify-center gap-6">
                 {cards.map((card) => {
                     const Icon = card.icon;
                     return (
-                        <Link key={card.label} href={card.href}>
+                        <Link key={card.label} href={card.href} className="w-full md:w-[240px]">
                             <div className="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group">
                                 <div className="flex items-center justify-between mb-4">
                                     <span className="text-sm font-medium text-muted-foreground">{card.label}</span>
@@ -121,23 +110,6 @@ export default function AdminDashboard() {
                 })}
             </div>
 
-            {/* Low Stock Alert */}
-            {stats && stats.lowStockProducts.length > 0 && (
-                <div className="bg-orange-50 border border-orange-200 p-6 rounded-xl">
-                    <h3 className="text-lg font-bold text-orange-800 flex items-center gap-2 mb-4">
-                        <AlertCircle className="h-5 w-5" />
-                        מוצרים עם מלאי נמוך
-                    </h3>
-                    <div className="space-y-2">
-                        {stats.lowStockProducts.map((p) => (
-                            <Link key={p.id} href={`/admin/products/${p.id}`} className="flex items-center justify-between text-sm py-2 px-3 bg-white rounded-lg hover:bg-orange-100 transition-colors">
-                                <span className="font-medium">{p.name}</span>
-                                <span className="text-orange-600 font-bold">{p.stock_quantity} יח&apos;</span>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

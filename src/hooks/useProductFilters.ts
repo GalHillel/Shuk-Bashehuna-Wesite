@@ -7,7 +7,6 @@ export interface FilterState {
     minPrice: number;
     maxPrice: number;
     searchQuery: string;
-    inStockOnly: boolean;
     sort: SortOption;
 }
 
@@ -27,7 +26,6 @@ export function useProductFilters(initialProducts: Product[]) {
         minPrice: 0,
         maxPrice: 1000,
         searchQuery: '',
-        inStockOnly: false,
         sort: 'newest'
     });
 
@@ -59,10 +57,6 @@ export function useProductFilters(initialProducts: Product[]) {
             return price >= filters.minPrice && price <= filters.maxPrice;
         });
 
-        // Stock
-        if (filters.inStockOnly) {
-            result = result.filter(p => p.stock_quantity > 0);
-        }
 
         // Sort
         result.sort((a, b) => {
@@ -87,13 +81,11 @@ export function useProductFilters(initialProducts: Product[]) {
     const setMinPrice = (val: number) => setFilters(prev => ({ ...prev, minPrice: val }));
     const setMaxPrice = (val: number) => setFilters(prev => ({ ...prev, maxPrice: val }));
     const setSearchQuery = (val: string) => setFilters(prev => ({ ...prev, searchQuery: val }));
-    const setInStockOnly = (val: boolean) => setFilters(prev => ({ ...prev, inStockOnly: val }));
     const setSort = (val: SortOption) => setFilters(prev => ({ ...prev, sort: val }));
     const resetFilters = () => setFilters({
         minPrice: initialMin,
         maxPrice: initialMax,
         searchQuery: '',
-        inStockOnly: false,
         sort: 'newest'
     });
 
@@ -107,7 +99,6 @@ export function useProductFilters(initialProducts: Product[]) {
             setMinPrice,
             setMaxPrice,
             setSearchQuery,
-            setInStockOnly,
             setSort,
             resetFilters,
             setFilters // Allow bulk updates if needed

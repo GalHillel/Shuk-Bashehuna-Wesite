@@ -96,18 +96,6 @@ export function FilterSidebar({
                 />
             </div>
 
-            {/* 4. Availability */}
-            <div className="flex items-center gap-3 pt-2">
-                <Checkbox
-                    id="instock"
-                    checked={filters.inStockOnly}
-                    onCheckedChange={(checked) => actions.setInStockOnly(checked as boolean)}
-                    className="border-slate-300 data-[state=checked]:bg-[#14532d] data-[state=checked]:border-[#14532d]"
-                />
-                <Label htmlFor="instock" className="text-sm font-medium text-slate-700 cursor-pointer">
-                    הצג רק מוצרים במלאי
-                </Label>
-            </div>
 
             {/* Reset */}
             <button

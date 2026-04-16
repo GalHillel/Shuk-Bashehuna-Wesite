@@ -85,18 +85,6 @@ export function FilterSheet({ filters, actions, bounds, filteredCount }: FilterS
                         />
                     </div>
 
-                    {/* Availability */}
-                    <div className="flex items-center justify-between pt-2">
-                        <Label htmlFor="instock" className="font-bold text-lg text-slate-800 cursor-pointer">
-                            הצג רק מוצרים במלאי
-                        </Label>
-                        <Switch
-                            id="instock"
-                            checked={filters.inStockOnly}
-                            onCheckedChange={actions.setInStockOnly}
-                            className="data-[state=checked]:bg-green-600"
-                        />
-                    </div>
                 </div>
 
                 {/* Footer Actions */}

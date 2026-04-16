@@ -17,7 +17,6 @@ export interface Database {
                     description: string | null
                     price: number
                     unit_type: 'kg' | 'unit' | 'pack'
-                    stock_quantity: number
                     image_url: string | null
                     category_id: string | null
                     is_active: boolean
@@ -32,7 +31,6 @@ export interface Database {
                     description?: string | null
                     price: number
                     unit_type: 'kg' | 'unit' | 'pack'
-                    stock_quantity?: number
                     image_url?: string | null
                     category_id?: string | null
                     is_active?: boolean
@@ -47,7 +45,6 @@ export interface Database {
                     description?: string | null
                     price?: number
                     unit_type?: 'kg' | 'unit' | 'pack'
-                    stock_quantity?: number
                     image_url?: string | null
                     category_id?: string | null
                     is_active?: boolean

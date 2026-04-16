@@ -69,6 +69,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         .from("products")
         .select("*")
         .eq("id", id)
+        .eq("is_active", true)
         .single();
 
     const product = data as Product | null;

@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
+import { toast } from "sonner";
+import { safeDeleteProduct } from "@/lib/product-service";
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -69,14 +71,33 @@ export default function AdminProductsPage() {
     }, [fetchProducts]);
 
     async function deleteProduct(product: Product) {
-        if (!confirm("האם אתה בטוח שברצונך למחוק מוצר זה?")) return;
+        if (!confirm(`האם אתה בטוח שברצונך למחוק את "${product.name}"?`)) return;
 
-        if (product.image_url) {
-            await deleteImageFromStorage(product.image_url);
+        setLoading(true);
+        try {
+            const result = await safeDeleteProduct(product);
+
+            if (result.type === 'deactivated') {
+                toast.error("לא ניתן למחוק מוצר המופיע בהזמנות. המוצר הועבר לסטטוס 'לא פעיל'.", {
+                    description: "הסטטוס עודכן בהצלחה",
+                });
+                await fetchProducts();
+            } else if (result.type === 'deleted') {
+                toast.success("המוצר נמחק לצמיתות בהצלחה");
+                await fetchProducts();
+            } else if (result.type === 'error') {
+                toast.error("אירעה שגיאה בביצוע הפעולה", {
+                    description: result.message,
+                });
+            }
+        } catch (err: any) {
+            console.error("Error in deleteProduct UI:", err);
+            toast.error("אירעה שגיאה בלתי צפויה", {
+                description: err.message,
+            });
+        } finally {
+            setLoading(false);
         }
-
-        await supabase.from("products").delete().eq("id", product.id);
-        fetchProducts();
     }
 
     return (
@@ -150,7 +171,7 @@ export default function AdminProductsPage() {
                                         <span className="text-xs text-muted-foreground">/ {product.unit_type === 'kg' ? 'ק"ג' : 'יח\''}</span>
                                     </div>
                                     <div className="text-xs text-muted-foreground mt-1">
-                                        מלאי: {product.stock_quantity} | {categories.find(c => c.id === product.category_id)?.name}
+                                        {categories.find(c => c.id === product.category_id)?.name}
                                     </div>
                                     <div className="flex justify-end gap-2 mt-3">
                                         <Button variant="outline" size="sm" asChild className="h-8">
@@ -175,7 +196,6 @@ export default function AdminProductsPage() {
                                 <TableHead className="text-right">שם המוצר</TableHead>
                                 <TableHead className="text-right">מחיר</TableHead>
                                 <TableHead className="text-right">יחידה</TableHead>
-                                <TableHead className="text-right">מלאי</TableHead>
                                 <TableHead className="text-right">קטגוריה</TableHead>
                                 <TableHead className="text-right">סטטוס</TableHead>
                                 <TableHead className="text-right">פעולות</TableHead>
@@ -213,7 +233,6 @@ export default function AdminProductsPage() {
                                             )}
                                         </TableCell>
                                         <TableCell>{product.unit_type === 'kg' ? 'ק&quot;ג' : product.unit_type === 'unit' ? 'יחידה' : 'מארז'}</TableCell>
-                                        <TableCell>{product.stock_quantity}</TableCell>
                                         <TableCell className="text-muted-foreground text-sm">
                                             {categories.find(c => c.id === product.category_id)?.name || product.category_id}
                                         </TableCell>
