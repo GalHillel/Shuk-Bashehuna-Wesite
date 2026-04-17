@@ -505,9 +505,9 @@ export function SiteHeader() {
                                                 {subs.length > 0 && <ChevronDown className="h-3 w-3 text-slate-400 group-hover:rotate-180 transition-transform" strokeWidth={3} />}
                                             </Link>
                                             
-                                            {/* Localized Megamenu Dropdown */}
+                                            {/* Localized Megamenu Dropdown - opens LEFT to avoid overflow */}
                                             {subs.length > 0 && (
-                                                <div className="absolute top-full right-0 pt-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[60] -mr-8">
+                                                <div className="absolute top-full left-0 pt-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[60] -ml-8">
                                                     <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-slate-100 animate-in fade-in slide-in-from-top-1 px-8 py-8 rounded-[32px] flex gap-12 min-w-[620px]">
                                                         
                                                         {/* Right Side: Subcategories List */}

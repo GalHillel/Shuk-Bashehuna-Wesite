@@ -27,19 +27,19 @@ export function Footer() {
     }, []);
 
     return (
-        <footer 
-            className="bg-[#112a1e] text-[#ebf3db]/80 mt-auto border-t border-[#AADB56]/20 py-20 relative overflow-hidden" 
+        <footer
+            className="bg-[#112a1e] text-[#ebf3db]/80 mt-auto border-t border-[#AADB56]/20 py-20 relative overflow-hidden"
             dir="rtl"
-            style={{ 
-                backgroundImage: 'radial-gradient(circle, rgba(170,219,86,0.04) 1.5px, transparent 1.5px)', 
-                backgroundSize: '24px 24px' 
+            style={{
+                backgroundImage: 'radial-gradient(circle, rgba(170,219,86,0.04) 1.5px, transparent 1.5px)',
+                backgroundSize: '24px 24px'
             }}
         >
             <div className="absolute inset-0 bg-gradient-to-b from-[#112a1e] via-transparent to-[#112a1e] pointer-events-none opacity-40"></div>
-            
+
             <div className="container mx-auto px-6 md:px-12 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
-                    
+
                     {/* Column 1: בואו להכיר */}
                     <div>
                         <h4 className="text-[#AADB56] font-black text-2xl mb-8 tracking-tighter relative inline-block">
@@ -76,7 +76,6 @@ export function Footer() {
                                 { label: "ירקות השוק", href: "/category/vegetables" },
                                 { label: "ירוקים וחסות", href: "/category/greens" },
                                 { label: "מגשי אירוח", href: "/category/platters" },
-                                { label: "אגוזים ופיצוחים", href: "/category/nuts" },
                                 { label: "מיצים טבעיים", href: "/category/juices" },
                                 { label: "המזווה שלנו", href: "/category/pantry" },
                                 { label: "מוצרי חלב", href: "/category/dairy" },
@@ -110,7 +109,7 @@ export function Footer() {
                                     <p className="text-[14px]">ו&apos;: 07:00 - 16:00</p>
                                 </div>
                             </div>
-                            
+
                             {settings.contact_phone && (
                                 <div className="flex items-center gap-4">
                                     <div className="bg-[#AADB56] p-3 rounded-2xl shadow-[0_10px_20px_rgba(170,219,86,0.1)] border border-white/10">
@@ -138,13 +137,13 @@ export function Footer() {
                     </div>
 
                 </div>
-                
+
                 {/* Bottom Bar */}
                 <div className="mt-24 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-white/30 text-xs font-black tracking-widest uppercase">
                     <p>© {new Date().getFullYear()} שוק בשכונה. כל הזכויות שמורות.</p>
                     <div className="flex items-center gap-4 py-2 px-5 bg-white/5 rounded-full border border-white/5 backdrop-blur-md">
-                       <MapPin className="h-4 w-4 text-[#AADB56]" />
-                       <span className="text-white/60 font-black">{settings.contact_address || "ישראל"}</span>
+                        <MapPin className="h-4 w-4 text-[#AADB56]" />
+                        <span className="text-white/60 font-black">{settings.contact_address || "ישראל"}</span>
                     </div>
                 </div>
             </div>
