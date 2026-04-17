@@ -98,7 +98,7 @@ export function SiteHeader() {
 
     return (
         <>
-            <header className="sticky top-0 left-0 right-0 z-50 w-full flex flex-col pointer-events-auto border-b border-slate-100">
+            <header className="sticky top-0 left-0 right-0 z-50 w-full flex flex-col pointer-events-auto">
                 {/* 1. Top Bar */}
                 <div className="bg-[#CFE1A7] text-slate-800 text-[12px] font-extrabold h-[34px] px-4 md:px-6 hidden md:flex items-center justify-between tracking-wide" dir="rtl">
                     <div className="flex items-center gap-3">
@@ -112,7 +112,7 @@ export function SiteHeader() {
 
                 {/* 2. Main Header (Green Background with dots) */}
                 <div 
-                    className="bg-[#AADB56] px-4 md:px-6 h-[86px] flex items-center justify-between relative shadow-sm" 
+                    className="bg-[#AADB56] px-4 md:px-6 h-[86px] flex items-center justify-between relative" 
                     dir="rtl"
                     style={{ 
                         backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.25) 2px, transparent 2.5px)', 
@@ -380,7 +380,7 @@ export function SiteHeader() {
                 </div>
 
                 {/* 3. Category Navigation (White Strip) */}
-                <nav className="hidden md:flex bg-white h-[46px] relative z-40 w-full border-b border-slate-100" dir="rtl">
+                <nav className="hidden md:flex bg-white h-[46px] relative z-40 w-full" dir="rtl">
                     <div className="w-full max-w-[1920px] mx-auto h-full px-1 lg:px-2 xl:px-4">
                         <div className="grid grid-cols-[minmax(0,1fr)_160px_minmax(0,1fr)] h-full w-full">
                         
@@ -411,34 +411,62 @@ export function SiteHeader() {
                                                 {subs.length > 0 && <ChevronDown className="h-3 w-3 text-slate-400 group-hover:rotate-180 transition-transform" strokeWidth={3} />}
                                             </Link>
                                             
-                                            {/* Localized Dropdown Menu */}
+                                            {/* Localized Megamenu Dropdown */}
                                             {subs.length > 0 && (
-                                                <div className="absolute top-full right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[60]">
-                                                    <div className="bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border-x border-b border-slate-100 animate-in fade-in slide-in-from-top-1 p-6 lg:p-8 rounded-b-2xl flex gap-8 lg:gap-12">
-                                                        {/* Categories List */}
-                                                        <div className="flex flex-col shrink-0 min-w-[140px] justify-center">
-                                                            {!cat.image_url && (
-                                                                <h3 className="text-slate-950 font-extrabold mb-4 text-base border-b border-[#AADB56]/50 pb-2 px-1 text-right">{cat.name}</h3>
-                                                            )}
-                                                            <div className="flex flex-col gap-3.5">
+                                                <div className="absolute top-full right-0 pt-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[60] -mr-8">
+                                                    <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-slate-100 animate-in fade-in slide-in-from-top-1 px-8 py-8 rounded-[32px] flex gap-12 min-w-[620px]">
+                                                        
+                                                        {/* Right Side: Subcategories List */}
+                                                        <div className="flex-1 flex flex-col">
+                                                            <div className="flex items-center gap-2 mb-6 border-r-4 border-[#AADB56] pr-4">
+                                                                <h3 className="text-[17px] font-black text-[#112a1e] tracking-tight">{cat.name}</h3>
+                                                            </div>
+                                                            <div className="flex flex-col gap-1">
                                                                 {subs.map(sub => (
                                                                     <Link 
                                                                         key={sub.id} 
                                                                         href={`/category/${sub.id}`}
-                                                                        className="text-slate-700 hover:text-[#6c9b29] text-[15px] lg:text-[16px] transition-colors font-medium flex items-center pr-1"
+                                                                        className="group/sub pr-4 pl-8 py-2.5 rounded-full hover:bg-[#AADB56] transition-all duration-200 text-[#112a1e] font-bold text-[16px] flex items-center justify-between"
                                                                     >
-                                                                        {sub.name}
+                                                                        <span>{sub.name}</span>
+                                                                        <ChevronLeft className="w-4 h-4 opacity-0 -translate-x-2 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all" strokeWidth={3} />
                                                                     </Link>
                                                                 ))}
                                                             </div>
                                                         </div>
 
-                                                        {/* Promotional Image (Left side) */}
-                                                        {cat.image_url && (
-                                                            <div className="w-[200px] lg:w-[260px] shrink-0 rounded-2xl overflow-hidden h-[260px] lg:h-[320px] shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] border border-slate-50">
-                                                                <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                                                            </div>
-                                                        )}
+                                                        {/* Left Side: Category Banner (with Smart Fallback) */}
+                                                        {(() => {
+                                                            const fallbacks: Record<string, string> = {
+                                                                "פירות השוק": "/images/megamenu/fruits.png",
+                                                                "ירקות השוק": "/images/megamenu/vegetables.png",
+                                                                "ירוקים וחסות": "/images/megamenu/greens.png",
+                                                                "מגשי אירוח": "/images/megamenu/platters.png",
+                                                                "אגוזים ופיצוחים": "/images/megamenu/nuts.png",
+                                                                "מיצים טבעיים": "/images/megamenu/juices.png",
+                                                                "המזווה שלנו": "/images/megamenu/pantry.png",
+                                                                "מוצרי חלב": "/images/megamenu/dairy.png",
+                                                                "לחמים": "/images/megamenu/breads.png",
+                                                                "משקאות ויינות": "/images/megamenu/drinks.png",
+                                                                "לבית ולמטבח": "/images/megamenu/home_kitchen.png",
+                                                            };
+                                                            const bannerUrl = cat.image_url || fallbacks[cat.name];
+
+                                                            return bannerUrl ? (
+                                                                <div className="w-[260px] h-[340px] shrink-0 rounded-[24px] overflow-hidden shadow-xl border-4 border-white group/banner relative">
+                                                                    <img 
+                                                                        src={bannerUrl} 
+                                                                        alt={cat.name} 
+                                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover/banner:scale-110" 
+                                                                    />
+                                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#112a1e]/40 to-transparent pointer-events-none" />
+                                                                </div>
+                                                            ) : (
+                                                                <div className="w-[260px] h-[340px] bg-gradient-to-br from-[#AADB56]/10 to-[#AADB56]/30 rounded-[24px] flex items-center justify-center border-2 border-dashed border-[#AADB56]/40">
+                                                                    <ShoppingBasket className="w-16 h-16 text-[#AADB56]/40" strokeWidth={1} />
+                                                                </div>
+                                                            );
+                                                        })()}
                                                     </div>
                                                 </div>
                                             )}
@@ -477,34 +505,62 @@ export function SiteHeader() {
                                                 {subs.length > 0 && <ChevronDown className="h-3 w-3 text-slate-400 group-hover:rotate-180 transition-transform" strokeWidth={3} />}
                                             </Link>
                                             
-                                            {/* Localized Dropdown Menu */}
+                                            {/* Localized Megamenu Dropdown */}
                                             {subs.length > 0 && (
-                                                <div className="absolute top-full right-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[60]">
-                                                    <div className="bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border-x border-b border-slate-100 animate-in fade-in slide-in-from-top-1 p-6 lg:p-8 rounded-b-2xl flex gap-8 lg:gap-12">
-                                                        {/* Categories List */}
-                                                        <div className="flex flex-col shrink-0 min-w-[140px] justify-center">
-                                                            {!cat.image_url && (
-                                                                <h3 className="text-slate-950 font-extrabold mb-4 text-base border-b border-[#AADB56]/50 pb-2 px-1 text-right">{cat.name}</h3>
-                                                            )}
-                                                            <div className="flex flex-col gap-3.5">
+                                                <div className="absolute top-full right-0 pt-0 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[60] -mr-8">
+                                                    <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-slate-100 animate-in fade-in slide-in-from-top-1 px-8 py-8 rounded-[32px] flex gap-12 min-w-[620px]">
+                                                        
+                                                        {/* Right Side: Subcategories List */}
+                                                        <div className="flex-1 flex flex-col">
+                                                            <div className="flex items-center gap-2 mb-6 border-r-4 border-[#AADB56] pr-4">
+                                                                <h3 className="text-[17px] font-black text-[#112a1e] tracking-tight">{cat.name}</h3>
+                                                            </div>
+                                                            <div className="flex flex-col gap-1">
                                                                 {subs.map(sub => (
                                                                     <Link 
                                                                         key={sub.id} 
                                                                         href={`/category/${sub.id}`}
-                                                                        className="text-slate-700 hover:text-[#6c9b29] text-[15px] lg:text-[16px] transition-colors font-medium flex items-center pr-1"
+                                                                        className="group/sub pr-4 pl-8 py-2.5 rounded-full hover:bg-[#AADB56] transition-all duration-200 text-[#112a1e] font-bold text-[16px] flex items-center justify-between"
                                                                     >
-                                                                        {sub.name}
+                                                                        <span>{sub.name}</span>
+                                                                        <ChevronLeft className="w-4 h-4 opacity-0 -translate-x-2 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all" strokeWidth={3} />
                                                                     </Link>
                                                                 ))}
                                                             </div>
                                                         </div>
 
-                                                        {/* Promotional Image (Left side) */}
-                                                        {cat.image_url && (
-                                                            <div className="w-[200px] lg:w-[260px] shrink-0 rounded-2xl overflow-hidden h-[260px] lg:h-[320px] shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] border border-slate-50">
-                                                                <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                                                            </div>
-                                                        )}
+                                                        {/* Left Side: Category Banner (with Smart Fallback) */}
+                                                        {(() => {
+                                                            const fallbacks: Record<string, string> = {
+                                                                "פירות השוק": "/images/megamenu/fruits.png",
+                                                                "ירקות השוק": "/images/megamenu/vegetables.png",
+                                                                "ירוקים וחסות": "/images/megamenu/greens.png",
+                                                                "מגשי אירוח": "/images/megamenu/platters.png",
+                                                                "אגוזים ופיצוחים": "/images/megamenu/nuts.png",
+                                                                "מיצים טבעיים": "/images/megamenu/juices.png",
+                                                                "המזווה שלנו": "/images/megamenu/pantry.png",
+                                                                "מוצרי חלב": "/images/megamenu/dairy.png",
+                                                                "לחמים": "/images/megamenu/breads.png",
+                                                                "משקאות ויינות": "/images/megamenu/drinks.png",
+                                                                "לבית ולמטבח": "/images/megamenu/home_kitchen.png",
+                                                            };
+                                                            const bannerUrl = cat.image_url || fallbacks[cat.name];
+
+                                                            return bannerUrl ? (
+                                                                <div className="w-[260px] h-[340px] shrink-0 rounded-[24px] overflow-hidden shadow-xl border-4 border-white group/banner relative">
+                                                                    <img 
+                                                                        src={bannerUrl} 
+                                                                        alt={cat.name} 
+                                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover/banner:scale-110" 
+                                                                    />
+                                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#112a1e]/40 to-transparent pointer-events-none" />
+                                                                </div>
+                                                            ) : (
+                                                                <div className="w-[260px] h-[340px] bg-gradient-to-br from-[#AADB56]/10 to-[#AADB56]/30 rounded-[24px] flex items-center justify-center border-2 border-dashed border-[#AADB56]/40">
+                                                                    <ShoppingBasket className="w-16 h-16 text-[#AADB56]/40" strokeWidth={1} />
+                                                                </div>
+                                                            );
+                                                        })()}
                                                     </div>
                                                 </div>
                                             )}
@@ -518,7 +574,7 @@ export function SiteHeader() {
 
                 {/* 4. Mobile Toggleable Search Bar */}
                 {mobileSearchOpen && (
-                    <div className="w-full bg-white px-3 py-3 md:hidden border-b border-slate-100 shadow-md animate-in slide-in-from-top duration-300" dir="rtl">
+                    <div className="w-full bg-white px-3 py-3 md:hidden animate-in slide-in-from-top duration-300" dir="rtl">
                         <GlobalSearch />
                     </div>
                 )}

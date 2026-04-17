@@ -30,7 +30,38 @@ export function AdminRealtimeListener() {
         }
     };
 
+    const lastNotifiedOrderId = useRef<string | null>(null);
+
+    const handleNewOrder = (payload: any) => {
+        const newOrder = payload.new || payload; // Support both Postgres insert and Broadcast
+        if (!newOrder || !newOrder.id) return;
+        
+        // De-duplicate if we already notified for this ID in the last 10 seconds
+        if (lastNotifiedOrderId.current === newOrder.id) return;
+        lastNotifiedOrderId.current = newOrder.id;
+
+        console.log("📦 NEW ORDER ALERT:", newOrder);
+        
+        // 1. Play Sound (safely)
+        playNotificationSound();
+
+        // 2. Show Toast Notification
+        toast.success(`הזמנה חדשה נכנסה!`, {
+            description: `לקוח: ${newOrder.customer_name || 'לא ידוע'} | סכום: ₪${newOrder.total_price_estimated?.toFixed(2) || '0.00'}`,
+            duration: 10000,
+            action: {
+                label: "צפה בהזמנה",
+                onClick: () => router.push(`/admin/orders`),
+            },
+        });
+
+        // 3. Refresh Data
+        router.refresh();
+    };
+
     useEffect(() => {
+        console.log("🔔 Initializing Admin Realtime Listener...");
+        
         const channel = supabase
             .channel('admin-orders-channel')
             .on(
@@ -41,28 +72,28 @@ export function AdminRealtimeListener() {
                     table: 'orders',
                 },
                 (payload) => {
-                    // 1. Play Sound (safely)
-                    playNotificationSound();
-
-                    // 2. Show Toast Notification
-                    const newOrder = payload.new as any;
-                    toast.success(`הזמנה חדשה נכנסה!`, {
-                        description: `סכום: ₪${newOrder.total_price_estimated?.toFixed(2) || '0.00'} | לקוח: ${newOrder.customer_name}`,
-                        duration: 5000,
-                        action: {
-                            label: "צפה בהזמנה",
-                            onClick: () => router.push(`/admin/orders`),
-                        },
-                    });
-
-                    // 3. Refresh Data
-                    router.refresh();
+                    console.log("📥 Received Postgres INSERT:", payload);
+                    handleNewOrder(payload.new);
                 }
             )
-            .subscribe();
+            .on(
+                'broadcast',
+                { event: 'new-order' },
+                (payload) => {
+                    console.log("📡 Received Broadcast 'new-order':", payload);
+                    handleNewOrder(payload.payload);
+                }
+            )
+            .subscribe((status) => {
+                console.log(`📡 Supabase Subscription Status: ${status}`);
+                if (status === 'SUBSCRIBED') {
+                    console.log("✅ Successfully subscribed to new orders via Postgres & Broadcast");
+                }
+            });
 
         // Cleanup
         return () => {
+            console.log("🔕 Removing Admin Realtime Listener...");
             supabase.removeChannel(channel);
         };
     }, [supabase, router]);

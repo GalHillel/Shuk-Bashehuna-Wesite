@@ -2,9 +2,15 @@ import { Truck, Map, Clock } from "lucide-react";
 
 export default function DeliveryPage() {
     return (
-        <div className="flex min-h-screen flex-col">
-            <main className="flex-1 container py-12 max-w-3xl">
-                <h1 className="text-4xl font-bold mb-8 text-center text-primary">משלוחים ואזורי חלוקה</h1>
+        <div 
+            className="flex min-h-screen flex-col bg-[#f9faf6] relative overflow-hidden" 
+            style={{ 
+                backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
+                backgroundSize: '24px 24px' 
+            }}
+        >
+            <main className="flex-1 container py-16 max-w-4xl relative z-10">
+                <h1 className="text-4xl md:text-5xl font-black mb-10 text-center text-[#112a1e] tracking-tighter">משלוחים ואזורי חלוקה</h1>
 
                 <div className="space-y-8">
                     <div className="bg-primary/5 p-6 rounded-xl border border-primary/20 flex flex-col items-center text-center">

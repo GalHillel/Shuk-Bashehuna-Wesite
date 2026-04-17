@@ -8,6 +8,7 @@ export interface FilterState {
     maxPrice: number;
     searchQuery: string;
     sort: SortOption;
+    selectedCategory: string; // Add this
 }
 
 export function useProductFilters(initialProducts: Product[]) {
@@ -26,7 +27,8 @@ export function useProductFilters(initialProducts: Product[]) {
         minPrice: 0,
         maxPrice: 1000,
         searchQuery: '',
-        sort: 'newest'
+        sort: 'newest',
+        selectedCategory: 'all' // Default to all
     });
 
     // Update state bounds when products change (e.g. category switch)
@@ -48,6 +50,14 @@ export function useProductFilters(initialProducts: Product[]) {
             result = result.filter(p =>
                 p.name.toLowerCase().includes(q) ||
                 (p.description && p.description.toLowerCase().includes(q))
+            );
+        }
+
+        // Category Filter
+        if (filters.selectedCategory !== 'all') {
+            result = result.filter(p => 
+                p.category_id === filters.selectedCategory || 
+                p.subcategory_id === filters.selectedCategory
             );
         }
 
@@ -82,11 +92,14 @@ export function useProductFilters(initialProducts: Product[]) {
     const setMaxPrice = (val: number) => setFilters(prev => ({ ...prev, maxPrice: val }));
     const setSearchQuery = (val: string) => setFilters(prev => ({ ...prev, searchQuery: val }));
     const setSort = (val: SortOption) => setFilters(prev => ({ ...prev, sort: val }));
+    const setSelectedCategory = (val: string) => setFilters(prev => ({ ...prev, selectedCategory: val }));
+    
     const resetFilters = () => setFilters({
         minPrice: initialMin,
         maxPrice: initialMax,
         searchQuery: '',
-        sort: 'newest'
+        sort: 'newest',
+        selectedCategory: 'all'
     });
 
     return {
@@ -100,6 +113,7 @@ export function useProductFilters(initialProducts: Product[]) {
             setMaxPrice,
             setSearchQuery,
             setSort,
+            setSelectedCategory,
             resetFilters,
             setFilters // Allow bulk updates if needed
         }

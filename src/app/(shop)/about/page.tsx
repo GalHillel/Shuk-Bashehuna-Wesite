@@ -27,81 +27,94 @@ export default function AboutPage() {
     }, []);
 
     return (
-        <div className="flex min-h-screen flex-col">
-            <main className="flex-1">
-                {/* Hero Section */}
-                <section className="relative h-64 md:h-80 overflow-hidden">
-                    <Image
-                        src={settings.about_hero_image || "/placeholder.png"}
-                        alt={settings.site_name || "שוק בשכונה - פירות וירקות טריים"}
-                        fill
-                        className="object-cover brightness-50"
-                        priority
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <h1 className="text-4xl md:text-5xl font-bold text-white text-center">
-                            {settings.site_name ? `🥬 ${settings.site_name}` : "🥬 שוק בשכונה"}
-                        </h1>
-                    </div>
-                </section>
+        <div className="flex min-h-screen flex-col bg-[#fcfcfc]" dir="rtl">
+            {/* Hero Section */}
+            <div
+                className="bg-[#AADB56] pt-16 pb-14 text-center relative overflow-hidden"
+                style={{
+                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 2.5px)',
+                    backgroundSize: '24px 24px'
+                }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 pointer-events-none"></div>
+                <div className="relative z-10 container mx-auto px-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#112a1e] mb-4 tracking-tighter drop-shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                        הסיפור שלנו
+                    </h1>
+                    <div className="w-16 h-1.5 bg-[#112a1e] mx-auto mb-6 rounded-full opacity-20"></div>
+                    <p className="text-lg md:text-xl text-[#2c3e1c] font-black max-w-2xl mx-auto px-4 leading-tight opacity-90 animate-in fade-in slide-in-from-bottom-4 delay-200 duration-700">
+                        מביאים את הטריות של השדה ישירות אל הצלחת שלכם
+                    </p>
+                </div>
+            </div>
 
-                <div className="container max-w-4xl py-12 space-y-12 mx-auto">
-                    {/* Story */}
-                    <section className="space-y-4 text-lg leading-relaxed text-center">
-                        <h2 className="text-3xl font-bold text-primary">{settings.about_story_title || "הסיפור שלנו"}</h2>
-                        <p className="max-w-3xl mx-auto">
-                            {settings.about_story_p1 || "״שוק בשכונה״ הוקם מתוך אהבה אמיתית לאדמה ולתוצרת החקלאית הישראלית. אנחנו דור שלישי למשפחת חקלאים, ומביאים אליכם את הסיפור שמאחורי כל עגבנייה ומלפפון."}
-                        </p>
-                        <p className="max-w-3xl mx-auto">
-                            {settings.about_story_p2 || "החלום שלנו הוא להגיע אליכם הביתה עם המשלוח המושלם – כזה שמרגיש כאילו קטפתם את התוצרת בעצמכם רגע לפני שהגיעה לדלת. אנחנו מתחייבים לטריות, לאיכות ולשירות ללא פשרות."}
-                        </p>
+            <main
+                className="flex-1 container mx-auto px-4 py-16 max-w-4xl bg-[#f9faf6] min-w-full"
+                style={{
+                    backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)',
+                    backgroundSize: '24px 24px'
+                }}
+            >
+                <div className="max-w-4xl mx-auto space-y-20">
+                    {/* Story Section */}
+                    <section className="space-y-8 text-center max-w-3xl mx-auto">
+                        <h2 className="text-3xl md:text-4xl font-black text-[#112a1e] tracking-tight">
+                            {settings.about_story_title || "חקלאות ישראלית עם נשמה"}
+                        </h2>
+                        <div className="space-y-6 text-xl md:text-[22px] text-slate-700 font-medium leading-relaxed">
+                            <p className="animate-in fade-in duration-700">
+                                {settings.about_story_p1 || "״שוק בשכונה״ הוקם מתוך אהבה אמיתית לאדמה ולתוצרת החקלאית הישראלית. אנחנו דור שלישי למשפחת חקלאים, ומביאים אליכם את הסיפור שמאחורי כל עגבנייה ומלפפון."}
+                            </p>
+                            <p className="animate-in fade-in duration-1000">
+                                {settings.about_story_p2 || "החלום שלנו הוא להגיע אליכם הביתה עם המשלוח המושלם – כזה שמרגיש כאילו קטפתם את התוצרת בעצמכם רגע לפני שהגיעה לדלת. אנחנו מתחייבים לטריות, לאיכות ולשירות ללא פשרות."}
+                            </p>
+                        </div>
                     </section>
 
                     {/* Values Grid */}
-                    <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {(settings.about_features && Array.isArray(settings.about_features) ? settings.about_features : [
                             {
                                 icon: "Leaf",
                                 title: "טריות ללא פשרות",
-                                desc: "כל המוצרים נקטפים ומגיעים טריים ישירות מהשדה אליכם הביתה",
-                                color: "text-green-600 bg-green-50",
+                                desc: "כל המוצרים נקטפים ומגיעים טריים ישירות מהשדה אליכם הביתה בתחזוקה קפדנית.",
+                                color: "text-[#3a5223] bg-[#ebf3db] border-[#c4eab3]",
                             },
                             {
                                 icon: "Truck",
                                 title: "משלוח עד הבית",
-                                desc: "שליח ידידותי יביא את ההזמנה ישירות לדלת שלכם, בשעה שנוחה לכם",
-                                color: "text-blue-600 bg-blue-50",
+                                desc: "שליח ידידותי יביא את ההזמנה ישירות לדלת שלכם, בזמנים שנוחים לכם ביותר.",
+                                color: "text-[#3a5223] bg-[#ebf3db] border-[#c4eab3]",
                             },
                         ]).map((item: any, idx: number) => {
-                            // Map string icon name to Lucide component
                             const iconMap: any = { Leaf, Truck, Heart, Phone, Star, Shield, Zap, Coffee, Award, Gift };
                             const Icon = iconMap[item.icon] || Leaf;
 
                             return (
-                                <div key={idx} className="p-6 rounded-xl border bg-card shadow-sm hover:shadow-md transition-shadow">
-                                    <div className={`inline-flex p-3 rounded-lg mb-4 ${item.color}`}>
-                                        <Icon className="h-6 w-6" />
+                                <div key={idx} className="p-8 md:p-10 rounded-[40px] border border-slate-200/60 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.06)] hover:border-[#AADB56] transition-all duration-500 group">
+                                    <div className={`inline-flex p-4 rounded-3xl mb-6 border-2 transform group-hover:scale-110 transition-transform duration-500 ${item.color}`}>
+                                        <Icon className="h-8 w-8" strokeWidth={2.5} />
                                     </div>
-                                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                                    <p className="text-muted-foreground">{item.desc}</p>
+                                    <h3 className="text-2xl font-black mb-4 text-[#112a1e] tracking-tight">{item.title}</h3>
+                                    <p className="text-lg text-slate-600 font-medium leading-relaxed">{item.desc}</p>
                                 </div>
                             );
                         })}
                     </section>
 
-                    {/* Image + Text */}
-                    <section className="grid md:grid-cols-2 gap-8 items-center">
-                        <div className="relative h-64 rounded-xl overflow-hidden shadow-md">
+                    {/* Secondary Image + Text */}
+                    <section className="grid md:grid-cols-2 gap-12 items-center">
+                        <div className="relative h-[400px] rounded-[40px] overflow-hidden shadow-2xl border-8 border-white">
                             <Image
                                 src={settings.about_secondary_image || "/placeholder.png"}
                                 alt="חקלאות ישראלית"
                                 fill
-                                className="object-cover"
+                                className="object-cover hover:scale-110 transition-transform duration-1000"
                             />
                         </div>
-                        <div className="space-y-4">
-                            <h2 className="text-2xl font-bold">{settings.about_vision_title || "בית לחקלאות ישראלית 🇮🇱"}</h2>
-                            <p className="text-lg leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                        <div className="space-y-6">
+                            <h2 className="text-3xl md:text-4xl font-black text-[#112a1e] tracking-tight">{settings.about_vision_title || "בית לחקלאות ישראלית 🇮🇱"}</h2>
+                            <p className="text-lg md:text-xl leading-relaxed text-slate-700 font-medium whitespace-pre-wrap border-r-4 border-[#AADB56] pr-6">
                                 {settings.about_vision_text || `אנחנו מעודדים חקלאות כחול-לבן! שוק בשכונה הוקם מתוך אידיאל עקרוני – להעניק לחקלאי הישראלי בית, ולחקלאות הישראלית במה.\n\nכשאתם קונים אצלנו, אתם תומכים ישירות במשקים ובמטעים הנפלאים של ארצנו.`}
                             </p>
                         </div>

@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Save, Loader2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { FeaturesJSONEditor } from "@/components/admin/FeaturesJSONEditor";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,7 +53,7 @@ export default function SettingsPage() {
         }
 
         setSaving(false);
-        alert("ההגדרות נשמרו בהצלחה!");
+        toast.success("ההגדרות נשמרו בהצלחה");
     };
 
     const handleChange = (key: string, value: string) => {
@@ -78,105 +79,82 @@ export default function SettingsPage() {
             </div>
 
             <Tabs defaultValue="general" dir="rtl" className="w-full">
-                <TabsList className="bg-slate-100 p-1 rounded-xl h-auto flex flex-wrap justify-start">
-                    <TabsTrigger value="general" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">כללי (Header)</TabsTrigger>
-                    <TabsTrigger value="footer" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">תחתית האתר (Footer)</TabsTrigger>
-                    <TabsTrigger value="about" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">אודות (About)</TabsTrigger>
-                    <TabsTrigger value="contact" className="rounded-lg px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-sm">יצירת קשר</TabsTrigger>
+                <TabsList className="bg-slate-100 p-1 rounded-2xl h-auto flex flex-wrap justify-start border border-slate-200 shadow-sm overflow-hidden mb-2">
+                    <TabsTrigger value="general" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-bold transition-all">כללי (Header)</TabsTrigger>
+                    <TabsTrigger value="about" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-bold transition-all">אודות (About)</TabsTrigger>
+                    <TabsTrigger value="contact" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-bold transition-all">יצירת קשר</TabsTrigger>
                 </TabsList>
 
                 {/* GENERAL / HEADER */}
-                <TabsContent value="general" className="mt-6 space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>הודעה עליונה (Top Bar)</CardTitle>
-                            <CardDescription>הטקסט שמופיע בפס הירוק בראש האתר</CardDescription>
+                <TabsContent value="general" className="mt-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-400">
+                    <Card className="rounded-[32px] overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40">
+                        <CardHeader className="bg-slate-50/50 pb-8 border-b border-slate-50">
+                            <CardTitle className="text-xl font-black text-slate-800">הודעה עליונה (Top Bar)</CardTitle>
+                            <CardDescription className="text-slate-500">הטקסט שמופיע בפס הירוק בראש האתר</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold">הודעה ראשית (ימין)</label>
+                        <CardContent className="space-y-6 pt-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="text-sm font-black text-slate-700">הודעה ראשית (ימין)</label>
                                     <Input
                                         placeholder="משלוח חינם בקנייה מעל 300 ₪"
                                         value={settings.top_bar_right || ""}
                                         onChange={(e) => handleChange("top_bar_right", e.target.value)}
-                                        className="h-11"
+                                        className="h-14 rounded-2xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-[#AADB56] focus:border-[#AADB56] transition-all"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold">הודעה משנית (שמאל)</label>
+                                <div className="space-y-3">
+                                    <label className="text-sm font-black text-slate-700">הודעה משנית (שמאל)</label>
                                     <Input
                                         placeholder="הזמינו היום — קבלו מחר!"
                                         value={settings.top_bar_left || ""}
                                         onChange={(e) => handleChange("top_bar_left", e.target.value)}
-                                        className="h-11"
+                                        className="h-14 rounded-2xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-[#AADB56] focus:border-[#AADB56] transition-all"
                                     />
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>לוגו וכותרת ראשית</CardTitle>
-                            <CardDescription>הטקסט שמופיע ליד הלוגו</CardDescription>
+                    <Card className="rounded-[32px] overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40">
+                        <CardHeader className="bg-slate-50/50 pb-8 border-b border-slate-50">
+                            <CardTitle className="text-xl font-black text-slate-800">לוגו וכותרת ראשית</CardTitle>
+                            <CardDescription className="text-slate-500">הטקסט והמיתוג שמופיעים ליד הלוגו</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold">לוגו האתר (משמאל לימין)</label>
-                                    <div className="max-w-[200px]">
+                        <CardContent className="space-y-8 pt-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                <div className="space-y-4">
+                                    <label className="text-sm font-black text-slate-700">לוגו האתר</label>
+                                    <div className="max-w-[240px] p-2 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                                         <ImageUpload
                                             value={settings.site_logo || ""}
                                             onChange={(url) => handleChange("site_logo", url)}
                                             bucket="banners"
                                             folder="branding"
-                                            cropAspect={1} // Force square crop for round logo
                                         />
                                     </div>
-                                    <p className="text-xs text-muted-foreground">מומלץ: PNG שקוף או SVG. גודל מומלץ: 120x40 פיקסלים.</p>
+                                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed bg-[#AADB56]/5 p-3 rounded-xl border border-[#AADB56]/10">💡 מומלץ: PNG שקוף או SVG. גודל אידיאלי: 240x80 פיקסלים למראה חד ונקי.</p>
                                 </div>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold">שם האתר</label>
+                                <div className="space-y-6">
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-black text-slate-700">שם האתר</label>
                                         <Input
                                             placeholder="שוק בשכונה"
                                             value={settings.site_name || ""}
                                             onChange={(e) => handleChange("site_name", e.target.value)}
-                                            className="h-11"
+                                            className="h-14 rounded-2xl border-slate-200 bg-slate-50/30 focus:bg-white transition-all"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold">סלוגן (מתחת לשם)</label>
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-black text-slate-700">סלוגן (מתחת לשם)</label>
                                         <Input
                                             placeholder="הכי טרי • הכי קרוב • הכי טעים"
                                             value={settings.site_slogan || ""}
                                             onChange={(e) => handleChange("site_slogan", e.target.value)}
-                                            className="h-11"
+                                            className="h-14 rounded-2xl border-slate-200 bg-slate-50/30 focus:bg-white transition-all"
                                         />
                                     </div>
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                {/* FOOTER */}
-                <TabsContent value="footer" className="mt-6 space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>טקסט תחתון</CardTitle>
-                            <CardDescription>טקסט אודות קצר שמופיע בתחתית כל עמוד</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold">תיאור האתר</label>
-                                <Textarea
-                                    placeholder="פירות וירקות טריים ישירות מהחקלאי אליכם הביתה..."
-                                    value={settings.footer_description || ""}
-                                    onChange={(e) => handleChange("footer_description", e.target.value)}
-                                    className="min-h-[100px] h-32"
-                                />
                             </div>
                         </CardContent>
                     </Card>

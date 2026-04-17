@@ -10,18 +10,18 @@ export function CookieConsent() {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        // Check if user has already accepted cookies
-        const accepted = localStorage.getItem("cookie_consent_accepted");
+        // Check if user has already accepted cookies with the new key
+        const accepted = localStorage.getItem("shuk_cookie_consent_v1");
         if (!accepted) {
             // Show banner after a short delay for smooth entrance
-            const timer = setTimeout(() => setIsVisible(true), 1000);
+            const timer = setTimeout(() => setIsVisible(true), 1500);
             return () => clearTimeout(timer);
         }
     }, []);
 
     const handleAccept = () => {
         setIsVisible(false);
-        localStorage.setItem("cookie_consent_accepted", "true");
+        localStorage.setItem("shuk_cookie_consent_v1", "true");
     };
 
     if (!isVisible) return null;
@@ -29,34 +29,39 @@ export function CookieConsent() {
     return (
         <div
             className={cn(
-                "fixed bottom-0 left-0 right-0 z-50 p-4 transition-transform duration-500 ease-in-out",
-                "bg-[#14532d] border-t border-green-800 shadow-2xl safe-area-bottom"
+                "fixed bottom-6 left-6 right-6 z-[120] transition-all duration-700 ease-out",
+                "animate-in fade-in slide-in-from-bottom-10"
             )}
             dir="rtl"
         >
-            <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-start sm:items-center gap-3 text-white">
-                    <div className="p-2 bg-white/10 rounded-full shrink-0">
-                        <Cookie className="h-5 w-5 text-green-200" />
+            <div className="max-w-4xl mx-auto">
+                <div className="bg-white/80 backdrop-blur-2xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[32px] p-5 md:p-6 flex flex-col md:flex-row items-center gap-6">
+                    <div className="flex items-center gap-4 flex-1">
+                        <div className="w-14 h-14 rounded-2xl bg-[#AADB56]/20 flex items-center justify-center shrink-0 border border-[#AADB56]/30">
+                            <Cookie className="h-7 w-7 text-[#112a1e]" />
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="font-black text-[#112a1e] text-lg tracking-tight">אנחנו משתמשים בעוגיות 🍪</h4>
+                            <p className="text-slate-600 font-bold text-sm leading-relaxed">
+                                אתר זה עושה שימוש בקבצי Cookies כדי להבטיח שתקבלו את החוויה הטובה ביותר, לשמור על סל הקניות שלכם ולנתח את נתוני הגלישה. 
+                                <br className="hidden md:block" />
+                                למידע נוסף, עיינו ב
+                                <Link href="/privacy" className="text-[#112a1e] underline decoration-[#AADB56] decoration-2 underline-offset-4 hover:text-[#AADB56] transition-colors mx-1">
+                                    מדיניות הפרטיות
+                                </Link>
+                                שלנו.
+                            </p>
+                        </div>
                     </div>
-                    <p className="text-sm leading-relaxed max-w-2xl">
-                        אתר זה עושה שימוש בקבצי Cookies על מנת לשפר את חווית הגלישה.
-                        במידה ותמשיך לגלוש הנך מסכים לשימוש זה ולתנאי{" "}
-                        <Link href="/privacy" className="underline underline-offset-2 hover:text-green-200 font-medium transition-colors">
-                            מדיניות הפרטיות
-                        </Link>
-                        .
-                    </p>
-                </div>
 
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <Button
-                        onClick={handleAccept}
-                        size="sm"
-                        className="w-full sm:w-auto bg-white text-[#14532d] hover:bg-green-50 font-bold rounded-full px-6 whitespace-nowrap"
-                    >
-                        אני מסכים
-                    </Button>
+                    <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 md:border-r border-slate-200/60 pt-4 md:pt-0 md:pr-6">
+                        <Button
+                            onClick={handleAccept}
+                            className="w-full md:w-auto bg-[#112a1e] hover:bg-[#1b3626] text-white font-black px-8 py-6 rounded-2xl text-[16px] shadow-xl hover:shadow-[0_10px_20px_rgba(17,42,30,0.2)] transition-all active:scale-95"
+                        >
+                            אישור והמשך
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

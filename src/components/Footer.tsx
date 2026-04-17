@@ -27,81 +27,110 @@ export function Footer() {
     }, []);
 
     return (
-        <footer className="bg-[#112a1e] text-green-100 mt-auto border-t border-[#AADB56] py-16" dir="rtl">
-            <div className="container mx-auto px-6 md:px-12">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+        <footer 
+            className="bg-[#112a1e] text-[#ebf3db]/80 mt-auto border-t border-[#AADB56]/20 py-20 relative overflow-hidden" 
+            dir="rtl"
+            style={{ 
+                backgroundImage: 'radial-gradient(circle, rgba(170,219,86,0.04) 1.5px, transparent 1.5px)', 
+                backgroundSize: '24px 24px' 
+            }}
+        >
+            <div className="absolute inset-0 bg-gradient-to-b from-[#112a1e] via-transparent to-[#112a1e] pointer-events-none opacity-40"></div>
+            
+            <div className="container mx-auto px-6 md:px-12 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
                     
                     {/* Column 1: בואו להכיר */}
                     <div>
-                        <h4 className="text-white font-black text-2xl mb-6 tracking-tight relative inline-block">
+                        <h4 className="text-[#AADB56] font-black text-2xl mb-8 tracking-tighter relative inline-block">
                             בואו להכיר
-                            <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-[#AADB56] rounded-full"></span>
+                            <span className="absolute -bottom-2 right-0 w-12 h-1.5 bg-[#AADB56] rounded-full opacity-30 shadow-[0_0_10px_rgba(170,219,86,0.2)]"></span>
                         </h4>
-                        <ul className="space-y-3.5 font-bold text-[#ebf3db]/80">
-                            <li><Link href="/about" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> אודות</Link></li>
-                            <li><Link href="/kosher" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> תעודת כשרות</Link></li>
-                            <li><Link href="/faq" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> שאלות נפוצות</Link></li>
-                            <li><Link href="/terms" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> תנאי שימוש באתר</Link></li>
-                            <li><Link href="/accessibility" className="hover:text-[#AADB56] transition-colors flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/50"></div> הצהרת נגישות</Link></li>
+                        <ul className="space-y-4 font-bold">
+                            {[
+                                { label: "אודות", href: "/about" },
+                                { label: "תעודת כשרות", href: "/kosher" },
+                                { label: "שאלות נפוצות", href: "/faq" },
+                                { label: "תנאי שימוש באתר", href: "/terms" },
+                                { label: "הצהרת נגישות", href: "/accessibility" }
+                            ].map((link, idx) => (
+                                <li key={idx}>
+                                    <Link href={link.href} className="hover:text-[#AADB56] hover:translate-x-[-6px] transition-all flex items-center gap-2 group">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[#AADB56]/30 group-hover:bg-[#AADB56] transition-colors"></div>
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
                     {/* Column 2: החנות */}
                     <div>
-                        <h4 className="text-white font-black text-2xl mb-6 tracking-tight relative inline-block">
+                        <h4 className="text-[#AADB56] font-black text-2xl mb-8 tracking-tighter relative inline-block">
                             החנות
-                            <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-[#AADB56] rounded-full"></span>
+                            <span className="absolute -bottom-2 right-0 w-12 h-1.5 bg-[#AADB56] rounded-full opacity-30 shadow-[0_0_10px_rgba(170,219,86,0.2)]"></span>
                         </h4>
-                        <ul className="grid grid-cols-2 gap-x-4 gap-y-3.5 font-bold text-[#ebf3db]/80">
-                            <li><Link href="/category/fruits" className="hover:text-[#AADB56] transition-colors">פירות השוק</Link></li>
-                            <li><Link href="/category/vegetables" className="hover:text-[#AADB56] transition-colors">ירקות השוק</Link></li>
-                            <li><Link href="/category/greens" className="hover:text-[#AADB56] transition-colors">ירוקים וחסות</Link></li>
-                            <li><Link href="/category/platters" className="hover:text-[#AADB56] transition-colors">מגשי אירוח</Link></li>
-                            <li><Link href="/category/nuts" className="hover:text-[#AADB56] transition-colors">אגוזים ופירות יבשים</Link></li>
-                            <li><Link href="/category/juices" className="hover:text-[#AADB56] transition-colors">מיצים טבעיים</Link></li>
-                            <li><Link href="/category/pantry" className="hover:text-[#AADB56] transition-colors">המזווה שלנו</Link></li>
-                            <li><Link href="/category/dairy" className="hover:text-[#AADB56] transition-colors">מוצרי חלב וביצים</Link></li>
-                            <li><Link href="/category/breads" className="hover:text-[#AADB56] transition-colors">לחמים</Link></li>
-                            <li><Link href="/category/drinks" className="hover:text-[#AADB56] transition-colors">משקאות ויינות</Link></li>
-                            <li><Link href="/category/home" className="hover:text-[#AADB56] transition-colors">לבית ולמטבח</Link></li>
+                        <ul className="grid grid-cols-2 gap-x-4 gap-y-4 font-bold">
+                            {[
+                                { label: "פירות השוק", href: "/category/fruits" },
+                                { label: "ירקות השוק", href: "/category/vegetables" },
+                                { label: "ירוקים וחסות", href: "/category/greens" },
+                                { label: "מגשי אירוח", href: "/category/platters" },
+                                { label: "אגוזים ופיצוחים", href: "/category/nuts" },
+                                { label: "מיצים טבעיים", href: "/category/juices" },
+                                { label: "המזווה שלנו", href: "/category/pantry" },
+                                { label: "מוצרי חלב", href: "/category/dairy" },
+                                { label: "לחמים", href: "/category/breads" },
+                                { label: "משקאות ויינות", href: "/category/drinks" },
+                                { label: "לבית ולמטבח", href: "/category/home" }
+                            ].map((link, idx) => (
+                                <li key={idx}>
+                                    <Link href={link.href} className="hover:text-[#AADB56] transition-colors flex items-center gap-2 group opacity-90 hover:opacity-100">
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
                     {/* Column 3: שירות לקוחות */}
                     <div>
-                        <h4 className="text-white font-black text-2xl mb-6 tracking-tight relative inline-block">
+                        <h4 className="text-[#AADB56] font-black text-2xl mb-8 tracking-tighter relative inline-block">
                             שירות לקוחות
-                            <span className="absolute -bottom-2 right-0 w-1/2 h-1 bg-[#AADB56] rounded-full"></span>
+                            <span className="absolute -bottom-2 right-0 w-12 h-1.5 bg-[#AADB56] rounded-full opacity-30 shadow-[0_0_10px_rgba(170,219,86,0.2)]"></span>
                         </h4>
-                        <div className="space-y-5 text-[#ebf3db] font-bold">
-                            <div className="flex items-start gap-4">
-                                <div className="bg-[#1a4222] p-2.5 rounded-xl border border-[#2c6136]">
-                                    <Clock className="w-6 h-6 text-[#AADB56]" />
+                        <div className="space-y-6 text-[#ebf3db]/90 font-bold">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-[#AADB56] p-3 rounded-2xl shadow-[0_10px_20px_rgba(170,219,86,0.1)] border border-white/10 group">
+                                    <Clock className="w-6 h-6 text-[#112a1e] animate-pulse" />
                                 </div>
-                                <div className="leading-relaxed mt-1 tracking-wide">
-                                    <p>ראשון - חמישי: 7:00 - 20:00</p>
-                                    <p>שישי: 7:00 - 16:00</p>
+                                <div className="leading-tight tracking-tight">
+                                    <p className="font-black text-[#AADB56] text-[15px] mb-0.5">שעות פעילות:</p>
+                                    <p className="text-[14px]">א&apos;-ה&apos;: 07:00 - 20:00</p>
+                                    <p className="text-[14px]">ו&apos;: 07:00 - 16:00</p>
                                 </div>
                             </div>
                             
                             {settings.contact_phone && (
-                                <div className="flex items-start gap-4 mt-6">
-                                    <div className="bg-[#1a4222] p-2.5 rounded-xl border border-[#2c6136]">
-                                        <Phone className="w-6 h-6 text-[#AADB56]" />
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-[#AADB56] p-3 rounded-2xl shadow-[0_10px_20px_rgba(170,219,86,0.1)] border border-white/10">
+                                        <Phone className="w-6 h-6 text-[#112a1e]" />
                                     </div>
-                                    <div className="leading-relaxed mt-2 tracking-wide font-black text-xl flex items-center gap-2" dir="ltr">
-                                        <a href={`tel:${settings.contact_phone}`} className="hover:text-[#AADB56] transition-colors">{settings.contact_phone}</a>
+                                    <div className="leading-tight">
+                                        <p className="font-black text-[#AADB56] text-[15px] mb-0.5">לשיחה איתנו:</p>
+                                        <a href={`tel:${settings.contact_phone}`} className="text-xl font-black block text-white hover:text-[#AADB56] transition-colors" dir="ltr">{settings.contact_phone}</a>
                                     </div>
                                 </div>
                             )}
 
                             {settings.contact_email && (
-                                <div className="flex items-start gap-4 mt-2">
-                                    <div className="bg-[#1a4222] p-2.5 rounded-xl border border-[#2c6136]">
-                                        <Mail className="w-6 h-6 text-[#AADB56]" />
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-[#AADB56] p-3 rounded-2xl shadow-[0_10px_20px_rgba(170,219,86,0.1)] border border-white/10">
+                                        <Mail className="w-6 h-6 text-[#112a1e]" />
                                     </div>
-                                    <div className="leading-relaxed mt-2 tracking-wide font-bold" dir="ltr">
-                                        <a href={`mailto:${settings.contact_email}`} className="hover:text-[#AADB56] transition-colors">{settings.contact_email}</a>
+                                    <div className="leading-tight">
+                                        <p className="font-black text-[#AADB56] text-[15px] mb-0.5">פנייה במייל:</p>
+                                        <a href={`mailto:${settings.contact_email}`} className="text-sm font-black break-all text-white/90 hover:text-[#AADB56] transition-colors">{settings.contact_email}</a>
                                     </div>
                                 </div>
                             )}
@@ -110,11 +139,12 @@ export function Footer() {
 
                 </div>
                 
-                <div className="mt-16 pt-8 border-t border-[#1a4222] flex flex-col md:flex-row justify-between items-center gap-4 text-[#ebf3db]/40 text-sm font-bold tracking-wider">
+                {/* Bottom Bar */}
+                <div className="mt-24 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-white/30 text-xs font-black tracking-widest uppercase">
                     <p>© {new Date().getFullYear()} שוק בשכונה. כל הזכויות שמורות.</p>
-                    <div className="flex items-center gap-4">
-                       <MapPin className="h-4 w-4" />
-                       {settings.contact_address || "ישראל"}
+                    <div className="flex items-center gap-4 py-2 px-5 bg-white/5 rounded-full border border-white/5 backdrop-blur-md">
+                       <MapPin className="h-4 w-4 text-[#AADB56]" />
+                       <span className="text-white/60 font-black">{settings.contact_address || "ישראל"}</span>
                     </div>
                 </div>
             </div>

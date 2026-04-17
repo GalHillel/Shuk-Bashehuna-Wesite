@@ -104,23 +104,32 @@ export default function AdminOrdersPage() {
     });
 
     return (
-        <div className="p-6 space-y-6" dir="rtl">
+        <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold">ניהול הזמנות</h1>
-                <Button variant="outline" size="icon" onClick={fetchOrders} disabled={loading}>
-                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                <div>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">ניהול הזמנות</h1>
+                    <p className="text-slate-500 mt-1 font-medium">עקוב אחר הזמנות חדשות ונהל את היסטוריית המכירות</p>
+                </div>
+                <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={fetchOrders} 
+                    disabled={loading}
+                    className="h-12 w-12 rounded-2xl border-slate-100 shadow-sm hover:bg-[#AADB56]/10 transition-all"
+                >
+                    <RefreshCw className={`h-5 w-5 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
                 </Button>
             </div>
 
-            <div className="flex gap-2 border-b">
+            <div className="flex bg-slate-100/50 p-1.5 rounded-2xl w-fit border border-slate-100 shadow-sm">
                 <button
-                    className={`px-4 py-2 font-medium transition-colors border-b-2 ${activeTab === 'active' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                    className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'active' ? 'bg-white text-[#112a1e] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                     onClick={() => setActiveTab('active')}
                 >
-                    פעילות ({orders.filter(o => ['pending', 'paid', 'preparing', 'shipping'].includes(o.status)).length})
+                    הזמנות פעילות ({orders.filter(o => ['pending', 'paid', 'preparing', 'shipping'].includes(o.status)).length})
                 </button>
                 <button
-                    className={`px-4 py-2 font-medium transition-colors border-b-2 ${activeTab === 'history' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                    className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'history' ? 'bg-white text-[#112a1e] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                     onClick={() => setActiveTab('history')}
                 >
                     היסטוריה ({orders.filter(o => ['completed', 'cancelled', 'refunded'].includes(o.status)).length})
@@ -129,15 +138,16 @@ export default function AdminOrdersPage() {
 
             {/* Loading State */}
             {loading && (
-                <div className="text-center py-12">
-                    <RefreshCw className="h-8 w-8 animate-spin mx-auto text-primary" />
-                    <p className="mt-2 text-muted-foreground">טוען הזמנות...</p>
+                <div className="text-center py-24 bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40">
+                    <RefreshCw className="h-10 w-10 animate-spin mx-auto text-[#AADB56]" />
+                    <p className="mt-4 text-slate-400 font-bold">טוען נתונים מהשרת...</p>
                 </div>
             )}
 
             {!loading && filteredOrders.length === 0 && (
-                <div className="text-center py-12 bg-white rounded-xl border border-dashed">
-                    <p className="text-lg text-muted-foreground">
+                <div className="text-center py-24 bg-white rounded-[32px] border border-dashed border-slate-200 shadow-inner">
+                    <ShoppingBag className="h-12 w-12 mx-auto text-slate-200 mb-4" />
+                    <p className="text-xl font-black text-slate-400 font-bold">
                         לא נמצאו הזמנות {activeTab === 'active' ? 'פעילות' : 'בהיסטוריה'}
                     </p>
                 </div>
@@ -159,80 +169,78 @@ export default function AdminOrdersPage() {
                     </div>
 
                     {/* Desktop View (Table) */}
-                    <Card className="hidden md:block">
-                        <CardHeader>
-                            <CardTitle>{activeTab === 'active' ? 'הזמנות פעילות' : 'היסטוריית הזמנות'}</CardTitle>
-                            <CardDescription>
+                    <div className="hidden md:block bg-white rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
+                        <div className="p-8 border-b border-slate-50">
+                             <h2 className="text-xl font-black text-slate-800">{activeTab === 'active' ? 'הזמנות שמחכות לך' : 'סיכום הזמנות עבר'}</h2>
+                             <p className="text-sm text-slate-400 font-medium">
                                 {activeTab === 'active'
                                     ? 'הזמנות שממתינות לטיפול, ליקוט או משלוח.'
                                     : 'הזמנות שהושלמו או בוטלו.'}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="text-right">מס׳ הזמנה</TableHead>
-                                        <TableHead className="text-right">תאריך</TableHead>
-                                        <TableHead className="text-right">סה״כ (משוער)</TableHead>
-                                        <TableHead className="text-right">סטטוס</TableHead>
-                                        <TableHead className="text-left">פעולות</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {filteredOrders.map((order) => (
-                                        <TableRow key={order.id}>
-                                            <TableCell className="font-mono text-xs font-bold">#{(order.shipping_address as any)?.order_number || order.id.slice(0, 8)}</TableCell>
-                                            <TableCell>{format(new Date(order.created_at), "dd/MM/yyyy HH:mm")}</TableCell>
-                                            <TableCell>₪{order.total_price_estimated.toFixed(2)}</TableCell>
-                                            <TableCell>{getStatusBadge(order.status)}</TableCell>
-                                            <TableCell className="text-left">
-                                                <div className="flex items-center gap-2 justify-end">
-                                                    {activeTab === 'active' && (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                                            title="סמן כהושלם"
-                                                            onClick={() => handleCompleteOrder(order.id)}
-                                                        >
-                                                            <CheckCircle className="h-4 w-4" />
-                                                        </Button>
-                                                    )}
+                            </p>
+                        </div>
+                        <Table dir="rtl">
+                            <TableHeader className="bg-slate-50/50">
+                                <TableRow className="hover:bg-transparent border-slate-50">
+                                    <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider pr-8">מס׳ הזמנה</TableHead>
+                                    <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider">תאריך ושעה</TableHead>
+                                    <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider">סה״כ לתשלום</TableHead>
+                                    <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider">סטטוס</TableHead>
+                                    <TableHead className="text-left py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider pl-8">פעולות</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredOrders.map((order) => (
+                                    <TableRow key={order.id} className="hover:bg-slate-50/50 transition-colors border-slate-50 group">
+                                        <TableCell className="font-mono text-xs font-black text-slate-600 pr-8">#{(order.shipping_address as any)?.order_number || order.id.slice(0, 8)}</TableCell>
+                                        <TableCell className="font-bold text-slate-500">{format(new Date(order.created_at), "dd/MM/yyyy HH:mm")}</TableCell>
+                                        <TableCell className="font-black text-slate-800 text-base">₪{order.total_price_estimated.toFixed(2)}</TableCell>
+                                        <TableCell className="scale-90 origin-right">{getStatusBadge(order.status)}</TableCell>
+                                        <TableCell className="pl-8">
+                                            <div className="flex items-center gap-1 justify-end opacity-40 group-hover:opacity-100 transition-opacity">
+                                                {activeTab === 'active' && (
                                                     <Button
                                                         variant="ghost"
-                                                        size="sm"
-                                                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                        title="מחק הזמנה"
-                                                        onClick={() => handleDeleteOrder(order.id)}
+                                                        size="icon"
+                                                        className="h-10 w-10 text-green-500 hover:bg-green-50"
+                                                        title="סמן כהושלם"
+                                                        onClick={() => handleCompleteOrder(order.id)}
                                                     >
-                                                        <Trash2 className="h-4 w-4" />
+                                                        <CheckCircle className="h-5 w-5" />
                                                     </Button>
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button variant="ghost" size="sm" className="gap-2">
-                                                                <Eye className="h-4 w-4" />
-                                                                פרטים
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="max-w-2xl sm:max-w-[1000px] gap-0 p-0" dir="rtl">
-                                                            <DialogHeader className="p-6 pb-2">
-                                                                <DialogTitle className="flex items-center justify-center w-full gap-2 text-xl">
-                                                                    <ShoppingBag className="h-5 w-5 text-primary" />
-                                                                    פרטי הזמנה #{(order.shipping_address as any)?.order_number || order.id.slice(0, 8)}
-                                                                </DialogTitle>
-                                                            </DialogHeader>
-                                                            <OrderDetails order={order} />
-                                                        </DialogContent>
-                                                    </Dialog>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
+                                                )}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-10 w-10 text-red-400 hover:text-red-600 hover:bg-red-50"
+                                                    title="מחק הזמנה"
+                                                    onClick={() => handleDeleteOrder(order.id)}
+                                                >
+                                                    <Trash2 className="h-5 w-5" />
+                                                </Button>
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button variant="ghost" className="h-10 px-4 rounded-xl gap-2 font-bold text-slate-600 hover:bg-slate-100">
+                                                            <Eye className="h-4 w-4" />
+                                                            פרטים
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="max-w-2xl sm:max-w-[1000px] gap-0 p-0 rounded-[40px] overflow-hidden border-none shadow-2xl" dir="rtl">
+                                                        <DialogHeader className="p-8 pb-4 bg-slate-50/50">
+                                                            <DialogTitle className="flex items-center justify-center w-full gap-3 text-2xl font-black text-slate-800">
+                                                                <ShoppingBag className="h-7 w-7 text-[#AADB56]" />
+                                                                פרטי הזמנה #{(order.shipping_address as any)?.order_number || order.id.slice(0, 8)}
+                                                            </DialogTitle>
+                                                        </DialogHeader>
+                                                        <OrderDetails order={order} />
+                                                    </DialogContent>
+                                                </Dialog>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </>
             )}
         </div>

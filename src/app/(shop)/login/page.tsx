@@ -120,7 +120,15 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-4" dir="rtl">
+        <div 
+            className="min-h-screen w-full flex items-center justify-center bg-[#f9faf6] p-4 relative overflow-hidden" 
+            dir="rtl"
+            style={{ 
+                backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
+                backgroundSize: '24px 24px' 
+            }}
+        >
+            <div className="absolute inset-0 bg-gradient-to-br from-[#AADB56]/5 to-transparent pointer-events-none"></div>
             <Suspense fallback={<Loader2 className="h-10 w-10 animate-spin text-green-600" />}>
                 <LoginForm />
             </Suspense>

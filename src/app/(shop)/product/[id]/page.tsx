@@ -95,8 +95,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }
 
     return (
-        <div className="flex min-h-screen flex-col">
-            <main className="flex-1 container py-8">
+        <div 
+            className="flex min-h-screen flex-col bg-[#f9faf6] relative overflow-hidden" 
+            style={{ 
+                backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
+                backgroundSize: '24px 24px' 
+            }}
+        >
+            <main className="flex-1 container py-8 relative z-10">
                 <div className="flex flex-col gap-6">
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">

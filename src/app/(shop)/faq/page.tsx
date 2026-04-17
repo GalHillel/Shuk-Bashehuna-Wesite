@@ -83,15 +83,35 @@ export default function FAQPage() {
     return (
         <div className="flex min-h-screen flex-col bg-[#fcfcfc]" dir="rtl">
             {/* Hero Section */}
-            <div className="bg-[#ebf3db] py-16 text-center border-b border-[#d8e8c1]">
-                <h1 className="text-4xl md:text-5xl font-black text-[#112a1e] mb-4 tracking-tight drop-shadow-sm">שאלות נפוצות</h1>
-                <p className="text-lg md:text-xl text-[#2c3e1c] font-bold max-w-2xl mx-auto px-4">
-                    כל התשובות לשאלות שלכם, במקום אחד. לא מצאתם? תשאירו לנו הודעה.
-                </p>
+            <div 
+                className="bg-[#AADB56] pt-16 pb-14 text-center relative overflow-hidden"
+                style={{ 
+                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 2.5px)', 
+                    backgroundSize: '24px 24px' 
+                }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 pointer-events-none"></div>
+                <div className="relative z-10 container mx-auto px-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#112a1e] mb-4 tracking-tighter drop-shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                        שאלות נפוצות
+                    </h1>
+                    <div className="w-16 h-1.5 bg-[#112a1e] mx-auto mb-6 rounded-full opacity-20"></div>
+                    <p className="text-lg md:text-xl text-[#2c3e1c] font-black max-w-2xl mx-auto px-4 leading-tight opacity-90 animate-in fade-in slide-in-from-bottom-4 delay-200 duration-700">
+                        כל מה שרציתם לדעת על הפירות, הירקות והמשלוחים שלנו. <br className="hidden md:block" /> אנחנו כאן לכל שאלה.
+                    </p>
+                </div>
             </div>
 
-            <main className="flex-1 container mx-auto px-4 py-16 max-w-3xl">
-                <PageContentRenderer blocks={data.blocks} />
+            <main 
+                className="flex-1 container mx-auto px-4 py-16 max-w-3xl bg-[#f9faf6] min-w-full"
+                style={{ 
+                    backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
+                    backgroundSize: '24px 24px' 
+                }}
+            >
+                <div className="max-w-3xl mx-auto">
+                    <PageContentRenderer blocks={data.blocks} />
+                </div>
             </main>
         </div>
     );

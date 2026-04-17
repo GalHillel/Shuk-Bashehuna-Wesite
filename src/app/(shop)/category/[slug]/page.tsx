@@ -106,10 +106,28 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
     return (
         <div className="flex min-h-screen flex-col bg-transparent overflow-x-hidden">
-            <main className="flex-1 container mx-auto px-6 md:px-8 py-8">
+            {/* Hero Section */}
+            <div 
+                className="bg-[#AADB56] pt-14 pb-12 text-center relative overflow-hidden"
+                style={{ 
+                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 2.5px)', 
+                    backgroundSize: '24px 24px' 
+                }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 pointer-events-none"></div>
+                <div className="relative z-10 container mx-auto px-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#112a1e] mb-2 tracking-tighter drop-shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                        {category.name}
+                    </h1>
+                    <div className="w-16 h-1.5 bg-[#112a1e] mx-auto mb-4 rounded-full opacity-20"></div>
+                    <p className="text-lg md:text-xl text-[#2c3e1c] font-black max-w-2xl mx-auto px-4 leading-tight opacity-90 animate-in fade-in slide-in-from-bottom-4 delay-200 duration-700">
+                        התוצרת הטרייה והאיכותית ביותר, ישירות מהחקלאי עד אליכם.
+                    </p>
+                </div>
+            </div>
+
+            <main className="flex-1 container mx-auto px-6 md:px-8 py-8 lg:py-12">
                 <div className="flex flex-col gap-6">
-
-
                     <CategoryPageClient 
                         initialProducts={products} 
                         subCategories={subCategories} 

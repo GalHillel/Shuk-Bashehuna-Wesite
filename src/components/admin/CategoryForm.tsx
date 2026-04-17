@@ -50,7 +50,7 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
     const form = useForm<CategoryFormValues>({
         defaultValues: {
             name: defaultValues?.name || "",
-            slug: (defaultValues as any)?.slug || "", 
+            slug: (defaultValues as any)?.slug || "",
             parent_id: defaultValues?.parent_id || "none",
             image_url: defaultValues?.image_url || "",
             sort_order: defaultValues?.sort_order || 0,
@@ -65,7 +65,7 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
         const fetchParents = async () => {
             let query = supabase.from("categories").select("*").is("parent_id", null);
             if (isEditing && (defaultValues as any)?.id) {
-                 query = query.neq("id", (defaultValues as any).id);
+                query = query.neq("id", (defaultValues as any).id);
             }
             const { data } = await query;
             if (data) setParentCategories(data as Category[]);
@@ -204,7 +204,16 @@ export function CategoryForm({ defaultValues }: CategoryFormProps) {
                                     folder="categories"
                                 />
                             </FormControl>
-                            <p className="text-xs text-muted-foreground mt-2 font-medium">✨ מומלץ להעלות תמונה אנכית (לדוגמה: פוסטר) במידות 400x500 פיקסלים. התמונה תוצג בפאנל הצדדי בתפריט הראשי.</p>
+                            <div className="bg-[#AADB56]/10 p-4 rounded-xl border border-[#AADB56]/20 mt-3">
+                                <p className="text-[13px] font-black text-[#112a1e] mb-1 flex items-center gap-2">
+                                    <span className="text-xl">✨</span>
+                                </p>
+                                <p className="text-xs text-slate-600 font-bold leading-relaxed px-1">
+                                    התמונה שתעלה כאן תוצג כבאנר מרשים בתפריט הניווט העליון.
+                                    <br />
+                                    <span className="text-[#112a1e]">המלצה חמה:</span> השתמש ביחס גובה-רוחב אנכי. מידות מומלצות: <span className="underline decoration-[#AADB56] decoration-2 underline-offset-2">400x550 פיקסלים</span>.
+                                </p>
+                            </div>
                             <FormMessage />
                         </FormItem>
                     )}

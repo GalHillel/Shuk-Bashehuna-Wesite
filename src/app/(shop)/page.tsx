@@ -54,8 +54,14 @@ export default async function Home() {
   const blocks = await getHomepageBlocks();
 
   return (
-    <div className="flex min-h-screen flex-col bg-transparent">
-      <main className="flex-1">
+    <div 
+        className="flex min-h-screen flex-col bg-[#f9faf6] relative overflow-hidden"
+        style={{ 
+            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
+            backgroundSize: '24px 24px' 
+        }}
+    >
+      <main className="flex-1 relative z-10">
         {blocks.map((block: ContentBlock, index: number) => {
           let content = null;
           switch (block.type) {
@@ -89,8 +95,8 @@ export default async function Home() {
           
           if (!content) return null;
 
-          // Hero shouldn't have artificial wrapper padding/bg if it's supposed to be edge-to-edge
-          if (block.type === 'hero_slider' || block.type === 'text_banner') {
+          // Hero, Category Grid, Product Carousel and Banners Grid shouldn't have artificial wrapper padding/bg if they're supposed to be edge-to-edge
+          if (block.type === 'hero_slider' || block.type === 'category_grid' || block.type === 'product_carousel' || block.type === 'banners_grid' || block.type === 'text_banner') {
             return <div key={block.id}>{content}</div>;
           }
 

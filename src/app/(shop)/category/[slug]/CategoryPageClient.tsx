@@ -176,10 +176,9 @@ export function CategoryPageClient({ initialProducts, subCategories = [], curren
                 </div>
 
                 {/* Desktop Results Count Header */}
-                <div className="hidden md:flex justify-between items-end mb-4 pb-2 border-b border-slate-100 pt-0">
-                    <h1 className="text-2xl font-black text-[#113123] tracking-tight leading-none">{currentCategoryName}</h1>
-                    <span className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">
-                         {filteredCount} מוצרים
+                <div className="hidden md:flex justify-end items-center mb-4 pb-2 border-b border-slate-100 pt-0">
+                    <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg tracking-widest border border-slate-100">
+                         {filteredCount} תוצאות
                     </span>
                 </div>
 

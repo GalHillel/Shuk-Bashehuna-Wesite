@@ -30,10 +30,25 @@ async function SuccessPageContent({ order_id }: { order_id: string }) {
         }
     );
 
-    // Fetch order details
+    // Fetch order details with items and products
     const { data: order, error } = await supabaseAdmin
         .from('orders')
-        .select('id, customer_name, total_price_estimated, payment_method, shipping_address', { count: 'exact' })
+        .select(`
+            id, 
+            customer_name, 
+            total_price_estimated, 
+            payment_method, 
+            shipping_address,
+            order_items (
+                quantity_ordered,
+                products (
+                    id,
+                    name,
+                    image_url,
+                    unit_type
+                )
+            )
+        `)
         .eq('id', order_id)
         .single();
 
@@ -56,12 +71,20 @@ async function SuccessPageContent({ order_id }: { order_id: string }) {
     const orderNumber = (order.shipping_address as any)?.order_number || order.id.slice(0, 8);
     const displayId = (order.shipping_address as any)?.order_number || order.id;
 
+    const isPickup = (order.shipping_address as any)?.type === 'pickup';
+    const items = (order.order_items || []).map((item: any) => ({
+        product: item.products,
+        quantity: item.quantity_ordered
+    }));
+
     return (
         <SuccessClient
             orderId={displayId}
             customerName={order.customer_name || 'לקוח'}
             totalAmount={order.total_price_estimated}
             paymentMethod={order.payment_method || 'cash'}
+            isPickup={isPickup}
+            items={items}
         />
     );
 }

@@ -17,9 +17,15 @@ const BRANCHES = [
 
 export default function BranchesPage() {
     return (
-        <div className="flex min-h-screen flex-col">
-            <main className="flex-1 container py-12">
-                <h1 className="text-4xl font-bold mb-4 text-center text-primary">הסניפים שלנו</h1>
+        <div 
+            className="flex min-h-screen flex-col bg-[#f9faf6] relative overflow-hidden" 
+            style={{ 
+                backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
+                backgroundSize: '24px 24px' 
+            }}
+        >
+            <main className="flex-1 container py-16 relative z-10">
+                <h1 className="text-4xl md:text-5xl font-black mb-6 text-center text-[#112a1e] tracking-tighter">הסניפים שלנו</h1>
                 <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
                     לרשת &quot;שוק אונליין&quot; סניפים יפהפיים ברחבי הארץ, כולל סניפי אאוטלט ייחודים עם תוצרת חקלאית טרייה, איכותית וטעימה.
                 </p>

@@ -32,7 +32,6 @@ export function AdminSidebarContent({ onClose }: AdminSidebarContentProps) {
         { href: "/admin/orders", label: "הזמנות", icon: ShoppingCart },
         { href: "/admin/promotions", label: "מבצעים", icon: Percent }, // Added Promotions link
         { href: "/admin/content", label: "דף הבית", icon: LayoutDashboard },
-        { href: "/admin/pages", label: "ניהול עמודים", icon: FileText },
         { href: "/admin/settings", label: "הגדרות", icon: Settings },
     ];
 

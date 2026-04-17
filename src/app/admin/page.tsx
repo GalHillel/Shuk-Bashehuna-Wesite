@@ -90,20 +90,24 @@ export default function AdminDashboard() {
                 <p className="text-muted-foreground mt-1">שוק בשכונה - סקירה כללית</p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {cards.map((card) => {
                     const Icon = card.icon;
                     return (
-                        <Link key={card.label} href={card.href} className="w-full md:w-[240px]">
-                            <div className="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-sm font-medium text-muted-foreground">{card.label}</span>
-                                    <div className={`p-2 rounded-lg ${card.color}`}>
-                                        <Icon className="h-5 w-5" />
+                        <Link key={card.label} href={card.href} className="w-full">
+                            <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:border-[#AADB56]/30 transition-all cursor-pointer group relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-[#AADB56]/5 rounded-bl-[100px] -mr-8 -mt-8 group-hover:bg-[#AADB56]/10 transition-colors" />
+                                <div className="flex items-center justify-between mb-6">
+                                    <span className="text-sm font-black text-slate-400 uppercase tracking-wider">{card.label}</span>
+                                    <div className={`p-3 rounded-2xl ${card.color} shadow-sm group-hover:scale-110 transition-transform`}>
+                                        <Icon className="h-6 w-6" />
                                     </div>
                                 </div>
-                                <p className="text-3xl font-bold">{card.value}</p>
-                                <p className="text-sm text-muted-foreground mt-1">{card.sub}</p>
+                                <p className="text-5xl font-black text-slate-800 tracking-tight">{card.value}</p>
+                                <p className="text-sm font-bold text-slate-400 mt-2 flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#AADB56]" />
+                                    {card.sub}
+                                </p>
                             </div>
                         </Link>
                     );
@@ -112,22 +116,24 @@ export default function AdminDashboard() {
 
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link href="/admin/products/new" className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition-all text-center">
-                    <Package className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <p className="font-medium">הוסף מוצר חדש</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Link href="/admin/products/new" className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:scale-[1.02] transition-all text-center flex flex-col items-center justify-center gap-2 group">
+                    <div className="bg-[#AADB56]/10 p-4 rounded-2xl group-hover:bg-[#AADB56]/20 transition-colors">
+                        <Package className="h-8 w-8 text-[#6c9b29]" />
+                    </div>
+                    <p className="font-black text-slate-800">הוסף מוצר חדש</p>
                 </Link>
-                <Link href="/admin/content" className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition-all text-center">
-                    <TrendingUp className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <p className="font-medium">ערוך דף הבית</p>
+                <Link href="/admin/content" className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:scale-[1.02] transition-all text-center flex flex-col items-center justify-center gap-2 group">
+                    <div className="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-100 transition-colors">
+                        <TrendingUp className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <p className="font-black text-slate-800">ערוך דף הבית</p>
                 </Link>
-                <Link href="/admin/pages" className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition-all text-center">
-                    <FileText className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <p className="font-medium">ערוך עמודי תוכן</p>
-                </Link>
-                <Link href="/admin/orders" className="bg-white p-4 rounded-xl border shadow-sm hover:shadow-md transition-all text-center">
-                    <ShoppingCart className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <p className="font-medium">צפה בהזמנות</p>
+                <Link href="/admin/orders" className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:scale-[1.02] transition-all text-center flex flex-col items-center justify-center gap-2 group">
+                    <div className="bg-purple-50 p-4 rounded-2xl group-hover:bg-purple-100 transition-colors">
+                        <ShoppingCart className="h-8 w-8 text-purple-600" />
+                    </div>
+                    <p className="font-black text-slate-800">ניהול הזמנות</p>
                 </Link>
             </div>
         </div>

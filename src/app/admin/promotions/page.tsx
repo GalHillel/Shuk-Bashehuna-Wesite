@@ -151,98 +151,121 @@ export default function PromotionsPage() {
     if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin h-10 w-10 text-slate-300" /></div>;
 
     return (
-        <div className="space-y-8 max-w-4xl mx-auto pb-20">
-            <div className="flex items-center gap-3">
-                <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600">
-                    <Percent className="h-6 w-6" />
+        <div className="space-y-8 max-w-5xl mx-auto pb-20 animate-in fade-in duration-500">
+            <div className="flex flex-col md:flex-row md:items-center gap-6">
+                <div className="h-20 w-20 bg-[#AADB56]/10 rounded-[28px] flex items-center justify-center text-[#6c9b29] shadow-inner">
+                    <Percent className="h-10 w-10" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">ניהול מבצעים</h1>
-                    <p className="text-slate-500">החל הנחות גורפות על קטגוריות או על כל החנות</p>
+                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">ניהול מבצעים</h1>
+                    <p className="text-slate-500 mt-1 font-medium">החל הנחות גורפות בלחיצת כפתור אחת — חכם, מהיר ויוקרתי.</p>
                 </div>
             </div>
 
-            <Card className="border-slate-200 shadow-sm overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b border-slate-100">
-                    <CardTitle>אשף ההנחות</CardTitle>
-                    <CardDescription>בחר מוצרים, קבע גובה הנחה, והחל אותה בלחיצת כפתור.</CardDescription>
-                </CardHeader>
-                <CardContent className="p-6 md:p-8 space-y-8">
+            <Card className="rounded-[40px] border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
+                <div className="bg-slate-50/50 p-8 md:p-12 border-b border-slate-50">
+                    <h2 className="text-2xl font-black text-slate-800 mb-2">אשף ההנחות הגלובלי</h2>
+                    <p className="text-slate-400 font-medium">בחר את היעד, קבע את גובה ההנחה ועדכן את כל החנות ברגע.</p>
+                </div>
+                <CardContent className="p-8 md:p-12 space-y-12 bg-white">
 
-                    {/* Step 1: Scope */}
-                    <div className="space-y-4">
-                        <label className="text-sm font-bold text-slate-700 block">1. על אילו מוצרים להחיל?</label>
-                        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                            <SelectTrigger className="h-12 text-base bg-white border-slate-200">
-                                <SelectValue placeholder="בחר קטגוריה" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all" className="font-bold">✨ כל מוצרי החנות</SelectItem>
-                                {categories.map(cat => (
-                                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        {/* Step 1: Scope */}
+                        <div className="space-y-4">
+                            <label className="text-sm font-black text-slate-700 flex items-center gap-2 uppercase tracking-wider">
+                                <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">1</span>
+                                בחירת קהל יעד
+                            </label>
+                            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                <SelectTrigger className="h-16 text-lg rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-[#AADB56] transition-all font-bold text-slate-700">
+                                    <SelectValue placeholder="בחר קטגוריה להחלת המבצע" />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-2xl border-slate-100 shadow-2xl">
+                                    <SelectItem value="all" className="font-black py-3">✨ כל מוצרי החנות</SelectItem>
+                                    <div className="h-px bg-slate-50 my-1" />
+                                    {categories.map(cat => (
+                                        <SelectItem key={cat.id} value={cat.id} className="font-bold py-3">{cat.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                    {/* Step 2: Discount */}
-                    <div className="space-y-4">
-                        <label className="text-sm font-bold text-slate-700 block">2. מה גובה ההנחה?</label>
-                        <div className="relative">
-                            <Input
-                                type="number"
-                                placeholder="למשל: 15"
-                                className="h-12 text-lg pl-12"
-                                value={discountPercent}
-                                onChange={(e) => setDiscountPercent(e.target.value)}
-                                min="1"
-                                max="99"
-                            />
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                                <Percent className="h-5 w-5" />
+                        {/* Step 2: Discount */}
+                        <div className="space-y-4">
+                            <label className="text-sm font-black text-slate-700 flex items-center gap-2 uppercase tracking-wider">
+                                <span className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">2</span>
+                                גובה ההנחה באחוזים
+                            </label>
+                            <div className="relative">
+                                <Input
+                                    type="number"
+                                    placeholder="כמה אחוזי הנחה?"
+                                    className="h-16 text-2xl pr-6 pl-14 font-black rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-[#AADB56] transition-all"
+                                    value={discountPercent}
+                                    onChange={(e) => setDiscountPercent(e.target.value)}
+                                    min="1"
+                                    max="99"
+                                />
+                                <div className="absolute left-6 top-1/2 -translate-y-1/2 text-[#AADB56]">
+                                    <Percent className="h-8 w-8" />
+                                </div>
                             </div>
                         </div>
-                        <p className="text-xs text-slate-500">
-                            * ההנחה תחושב מתוך המחיר המקורי של המוצר. המחיר החדש יוצג כ"מחיר מבצע".
+                    </div>
+
+                    <div className="p-6 rounded-2xl bg-[#AADB56]/5 border border-[#AADB56]/10 flex items-start gap-4">
+                        <div className="bg-[#AADB56]/20 p-2 rounded-lg text-[#6c9b29]">
+                            <CheckCircle2 className="h-5 w-5" />
+                        </div>
+                        <p className="text-xs text-[#6c9b29] font-bold leading-relaxed">
+                            שים לב: המערכת תחשב את ההנחה מהמחיר המקורי ותעדכן את הסטטוס ל"מבצע". המחירים יוצגו ללקוח עם תגית אדומה בולטת.
                         </p>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-4 pt-4 border-t border-slate-100">
+                    <div className="flex flex-col md:flex-row gap-6 pt-6">
                         <Button
                             onClick={handleApplyDiscount}
                             disabled={processing || !discountPercent}
-                            className="flex-1 h-12 text-lg font-bold bg-green-600 hover:bg-green-700 shadow-lg shadow-green-900/10"
+                            className="h-16 flex-1 text-xl font-black bg-[#AADB56] hover:bg-[#9cbd4c] text-[#112a1e] rounded-2xl shadow-xl shadow-[#AADB56]/20 transition-all hover:scale-[1.01] active:scale-95"
                         >
-                            {processing ? <Loader2 className="animate-spin ml-2" /> : <Tag className="ml-2 h-5 w-5" />}
-                            החל מבצע
+                            {processing ? <Loader2 className="animate-spin ml-3" /> : <Tag className="ml-3 h-6 w-6" />}
+                            הפעל את המבצע עכשיו
                         </Button>
 
                         <Button
                             variant="outline"
                             onClick={handleClearDiscounts}
                             disabled={processing}
-                            className="flex-1 h-12 text-lg font-bold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            className="h-16 flex-1 text-xl font-bold border-2 border-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-600 hover:border-red-100 rounded-2xl transition-all"
                         >
-                            {processing ? <Loader2 className="animate-spin ml-2" /> : <RotateCcw className="ml-2 h-5 w-5" />}
-                            נקה מבצעים
+                            {processing ? <Loader2 className="animate-spin ml-3" /> : <RotateCcw className="ml-3 h-6 w-6" />}
+                            ביטול כל המבצעים
                         </Button>
                     </div>
 
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-blue-50 border-blue-100 text-blue-900">
-                    <CardContent className="p-6 flex items-center gap-4">
-                        <CheckCircle2 className="h-8 w-8 text-blue-500" />
-                        <div>
-                            <div className="font-bold text-lg">עדכון מיידי</div>
-                            <div className="text-sm opacity-80">המחירים מתעדכנים באתר מיד לאחר הפעולה</div>
-                        </div>
-                    </CardContent>
-                </Card>
-                {/* More info cards can be added here */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/30 flex items-center gap-6 group hover:border-[#AADB56]/20 transition-all">
+                    <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
+                        <CheckCircle2 className="h-8 w-8" />
+                    </div>
+                    <div>
+                        <div className="font-black text-slate-800 text-lg">עדכון בזמן אמת</div>
+                        <div className="text-sm font-medium text-slate-400">השינויים יופיעו בחנות מיד לאחר הלחיצה</div>
+                    </div>
+                </div>
+                <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/30 flex items-center gap-6 group hover:border-[#AADB56]/20 transition-all">
+                    <div className="h-14 w-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
+                        <Percent className="h-8 w-8" />
+                    </div>
+                    <div>
+                        <div className="font-black text-slate-800 text-lg">דיוק מקסימלי</div>
+                        <div className="text-sm font-medium text-slate-400">עיגול מחירים לשקלים שלמים לנוחות הלקוח</div>
+                    </div>
+                </div>
             </div>
         </div>
     );
