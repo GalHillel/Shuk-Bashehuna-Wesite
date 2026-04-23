@@ -28,6 +28,8 @@ import Image from "next/image";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
 import { toast } from "sonner";
 import { safeDeleteProduct } from "@/lib/product-service";
+import { MobileProductCard } from "@/components/admin/MobileProductCard";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -102,35 +104,34 @@ export default function AdminProductsPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">ניהול מוצרים</h1>
-                    <p className="text-slate-500 mt-1 font-medium">נהל את מלאי המוצרים, המחירים והמבצעים שלך</p>
-                </div>
-                <Button asChild className="bg-[#AADB56] hover:bg-[#9cbd4c] text-[#112a1e] font-black px-8 py-6 rounded-2xl shadow-lg shadow-[#AADB56]/20 transition-all hover:scale-[1.02] active:scale-95">
+            <AdminHeader 
+                title="ניהול מוצרים" 
+                description="נהל את מלאי המוצרים, המחירים והמבצעים שלך"
+            >
+                <Button asChild className="bg-[#AADB56] hover:bg-[#112a1e] text-[#112a1e] hover:text-white font-black h-14 w-full md:w-auto px-8 rounded-2xl shadow-xl transition-all">
                     <Link href="/admin/products/new">
                         <Plus className="ml-2 h-5 w-5" />
-                        הוסף מוצר חדש
+                        הוסף מוצר
                     </Link>
                 </Button>
-            </div>
+            </AdminHeader>
 
-            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-6 rounded-[28px] shadow-sm border border-slate-100">
+            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 md:p-6 rounded-[28px] shadow-sm border border-slate-100">
                 <div className="relative flex-1 w-full">
                     <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                     <Input
                         placeholder="חפש מוצר לפי שם..."
-                        className="pr-12 h-14 rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-[#AADB56] transition-all font-medium"
+                        className="pr-12 h-14 rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-[#AADB56] transition-all font-bold"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="w-full md:w-auto">
                     <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                        <SelectTrigger className="w-full md:w-[220px] h-14 rounded-2xl border-slate-100 bg-slate-50/50 font-bold text-slate-700">
+                        <SelectTrigger className="w-full md:w-[220px] h-14 rounded-2xl border-slate-100 bg-slate-50/50 font-black text-slate-700">
                             <SelectValue placeholder="סינון לפי קטגוריה" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-2xl border-slate-100 shadow-xl">
+                        <SelectContent className="rounded-2xl border-slate-100 shadow-xl" dir="rtl">
                             <SelectItem value="all" className="font-bold">כל הקטגוריות</SelectItem>
                             {categories.map(cat => (
                                 <SelectItem key={cat.id} value={cat.id} className="font-medium">{cat.name}</SelectItem>
@@ -140,7 +141,30 @@ export default function AdminProductsPage() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
+            {/* Mobile Cards View */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+                {loading ? (
+                    Array(5).fill(0).map((_, i) => (
+                        <div key={i} className="h-32 bg-white rounded-[24px] animate-pulse border border-slate-100" />
+                    ))
+                ) : products.length === 0 ? (
+                    <div className="text-center py-12 bg-white rounded-[24px] border border-dashed border-slate-200">
+                        <p className="font-bold text-slate-400">לא נמצאו מוצרים</p>
+                    </div>
+                ) : (
+                    products.map((product) => (
+                        <MobileProductCard
+                            key={product.id}
+                            product={product}
+                            categoryName={categories.find(c => c.id === product.category_id)?.name}
+                            onDelete={deleteProduct}
+                        />
+                    ))
+                )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
                 <Table dir="rtl">
                     <TableHeader className="bg-slate-50/50">
                         <TableRow className="hover:bg-transparent border-slate-100">

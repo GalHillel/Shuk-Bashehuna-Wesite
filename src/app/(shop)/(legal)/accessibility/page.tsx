@@ -52,22 +52,38 @@ export default function AccessibilityPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12" dir="rtl">
-            <div className="container mx-auto px-4 max-w-4xl">
-                <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-                    {/* Header */}
-                    <div className="bg-[#14532d] text-white p-6 md:p-12 text-center">
-                        <h1 className="text-3xl md:text-4xl font-extrabold mb-4">{data.title}</h1>
-                        <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-                            אנו רואים חשיבות רבה במתן שירות שוויוני לכלל הגולשים ובשיפור הנגישות באתר.
-                        </p>
-                    </div>
-
-                    <div className="p-6 md:p-12">
-                        <PageContentRenderer blocks={data.blocks} />
-                    </div>
+        <div className="flex min-h-screen flex-col bg-[#fcfcfc]" dir="rtl">
+            {/* Hero Section */}
+            <div 
+                className="bg-[#AADB56] pt-16 pb-14 text-center relative overflow-hidden"
+                style={{ 
+                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 2.5px)', 
+                    backgroundSize: '24px 24px' 
+                }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 pointer-events-none"></div>
+                <div className="relative z-10 container mx-auto px-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-[#112a1e] mb-4 tracking-tighter drop-shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                        {data.title}
+                    </h1>
+                    <div className="w-16 h-1.5 bg-[#112a1e] mx-auto mb-6 rounded-full opacity-20"></div>
+                    <p className="text-lg md:text-xl text-[#2c3e1c] font-black max-w-2xl mx-auto px-4 leading-tight opacity-90 animate-in fade-in slide-in-from-bottom-4 delay-200 duration-700">
+                        אנו רואים חשיבות רבה במתן שירות שוויוני לכלל הגולשים ובשיפור הנגישות באתר עבור כולם.
+                    </p>
                 </div>
             </div>
+
+            <main 
+                className="flex-1 container mx-auto px-4 py-16 max-w-3xl bg-[#f9faf6] min-w-full"
+                style={{ 
+                    backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
+                    backgroundSize: '24px 24px' 
+                }}
+            >
+                <div className="max-w-3xl mx-auto">
+                    <PageContentRenderer blocks={data.blocks} />
+                </div>
+            </main>
         </div>
     );
 }

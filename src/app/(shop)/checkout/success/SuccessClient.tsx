@@ -57,7 +57,7 @@ export default function SuccessClient({ orderId, customerName, totalAmount, paym
     const baseUrl = process.env.NEXT_PUBLIC_WHATSAPP_LINK || "https://wa.me/972542236335";
 
     // Format payment method for display
-    let paymentMethodDisplay = paymentMethod === 'bit' ? 'ביט' : 'מזומן';
+    let paymentMethodDisplay = paymentMethod === 'paybox' ? 'פייבוקס' : (paymentMethod === 'bit' ? 'ביט' : 'מזומן');
     if (paymentMethod === 'cash' && isPickup) {
         paymentMethodDisplay = 'תשלום בקופה';
     }
@@ -151,8 +151,34 @@ ${isPickup ? 'איסוף מהחנות' : 'משלוח'}
                     </div>
                 </div>
 
-                {/* WhatsApp Action */}
+                {/* Payment / WhatsApp Action */}
                 <div className="space-y-4 pt-4">
+                    {paymentMethod === 'paybox' && (
+                        <div className="p-5 bg-blue-50/50 rounded-3xl border border-blue-100 space-y-4 mb-4 animate-in fade-in slide-in-from-top-4">
+                            <div className="space-y-1">
+                                <h3 className="font-black text-[#0083DA] text-lg">תשלום ב-PayBox</h3>
+                                <p className="text-slate-500 font-bold text-[13px]">
+                                    לחצו על הכפתור כדי להשלים את התשלום
+                                </p>
+                            </div>
+                            <Button
+                                asChild
+                                className="w-full h-14 bg-[#0083DA] hover:bg-[#0070bb] text-white font-black text-lg rounded-2xl shadow-md transition-all active:scale-95"
+                            >
+                                <a 
+                                    href={`https://payboxapp.page.link/?link=https://payboxapp.com/pay?amount=${totalAmount.toFixed(2)}&phone=${process.env.NEXT_PUBLIC_PAYBOX_NUMBER || '0546637558'}&description=${encodeURIComponent('תשלום עבור הזמנה ' + orderId.slice(0, 8))}`} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                >
+                                    שלם עכשיו ב-PayBox (₪{totalAmount.toFixed(2)})
+                                </a>
+                            </Button>
+                            <p className="text-[11px] text-slate-400 font-bold">
+                                מספר טלפון להעברה ידנית: {process.env.NEXT_PUBLIC_PAYBOX_NUMBER || "054-663-7558"}
+                            </p>
+                        </div>
+                    )}
+
                     <div className="space-y-1.5">
                         <h3 className="font-black text-[#112a1e] text-lg">שלב אחרון לסיום!</h3>
                         <p className="text-slate-500 font-bold text-[13px] leading-relaxed">

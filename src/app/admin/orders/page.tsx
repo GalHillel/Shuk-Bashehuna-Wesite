@@ -27,12 +27,14 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import { RefreshCw, ShoppingBag, CheckCircle, Trash2, Eye } from "lucide-react";
 import { format } from "date-fns";
-import { ShoppingBag, Eye, RefreshCw, CheckCircle, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { deleteOrder } from "./actions";
 import { OrderDetails, getStatusBadge } from "@/components/admin/OrderDetails";
 import { MobileOrderCard } from "@/components/admin/MobileOrderCard";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState<any[]>([]);
@@ -65,8 +67,9 @@ export default function AdminOrdersPage() {
 
         const { error } = await supabase.from("orders").update({ status: "completed" }).eq("id", orderId);
         if (error) {
-            alert("שגיאה בעדכון ההזמנה");
+            toast.error("שגיאה בעדכון ההזמנה");
         } else {
+            toast.success("סטטוס ההזמנה עודכן");
             fetchOrders();
         }
     };
@@ -79,21 +82,18 @@ export default function AdminOrdersPage() {
             const result = await deleteOrder(orderId);
 
             if (result.success) {
-                // Remove from local state immediately
                 setOrders(prev => prev.filter(o => o.id !== orderId));
-                alert("ההזמנה נמחקה בהצלחה (לצמיתות)");
+                toast.success("ההזמנה נמחקה בהצלחה");
             } else {
-                alert(`שגיאה במחיקת ההזמנה: ${result.error}`);
+                toast.error(`שגיאה במחיקת ההזמנה: ${result.error}`);
             }
         } catch (err) {
             console.error("Unexpected error:", err);
-            alert("שגיאה לא צפויה במחיקת ההזמנה");
+            toast.error("שגיאה לא צפויה במחיקת ההזמנה");
         } finally {
             setLoading(false);
         }
     };
-
-
 
     const filteredOrders = orders.filter(order => {
         if (activeTab === 'active') {
@@ -103,36 +103,38 @@ export default function AdminOrdersPage() {
         }
     });
 
+    const activeCount = orders.filter(o => ['pending', 'paid', 'preparing', 'shipping'].includes(o.status)).length;
+    const historyCount = orders.filter(o => ['completed', 'cancelled', 'refunded'].includes(o.status)).length;
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">ניהול הזמנות</h1>
-                    <p className="text-slate-500 mt-1 font-medium">עקוב אחר הזמנות חדשות ונהל את היסטוריית המכירות</p>
-                </div>
+            <AdminHeader 
+                title="ניהול הזמנות" 
+                description="עקוב אחר הזמנות חדשות ונהל את היסטוריית המכירות"
+            >
                 <Button 
                     variant="outline" 
                     size="icon" 
                     onClick={fetchOrders} 
                     disabled={loading}
-                    className="h-12 w-12 rounded-2xl border-slate-100 shadow-sm hover:bg-[#AADB56]/10 transition-all"
+                    className="h-14 w-14 rounded-2xl border-slate-100 shadow-sm hover:bg-[#AADB56]/10 transition-all bg-white"
                 >
-                    <RefreshCw className={`h-5 w-5 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-6 w-6 text-[#112a1e] ${loading ? 'animate-spin' : ''}`} />
                 </Button>
-            </div>
+            </AdminHeader>
 
-            <div className="flex bg-slate-100/50 p-1.5 rounded-2xl w-fit border border-slate-100 shadow-sm">
+            <div className="flex bg-slate-100/50 p-1.5 rounded-2xl w-fit border border-slate-100 shadow-sm mb-4">
                 <button
-                    className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'active' ? 'bg-white text-[#112a1e] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`px-6 md:px-10 py-3 rounded-xl font-black transition-all text-sm tracking-tight ${activeTab === 'active' ? 'bg-white text-[#112a1e] shadow-md border border-slate-50' : 'text-slate-400 hover:text-slate-600'}`}
                     onClick={() => setActiveTab('active')}
                 >
-                    הזמנות פעילות ({orders.filter(o => ['pending', 'paid', 'preparing', 'shipping'].includes(o.status)).length})
+                    הזמנות פעילות <span className="opacity-40 font-bold ml-1">({activeCount})</span>
                 </button>
                 <button
-                    className={`px-8 py-2.5 rounded-xl font-bold transition-all text-sm ${activeTab === 'history' ? 'bg-white text-[#112a1e] shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`px-6 md:px-10 py-3 rounded-xl font-black transition-all text-sm tracking-tight ${activeTab === 'history' ? 'bg-white text-[#112a1e] shadow-md border border-slate-50' : 'text-slate-400 hover:text-slate-600'}`}
                     onClick={() => setActiveTab('history')}
                 >
-                    היסטוריה ({orders.filter(o => ['completed', 'cancelled', 'refunded'].includes(o.status)).length})
+                    היסטוריה <span className="opacity-40 font-bold ml-1">({historyCount})</span>
                 </button>
             </div>
 
@@ -184,6 +186,7 @@ export default function AdminOrdersPage() {
                                     <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider pr-8">מס׳ הזמנה</TableHead>
                                     <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider">תאריך ושעה</TableHead>
                                     <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider">סה״כ לתשלום</TableHead>
+                                    <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider">תשלום</TableHead>
                                     <TableHead className="text-right py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider">סטטוס</TableHead>
                                     <TableHead className="text-left py-6 font-black text-slate-400 uppercase text-[11px] tracking-wider pl-8">פעולות</TableHead>
                                 </TableRow>
@@ -194,6 +197,10 @@ export default function AdminOrdersPage() {
                                         <TableCell className="font-mono text-xs font-black text-slate-600 pr-8">#{(order.shipping_address as any)?.order_number || order.id.slice(0, 8)}</TableCell>
                                         <TableCell className="font-bold text-slate-500">{format(new Date(order.created_at), "dd/MM/yyyy HH:mm")}</TableCell>
                                         <TableCell className="font-black text-slate-800 text-base">₪{order.total_price_estimated.toFixed(2)}</TableCell>
+                                        <TableCell className="font-bold text-slate-500 text-xs">
+                                            {order.payment_method === 'paybox' ? 'PayBox' : 
+                                             order.payment_method === 'bit' ? 'Bit' : 'מזומן'}
+                                        </TableCell>
                                         <TableCell className="scale-90 origin-right">{getStatusBadge(order.status)}</TableCell>
                                         <TableCell className="pl-8">
                                             <div className="flex items-center gap-1 justify-end opacity-40 group-hover:opacity-100 transition-opacity">

@@ -20,6 +20,7 @@ import Link from "next/link";
 import { revalidateHomepage } from "@/app/actions/revalidate";
 import { toast } from "sonner";
 import { deleteContentBlock } from "./actions";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 const BLOCK_TYPE_LABELS: Record<string, string> = {
     hero_slider: "סליידר ראשי",
@@ -98,18 +99,17 @@ export default function AdminContentPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">עיצוב דף הבית</h1>
-                    <p className="text-slate-500 mt-1 font-medium">נהל את סדר הבלוקים והתוכן המופיע בעמוד הראשי</p>
-                </div>
-                <Button asChild className="bg-[#AADB56] hover:bg-[#9cbd4c] text-[#112a1e] font-black px-8 py-6 rounded-2xl shadow-lg shadow-[#AADB56]/20 transition-all hover:scale-[1.02] active:scale-95">
+            <AdminHeader 
+                title="עיצוב דף הבית" 
+                description="נהל את סדר הבלוקים והתוכן המופיע בעמוד הראשי"
+            >
+                <Button asChild className="bg-[#AADB56] hover:bg-[#112a1e] text-[#112a1e] hover:text-white font-black h-14 w-full md:w-auto px-8 rounded-2xl shadow-xl transition-all">
                     <Link href="/admin/content/new">
                         <Plus className="ml-2 h-5 w-5" />
-                        הוסף בלוק חדש
+                        בלוק חדש
                     </Link>
                 </Button>
-            </div>
+            </AdminHeader>
 
             <div className="bg-white rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
                 <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">

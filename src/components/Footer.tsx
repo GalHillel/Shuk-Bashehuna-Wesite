@@ -3,27 +3,41 @@
 import Link from "next/link";
 import { MapPin, Phone, Mail, Clock, Truck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Category } from "@/types/supabase";
 import { useEffect, useState } from "react";
 
 export function Footer() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [settings, setSettings] = useState<any>({});
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
-        async function fetchSettings() {
+        async function fetchData() {
             const supabase = createClient();
-            const { data } = await supabase.from("site_settings").select("*");
-            if (data) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const settingsMap = data.reduce((acc, curr) => {
+            
+            // Fetch settings
+            const { data: settingsData } = await supabase.from("site_settings").select("*");
+            if (settingsData) {
+                const settingsMap = settingsData.reduce((acc, curr) => {
                     acc[curr.key] = curr.value;
                     return acc;
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 }, {} as any);
                 setSettings(settingsMap);
             }
+
+            // Fetch parent categories
+            const { data: categoriesData } = await supabase
+                .from("categories")
+                .select("*")
+                .is("parent_id", null)
+                .eq("is_visible", true)
+                .order("sort_order", { ascending: true });
+            
+            if (categoriesData) {
+                setCategories(categoriesData);
+            }
         }
-        fetchSettings();
+        fetchData();
     }, []);
 
     return (
@@ -71,21 +85,10 @@ export function Footer() {
                             <span className="absolute -bottom-2 right-0 w-12 h-1.5 bg-[#AADB56] rounded-full opacity-30 shadow-[0_0_10px_rgba(170,219,86,0.2)]"></span>
                         </h4>
                         <ul className="grid grid-cols-2 gap-x-4 gap-y-4 font-bold">
-                            {[
-                                { label: "פירות השוק", href: "/category/fruits" },
-                                { label: "ירקות השוק", href: "/category/vegetables" },
-                                { label: "ירוקים וחסות", href: "/category/greens" },
-                                { label: "מגשי אירוח", href: "/category/platters" },
-                                { label: "מיצים טבעיים", href: "/category/juices" },
-                                { label: "המזווה שלנו", href: "/category/pantry" },
-                                { label: "מוצרי חלב", href: "/category/dairy" },
-                                { label: "לחמים", href: "/category/breads" },
-                                { label: "משקאות ויינות", href: "/category/drinks" },
-                                { label: "לבית ולמטבח", href: "/category/home" }
-                            ].map((link, idx) => (
-                                <li key={idx}>
-                                    <Link href={link.href} className="hover:text-[#AADB56] transition-colors flex items-center gap-2 group opacity-90 hover:opacity-100">
-                                        {link.label}
+                            {categories.map((cat) => (
+                                <li key={cat.id}>
+                                    <Link href={`/category/${cat.id}`} className="hover:text-[#AADB56] transition-colors flex items-center gap-2 group opacity-90 hover:opacity-100">
+                                        {cat.name}
                                     </Link>
                                 </li>
                             ))}

@@ -2,11 +2,11 @@ import { Truck, Map, Clock } from "lucide-react";
 
 export default function DeliveryPage() {
     return (
-        <div 
-            className="flex min-h-screen flex-col bg-[#f9faf6] relative overflow-hidden" 
-            style={{ 
-                backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)', 
-                backgroundSize: '24px 24px' 
+        <div
+            className="flex min-h-screen flex-col bg-[#f9faf6] relative overflow-hidden"
+            style={{
+                backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.04) 1.5px, transparent 1.5px)',
+                backgroundSize: '24px 24px'
             }}
         >
             <main className="flex-1 container py-16 max-w-4xl relative z-10">
@@ -16,7 +16,7 @@ export default function DeliveryPage() {
                     <div className="bg-primary/5 p-6 rounded-xl border border-primary/20 flex flex-col items-center text-center">
                         <Truck className="h-12 w-12 text-primary mb-4" />
                         <h2 className="text-2xl font-bold mb-2">עלות דמי משלוח</h2>
-                        <p className="text-xl font-bold text-primary">28 ₪ למשלוח</p>
+                        <p className="text-xl font-bold text-primary">20 ₪ למשלוח</p>
                         <p className="text-muted-foreground mt-2">
                             מינימום הזמנה: 150 ₪
                         </p>

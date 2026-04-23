@@ -59,12 +59,16 @@ export function EntryPopup() {
                         <div className="w-full p-6 md:p-8 backdrop-blur-xl bg-white/10 rounded-[32px] border border-white/20 shadow-2xl space-y-4 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-300">
                             <div>
                                 <h2 className="text-3xl md:text-4xl font-black text-white leading-tight tracking-tight drop-shadow-sm">
-                                    ברוכים הבאים<br />
-                                    <span className="text-[#AADB56]">לשוק בשכונה!</span>
+                                    שמחים שחזרתם!<br />
+                                    <span className="text-[#AADB56]">20 ₪ מתנה</span>
                                 </h2>
                                 <p className="text-lg md:text-xl font-bold text-slate-200 mt-3 drop-shadow-sm">
-                                    התוצרת הטובה ביותר, מהשדה ועד לביתכם.
+                                    לרכישה הראשונה באתר!
                                 </p>
+                                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 mt-4 animate-pulse">
+                                    <p className="text-white text-xs font-bold uppercase tracking-widest mb-1">השתמשו בקוד קופון:</p>
+                                    <p className="text-[#AADB56] text-3xl font-black tracking-[0.2em]">FIRST20</p>
+                                </div>
                             </div>
 
                             <button

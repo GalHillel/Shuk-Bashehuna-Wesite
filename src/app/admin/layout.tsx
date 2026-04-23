@@ -60,11 +60,9 @@ export default async function AdminLayout({
             <AdminSidebar />
 
             <div className="flex-1 flex flex-col min-h-screen md:mr-64 transition-all duration-300">
-                {/* Mobile Header */}
                 <AdminMobileHeader />
-
-                {/* Main Content */}
-                <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6 md:space-y-8">
+                {/* Main Content - Minimal pt since header is sticky and takes up space */}
+                <main className="flex-1 p-4 md:p-8 pt-4 md:pt-8 pb-10 md:pb-8 max-w-7xl mx-auto w-full space-y-6 md:space-y-8">
                     {children}
                 </main>
             </div>

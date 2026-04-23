@@ -58,22 +58,51 @@ export function HeroSliderEditor() {
                             </div>
                         </AccordionTrigger>
                         <AccordionContent className="pt-4 pb-4 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <FormField
+                                    control={control}
+                                    name={`data.slides.${index}.desktop_image_url`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-slate-500 font-bold">תמונה למחשב (Desktop - 21:9)</FormLabel>
+                                            <FormControl>
+                                                <ImageUpload
+                                                    value={field.value || ""}
+                                                    onChange={field.onChange}
+                                                    bucket="banners"
+                                                    folder="banners"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={control}
+                                    name={`data.slides.${index}.mobile_image_url`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-slate-500 font-bold">תמונה לנייד (Mobile - 4:5)</FormLabel>
+                                            <FormControl>
+                                                <ImageUpload
+                                                    value={field.value || ""}
+                                                    onChange={field.onChange}
+                                                    bucket="banners"
+                                                    folder="banners"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            {/* Backwards compatibility: hidden imageUrl field */}
                             <FormField
                                 control={control}
                                 name={`data.slides.${index}.image_url`}
                                 render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>תמונה</FormLabel>
-                                        <FormControl>
-                                            <ImageUpload
-                                                value={field.value || ""}
-                                                onChange={field.onChange}
-                                                bucket="banners"
-                                                folder="banners"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
+                                    <Input type="hidden" {...field} value={field.value || ""} />
                                 )}
                             />
 

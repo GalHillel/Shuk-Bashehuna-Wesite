@@ -12,25 +12,41 @@ import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useRef } from "react";
 import { Category } from "@/types/supabase";
 import { GlobalSearch } from "@/components/GlobalSearch";
-import { LoginDialog } from "@/components/LoginDialog";
+import { AuthDialog } from "@/components/AuthDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/ui/logo";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 
 
 export function SiteHeader() {
     const { user, isAdmin } = useAuth();
+    const [profile, setProfile] = useState<any>(null);
+
+    useEffect(() => {
+        if (user) {
+            supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => {
+                if (data) setProfile(data);
+            });
+        } else {
+            setProfile(null);
+        }
+    }, [user]);
+
+    const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0];
+
     const [categories, setCategories] = useState<Category[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [settings, setSettings] = useState<any>({});
     const [loginOpen, setLoginOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
+    const router = useRouter();
     const { items, totalPriceEstimated } = useCart();
     const [isMounted, setIsMounted] = useState(false);
 
@@ -99,14 +115,21 @@ export function SiteHeader() {
     return (
         <>
             <header className="sticky top-0 left-0 right-0 z-50 w-full flex flex-col pointer-events-auto">
-                {/* 1. Top Bar */}
-                <div className="bg-[#CFE1A7] text-slate-800 text-[12px] font-extrabold h-[34px] px-4 md:px-6 hidden md:flex items-center justify-between tracking-wide" dir="rtl">
-                    <div className="flex items-center gap-3">
+                {/* 1. Top Bar with inline ticker */}
+                <div className="bg-[#CFE1A7] text-slate-800 text-[12px] font-extrabold h-[34px] px-4 md:px-6 hidden md:flex items-center tracking-wide overflow-hidden" dir="rtl">
+                    <div className="flex items-center gap-3 shrink-0">
                         <Link href="/about" className="hover:text-primary transition">אודות</Link>
                         <span className="text-slate-400 font-light opacity-50">|</span>
                         <Link href="/kosher" className="hover:text-primary transition">כשרות</Link>
                         <span className="text-slate-400 font-light opacity-50">|</span>
                         <Link href="/faq" className="hover:text-primary transition">שאלות נפוצות</Link>
+                        <span className="text-slate-400 font-light opacity-50">|</span>
+                    </div>
+                    <div className="overflow-hidden whitespace-nowrap flex-1 mr-3">
+                        <div className="inline-block animate-marquee whitespace-nowrap">
+                            <span>{settings.ticker_text || "🚚 משלוח חינם בקנייה מעל 150 ₪ • התוצרת הטרייה ביותר מהשדה אליכם • שוק בשכונה - טעם של פעם, שירות של היום"} • </span>
+                            <span>{settings.ticker_text || "🚚 משלוח חינם בקנייה מעל 150 ₪ • התוצרת הטרייה ביותר מהשדה אליכם • שוק בשכונה - טעם של פעם, שירות של היום"} • </span>
+                        </div>
                     </div>
                 </div>
 
@@ -131,45 +154,6 @@ export function SiteHeader() {
                                 <span className="tracking-tight">מבצעים</span>
                             </Link>
                         )}
-
-                        <div className="relative" ref={menuRef}>
-                            <button
-                                className="bg-white rounded-full p-2.5 flex items-center justify-center shadow-sm border border-white hover:border-slate-200 transition group hover:bg-[#f6fbe8]"
-                                onClick={() => user ? setUserMenuOpen(!userMenuOpen) : setLoginOpen(true)}
-                                title={user ? "אזור אישי" : "התחברות"}
-                            >
-                                <User className="h-6 w-6 text-[#3a5223] group-hover:scale-110 transition-transform" strokeWidth={2} />
-                            </button>
-
-                            {userMenuOpen && user && (
-                                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-[70] animate-in fade-in slide-in-from-top-2">
-                                <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-                                    <p className="text-xs text-muted-foreground font-medium">שלום,</p>
-                                    <p className="text-sm font-bold truncate text-slate-800">{user.email}</p>
-                                </div>
-                                {isAdmin && (
-                                    <Link
-                                        href="/admin"
-                                        className="flex items-center gap-2 px-4 py-3 text-sm hover:bg-slate-50 transition-colors font-medium text-slate-700"
-                                        onClick={() => setUserMenuOpen(false)}
-                                    >
-                                        <Shield className="h-4 w-4 text-slate-400" />
-                                        פאנל ניהול
-                                    </Link>
-                                )}
-                                <button
-                                    onClick={async () => {
-                                        await supabase.auth.signOut();
-                                        window.location.reload();
-                                    }}
-                                    className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
-                                >
-                                    <LogOut className="h-4 w-4" />
-                                    התנתק
-                                </button>
-                            </div>
-                        )}
-                        </div>
                     </div>
 
                     {/* Mobile Top: Actions + Logo + Hamburger */}
@@ -187,19 +171,92 @@ export function SiteHeader() {
                                     {/* Mobile Menu Content - Top Section */}
                                     <div className="pt-10 px-5 pb-5">
                                         
-                                        {/* User Login Section */}
-                                        <button 
-                                            className="w-full bg-white rounded-xl p-3 flex justify-between items-center shadow-sm border border-slate-100 hover:bg-slate-50 transition-colors mb-4"
-                                            onClick={() => {
-                                                setMobileMenuOpen(false);
-                                                if(!user) setLoginOpen(true);
-                                            }}
-                                        >
-                                            <span className="font-extrabold text-[#2c3e1c] text-[17px] tracking-tight">{user ? "אזור אישי" : "כניסה לחשבון"}</span>
-                                            <div className="bg-[#ebf3db] p-1.5 rounded-full border border-[#c4eab3]">
-                                                <User className="h-7 w-7 text-[#6c9b29]" strokeWidth={2}/>
-                                            </div>
-                                        </button>
+                                        {/* User Login/Account Section with Expandable Menu */}
+                                        <div className="mb-4">
+                                            <button 
+                                                className={cn(
+                                                    "w-full rounded-xl p-3 flex justify-between items-center shadow-sm border transition-all duration-300",
+                                                    mobileUserMenuOpen && user ? "bg-[#AADB56] text-[#112a1e] border-[#AADB56]" : "bg-white text-[#2c3e1c] border-slate-100 hover:bg-slate-50"
+                                                )}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    if(!user) {
+                                                        setMobileMenuOpen(false);
+                                                        setLoginOpen(true);
+                                                    } else {
+                                                        setMobileUserMenuOpen(!mobileUserMenuOpen);
+                                                    }
+                                                }}
+                                            >
+                                                <div className="flex flex-col items-start text-right">
+                                                    <span className="font-extrabold text-[17px] tracking-tight text-right w-full">
+                                                        {user ? `שלום, ${firstName}` : "כניסה לחשבון"}
+                                                    </span>
+                                                    {user && (
+                                                        <span className={cn("text-[11px] opacity-70 truncate max-w-[180px] text-right w-full", mobileUserMenuOpen ? "text-[#112a1e]" : "text-slate-500")}>
+                                                            {user.email}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className={cn(
+                                                    "p-1.5 rounded-full border transition-all duration-300",
+                                                    mobileUserMenuOpen && user ? "bg-white/40 border-white/40 shadow-sm" : "bg-[#ebf3db] border-[#c4eab3]"
+                                                )}>
+                                                    {user ? (
+                                                        <ChevronDown className={cn("h-6 w-6 transition-transform duration-300", mobileUserMenuOpen ? "rotate-180" : "")} strokeWidth={2.5} />
+                                                    ) : (
+                                                        <User className="h-6 w-6 text-[#6c9b29]" strokeWidth={2}/>
+                                                    )}
+                                                </div>
+                                            </button>
+
+                                            {/* Expandable Account Links */}
+                                            {mobileUserMenuOpen && user && (
+                                                <div className="mt-2 bg-white rounded-xl border border-[#AADB56]/20 overflow-hidden shadow-inner animate-in slide-in-from-top-2 duration-300" dir="rtl">
+                                                    {isAdmin && (
+                                                        <Link 
+                                                            href="/admin" 
+                                                            className="flex items-center gap-3 px-4 py-4 border-b border-slate-50 hover:bg-[#AADB56]/5 transition-all font-black text-[#112a1e] text-sm text-right justify-start" 
+                                                            onClick={() => {
+                                                                setMobileMenuOpen(false);
+                                                                setMobileUserMenuOpen(false);
+                                                            }}
+                                                        >
+                                                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
+                                                                <Shield className="h-4 w-4" />
+                                                            </div>
+                                                            אזור ניהול (Admin)
+                                                        </Link>
+                                                    )}
+                                                    <Link 
+                                                        href="/account" 
+                                                        className="flex items-center gap-3 px-4 py-4 border-b border-slate-50 hover:bg-[#AADB56]/5 transition-all font-black text-[#112a1e] text-sm text-right justify-start" 
+                                                        onClick={() => {
+                                                            setMobileMenuOpen(false);
+                                                            setMobileUserMenuOpen(false);
+                                                        }}
+                                                    >
+                                                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
+                                                            <User className="h-4 w-4" />
+                                                        </div>
+                                                        פרופיל והזמנות
+                                                    </Link>
+                                                    <button 
+                                                        onClick={async () => { 
+                                                            await supabase.auth.signOut(); 
+                                                            window.location.reload(); 
+                                                        }} 
+                                                        className="flex items-center gap-3 w-full px-4 py-4 text-red-600 hover:bg-red-50 transition-all font-black text-sm text-right justify-start"
+                                                    >
+                                                        <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-400">
+                                                            <LogOut className="h-4 w-4" />
+                                                        </div>
+                                                        התנתקות מהמערכת
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
 
                                         {/* Social Links bar (Mobile) */}
                                         <div className="flex items-center justify-between bg-[#96D142] p-2 rounded-xl shadow-sm border border-[#a3e635]">
@@ -363,8 +420,73 @@ export function SiteHeader() {
                                   <span className="text-[13px] font-extrabold tracking-tight">{settings.contact_phone}</span>
                                   <Phone className="h-[14px] w-[14px]" />
                                </a>
-                           )}
+                            )}
+                         </div>
+
+                         {/* Desktop User Menu - Moved to be between Social and Cart */}
+                         <div className="relative" ref={menuRef}>
+                            <button
+                                className="bg-white rounded-full px-4 py-2.5 flex items-center justify-center gap-2 shadow-sm border border-white hover:border-slate-200 transition group hover:bg-[#f6fbe8]"
+                                onClick={() => user ? setUserMenuOpen(!userMenuOpen) : setLoginOpen(true)}
+                                title={user ? "אזור אישי" : "התחברות"}
+                            >
+                                <User className="h-5 w-5 text-[#3a5223] group-hover:scale-110 transition-transform" strokeWidth={2.5} />
+                                <span className="text-[13px] font-black text-[#112a1e] tracking-tight">
+                                    {user ? `שלום, ${firstName}` : "התחברות / הרשמה"}
+                                </span>
+                            </button>
+
+                            {userMenuOpen && user && (
+                                <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-64 bg-white rounded-[28px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[70] animate-in fade-in slide-in-from-top-4 duration-300" dir="rtl">
+                                    <div className="p-6 bg-slate-50/50 border-b border-slate-100 relative overflow-hidden">
+                                        <div className="absolute -top-4 -left-4 w-12 h-12 bg-[#AADB56]/10 rounded-full blur-xl" />
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">החשבון שלי</p>
+                                        <p className="text-sm font-black truncate text-[#112a1e] tracking-tight">{user.email}</p>
+                                    </div>
+                                    
+                                    <div className="p-2">
+                                        {isAdmin && (
+                                            <Link
+                                                href="/admin"
+                                                className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm hover:bg-[#AADB56]/10 transition-all font-black text-slate-700 group/item"
+                                                onClick={() => setUserMenuOpen(false)}
+                                            >
+                                                <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover/item:text-[#112a1e] group-hover/item:bg-white transition-all shadow-sm">
+                                                    <Shield className="h-4 w-4" />
+                                                </div>
+                                                אזור ניהול (Admin)
+                                            </Link>
+                                        )}
+                                        <Link
+                                            href="/account"
+                                            className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm hover:bg-[#AADB56]/10 transition-all font-black text-slate-700 group/item"
+                                            onClick={() => setUserMenuOpen(false)}
+                                        >
+                                            <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover/item:text-[#112a1e] group-hover/item:bg-white transition-all shadow-sm">
+                                                <User className="h-4 w-4" />
+                                            </div>
+                                            פרופיל והזמנות
+                                        </Link>
+                                        
+                                        <div className="h-px bg-slate-50 my-1 mx-4" />
+                                        
+                                        <button
+                                            onClick={async () => {
+                                                await supabase.auth.signOut();
+                                                window.location.reload();
+                                            }}
+                                            className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl text-sm text-red-600 hover:bg-red-50 transition-all font-black group/item"
+                                        >
+                                            <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-red-400 group-hover/item:text-red-600 group-hover/item:bg-white transition-all shadow-sm">
+                                                <LogOut className="h-4 w-4" />
+                                            </div>
+                                            התנתקות מהמערכת
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
+
                         <CartDrawer trigger={
                             <button className="bg-white rounded-full py-1.5 pl-2 pr-4 flex items-center gap-3 shadow-sm border border-white hover:border-slate-200 transition relative overflow-visible pointer-events-auto">
                                 <span className="font-extrabold text-[#3a5223] tracking-tighter text-base">₪{isMounted ? totalPriceEstimated().toFixed(2) : "0.00"}</span>
@@ -580,7 +702,7 @@ export function SiteHeader() {
                 )}
             </header>
 
-            <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+            <AuthDialog open={loginOpen} onOpenChange={setLoginOpen} />
         </>
     );
 }

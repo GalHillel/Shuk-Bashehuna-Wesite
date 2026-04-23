@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { deleteImageFromStorage } from "@/lib/storage-utils";
 import { toast } from "sonner";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { MobileCategoryItem } from "@/components/admin/MobileCategoryItem";
 
 // DnD Kit Imports
 import {
@@ -40,8 +42,18 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-// ─── Generic Sortable Table Row ───
-function SortableRow({ id, children, className }: { id: string; children: (props: { attributes: any; listeners: any; isDragging: boolean }) => React.ReactNode; className?: string }) {
+// ─── Generic Sortable Item ───
+function SortableItem({ 
+    id, 
+    children, 
+    className,
+    as: Component = "div" 
+}: { 
+    id: string; 
+    children: (props: { attributes: any; listeners: any; isDragging: boolean }) => React.ReactNode; 
+    className?: string;
+    as?: any;
+}) {
     const {
         attributes,
         listeners,
@@ -60,9 +72,9 @@ function SortableRow({ id, children, className }: { id: string; children: (props
     };
 
     return (
-        <TableRow ref={setNodeRef} style={style} className={className || ""}>
+        <Component ref={setNodeRef} style={style} className={className || ""}>
             {children({ attributes, listeners, isDragging })}
-        </TableRow>
+        </Component>
     );
 }
 
@@ -71,7 +83,11 @@ export default function AdminCategoriesPage() {
     const [loading, setLoading] = useState(true);
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // Don't trigger on tiny taps
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -194,27 +210,69 @@ export default function AdminCategoriesPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">ניהול קטגוריות</h1>
-                    <p className="text-slate-500 mt-1 font-medium">הוסף, ערוך ושנה את סדר התצוגה בגרירה — הכל בממשק אחד חכם.</p>
-                </div>
-                <Button asChild className="bg-[#AADB56] hover:bg-[#9cbd4c] text-[#112a1e] font-black px-8 py-6 rounded-2xl shadow-lg shadow-[#AADB56]/20 transition-all hover:scale-[1.02] active:scale-95">
+            <AdminHeader 
+                title="ניהול קטגוריות" 
+                description="הוסף, ערוך ושנה את סדר התצוגה בגרירה — הכל בממשק אחד חכם."
+            >
+                <Button asChild className="bg-[#AADB56] hover:bg-[#112a1e] text-[#112a1e] hover:text-white font-black h-14 w-full md:w-auto px-8 rounded-2xl shadow-lg transition-all">
                     <Link href="/admin/categories/new">
                         <Plus className="ml-2 h-5 w-5" />
-                        הוסף קטגוריה חדשה
+                        הוסף קטגוריה
                     </Link>
                 </Button>
-            </div>
+            </AdminHeader>
 
             <div className="space-y-4">
-                <div className="bg-white rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
-                    {/* Single DndContext OUTSIDE the table to avoid div-in-tbody */}
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                    >
+            <div className="space-y-6">
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                >
+                    {/* Mobile View */}
+                    <div className="md:hidden bg-white rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
+                        {loading ? (
+                            <div className="p-20 text-center font-bold text-slate-400">טוען...</div>
+                        ) : parents.length === 0 ? (
+                            <div className="p-20 text-center font-bold text-slate-400">אין קטגוריות</div>
+                        ) : (
+                            <SortableContext items={allSortableIds} strategy={verticalListSortingStrategy}>
+                                {parents.map(category => {
+                                    const subs = getSubCategoriesFor(category.id);
+                                    return (
+                                        <div key={category.id}>
+                                            <SortableItem id={category.id}>
+                                                {(props) => (
+                                                    <MobileCategoryItem 
+                                                        category={category} 
+                                                        onToggleVisibility={toggleVisibility} 
+                                                        onDelete={deleteCategory}
+                                                        {...props}
+                                                    />
+                                                )}
+                                            </SortableItem>
+                                            {subs.map(sub => (
+                                                <SortableItem key={sub.id} id={sub.id}>
+                                                    {(props) => (
+                                                        <MobileCategoryItem 
+                                                            category={sub} 
+                                                            isSub 
+                                                            onToggleVisibility={toggleVisibility} 
+                                                            onDelete={deleteCategory}
+                                                            {...props}
+                                                        />
+                                                    )}
+                                                </SortableItem>
+                                            ))}
+                                        </div>
+                                    );
+                                })}
+                            </SortableContext>
+                        )}
+                    </div>
+
+                    {/* Desktop View */}
+                    <div className="hidden md:block bg-white rounded-[32px] shadow-xl shadow-slate-200/40 border border-slate-100 overflow-hidden">
                         <Table dir="rtl">
                             <TableHeader className="bg-slate-50/50">
                                 <TableRow className="hover:bg-transparent border-slate-100">
@@ -245,7 +303,7 @@ export default function AdminCategoriesPage() {
                                             return (
                                                 <React.Fragment key={category.id}>
                                                     {/* Parent Row */}
-                                                    <SortableRow id={category.id} className="bg-white">
+                                                    <SortableItem id={category.id} as={TableRow} className="bg-white">
                                                         {({ attributes, listeners }) => (
                                                             <>
                                                                 <TableCell className="w-[50px]">
@@ -298,11 +356,11 @@ export default function AdminCategoriesPage() {
                                                                 </TableCell>
                                                             </>
                                                         )}
-                                                    </SortableRow>
+                                                    </SortableItem>
 
                                                     {/* Subcategory Rows */}
                                                     {subs.map(sub => (
-                                                        <SortableRow key={sub.id} id={sub.id} className="bg-slate-50/30 border-r-4 border-[#AADB56]/30">
+                                                        <SortableItem key={sub.id} id={sub.id} as={TableRow} className="bg-slate-50/30 border-r-4 border-[#AADB56]/30">
                                                             {({ attributes, listeners }) => (
                                                                 <>
                                                                     <TableCell className="w-[50px]">
@@ -343,7 +401,7 @@ export default function AdminCategoriesPage() {
                                                                     </TableCell>
                                                                 </>
                                                             )}
-                                                        </SortableRow>
+                                                        </SortableItem>
                                                     ))}
                                                 </React.Fragment>
                                             );
@@ -352,8 +410,9 @@ export default function AdminCategoriesPage() {
                                 )}
                             </TableBody>
                         </Table>
-                    </DndContext>
-                </div>
+                    </div>
+                </DndContext>
+            </div>
                 
                 <p className="text-[11px] text-slate-400 text-center font-medium">💡 טיפ: ניתן לגרור קטגוריות ראשיות ותת-קטגוריות באמצעות האייקון בצד ימין לשינוי סדר התצוגה באתר.</p>
             </div>

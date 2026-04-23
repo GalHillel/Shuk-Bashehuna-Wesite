@@ -27,9 +27,12 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { CheckCircle2, Loader2, MapPin, Truck, Clock, Store, Heart } from "lucide-react";
+import { CheckCircle2, Loader2, MapPin, Truck, Clock, Store, Heart, Check, Tag, X, Info, LogIn } from "lucide-react";
 import { submitOrder } from "./actions";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthDialog } from "@/components/AuthDialog";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const UNIT_LABELS: Record<string, string> = {
@@ -61,7 +64,9 @@ export default function CheckoutPage() {
     const [orderNumber, setOrderNumber] = useState<string | null>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
-    const [paymentMethod, setPaymentMethod] = useState<'cash' | 'bit'>('cash');
+    const [paymentMethod, setPaymentMethod] = useState<'cash' | 'paybox'>('cash');
+    const [authOpen, setAuthOpen] = useState(false);
+    const { user } = useAuth(); // We need useAuth here too
 
     const { register, handleSubmit, setValue, watch, formState: { errors }, clearErrors } = useForm<CheckoutFormValues>({
         defaultValues: {
@@ -70,9 +75,43 @@ export default function CheckoutPage() {
         }
     });
 
+    // Coupon states
+    const [promoCode, setPromoCode] = useState("");
+    const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+    const [couponError, setCouponError] = useState("");
+    const [isValidating, setIsValidating] = useState(false);
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
+
+    useEffect(() => {
+        if (!isMounted) return;
+        async function autoFill() {
+            if (user) {
+                const { data: prof } = await supabase
+                    .from("profiles")
+                    .select("full_name, phone, default_address")
+                    .eq("id", user.id)
+                    .single();
+                if (prof) {
+                    if (prof.full_name) setValue("fullName", prof.full_name);
+                    if (prof.phone) setValue("phone", prof.phone);
+                    
+                    // Auto-fill address from saved profile
+                    const addr = prof.default_address as any;
+                    if (addr) {
+                        if (addr.city) setValue("city", addr.city);
+                        if (addr.street) setValue("street", addr.street);
+                        if (addr.houseNumber) setValue("houseNumber", addr.houseNumber);
+                        if (addr.floor) setValue("floor", addr.floor);
+                        if (addr.apartment) setValue("apartment", addr.apartment);
+                    }
+                }
+            }
+        }
+        autoFill();
+    }, [isMounted, user, setValue]);
 
     useEffect(() => {
         if (isMounted && items.length === 0 && !isSuccess) {
@@ -80,13 +119,79 @@ export default function CheckoutPage() {
         }
     }, [items, isSuccess, router, isMounted]);
 
+    const handleApplyCoupon = async () => {
+        if (!promoCode) return;
+        setIsValidating(true);
+        setCouponError("");
+        
+        try {
+            const { data: coupon, error } = await supabase
+                .from("coupons")
+                .select("*")
+                .eq("code", promoCode.toUpperCase())
+                .eq("is_active", true)
+                .single();
+            
+            if (error || !coupon) {
+                setCouponError("קוד קופון לא תקין או פג תוקף");
+                setAppliedCoupon(null);
+            } else if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
+                setCouponError("השימוש בקופון זה הגיע למגבלה המקסימלית");
+                setAppliedCoupon(null);
+            } else {
+                // Check per-user limit
+                if (coupon.usage_limit_per_user) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                        // Count orders by this user that used this coupon code
+                        const { data: userOrders } = await supabase
+                            .from("orders")
+                            .select("id, shipping_address")
+                            .eq("user_id", user.id);
+                        
+                        const userUsageCount = (userOrders || []).filter(
+                            (o: any) => (o.shipping_address as any)?.coupon_code === coupon.code
+                        ).length;
+
+                        if (userUsageCount >= coupon.usage_limit_per_user) {
+                            setCouponError("כבר השתמשת בקופון זה את מספר הפעמים המקסימלי");
+                            setAppliedCoupon(null);
+                            setIsValidating(false);
+                            return;
+                        }
+                    }
+                }
+
+                setAppliedCoupon(coupon);
+                setPromoCode("");
+            }
+        } catch (err) {
+            setCouponError("שגיאה באימות הקופון");
+        } finally {
+            setIsValidating(false);
+        }
+    };
+
+    const calculateDiscount = () => {
+        if (!appliedCoupon) return 0;
+        const subtotal = totalPriceEstimated();
+        if (appliedCoupon.discount_type === 'percentage') {
+            return (subtotal * appliedCoupon.discount_amount) / 100;
+        } else {
+            return Math.min(appliedCoupon.discount_amount, subtotal);
+        }
+    };
+
+    const subtotal = totalPriceEstimated();
+    const discount = calculateDiscount();
+    const shippingFee = (subtotal >= 150 || deliveryMethod === 'pickup') ? 0 : 20;
+    const finalTotal = subtotal - discount + shippingFee;
+
     const onSubmit = async (values: CheckoutFormValues) => {
         setIsSubmitting(true);
         try {
             // Try to get logged-in user, but allow guest checkout
             const { data: { user } } = await supabase.auth.getUser();
-
-            const total = totalPriceEstimated();
 
             // Calculate Delivery Slot
             const [startHour, endHour] = values.deliveryTime.split("-").map(t => t.trim());
@@ -100,7 +205,7 @@ export default function CheckoutPage() {
                 customer_name: values.fullName,
                 customer_phone: values.phone,
                 status: "pending",
-                total_price_estimated: total,
+                total_price_estimated: finalTotal, // Use final total
                 delivery_slot_start: deliveryStart.toISOString(),
                 delivery_slot_end: deliveryEnd.toISOString(),
                 delivery_method: deliveryMethod,
@@ -113,12 +218,18 @@ export default function CheckoutPage() {
                     floor: values.floor,
                     fullName: values.fullName,
                     phone: values.phone,
-                    notes: values.notes
+                    notes: values.notes,
+                    coupon_code: appliedCoupon?.code || null,
+                    discount_amount: calculateDiscount(),
+                    shipping_fee: shippingFee
                 } : {
                     fullName: values.fullName,
                     phone: values.phone,
                     notes: values.notes,
-                    type: 'pickup'
+                    type: 'pickup',
+                    coupon_code: appliedCoupon?.code || null,
+                    discount_amount: calculateDiscount(),
+                    shipping_fee: 0
                 }
             };
 
@@ -133,17 +244,23 @@ export default function CheckoutPage() {
                     : item.product.price)
             }));
 
-            // 2. Submit via Server Action (Logic includes Redirect)
+            // 2. Submit via Server Action
             const result = await submitOrder(orderPayload, orderItemsPayload);
 
-            // If we are here, it means NO redirect happened, so check for error
+            // 3. If coupon was used, increment used_count
+            if (appliedCoupon && result.success) {
+                await supabase
+                    .from("coupons")
+                    .update({ used_count: appliedCoupon.used_count + 1 })
+                    .eq("id", appliedCoupon.id);
+            }
+
             if (result && !result.success) {
                 throw new Error(result.error);
             }
 
         } catch (error: any) {
             console.error("Order error:", error);
-            // Ignore redirect error if it bubbled up somehow, though server action usually handles it
             if (error.message !== "NEXT_REDIRECT") {
                 alert(`שגיאה בביצוע ההזמנה: ${error.message || "שגיאה לא ידועה"}`);
                 setIsSubmitting(false);
@@ -172,6 +289,34 @@ export default function CheckoutPage() {
                         <h1 className="text-3xl md:text-4xl font-black text-[#1b3626] leading-none tracking-tighter">פרטי הזמנה</h1>
                     </div>
                 </div>
+
+                {/* Guest Incentive Banner */}
+                {isMounted && !user && (
+                    <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-1000">
+                        <div className="bg-[#AADB56]/10 border border-[#AADB56]/30 rounded-[32px] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#AADB56]/10 rounded-bl-full -z-1 transition-transform group-hover:scale-110" />
+                            
+                            <div className="w-16 h-16 rounded-2xl bg-[#AADB56] flex items-center justify-center shrink-0 shadow-lg shadow-lime-100 rotate-3 group-hover:rotate-0 transition-transform">
+                                <Heart className="w-8 h-8 text-[#112a1e] fill-[#112a1e]/10" />
+                            </div>
+                            
+                            <div className="flex-1 text-center md:text-right space-y-2">
+                                <h3 className="text-xl font-black text-[#112a1e]">שלום אורח/ת! נעים להכיר</h3>
+                                <p className="text-[#112a1e]/70 font-bold leading-relaxed max-w-2xl text-[15px]">
+                                    כדאי לדעת: משתמשים רשומים נהנים ממימוש <span className="text-[#112a1e] font-black underline decoration-[#AADB56] decoration-4">קופונים</span>, שמירת כתובות למשלוח מהיר ומעקב אחר הזמנות בזמן אמת.
+                                </p>
+                            </div>
+                            
+                            <Button 
+                                onClick={() => setAuthOpen(true)}
+                                className="bg-[#112a1e] hover:bg-[#2c533c] text-white font-black h-14 px-8 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95 shrink-0 flex items-center gap-2"
+                            >
+                                <LogIn className="w-5 h-5" />
+                                להתחברות או הרשמה מהירה
+                            </Button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
 
@@ -232,8 +377,20 @@ export default function CheckoutPage() {
                                                 ))}
                                                 <div className="pt-4 mt-4 border-t border-slate-100 flex justify-between items-center text-sm font-bold text-slate-500">
                                                     <span>משלוח</span>
-                                                    <span className="text-[#AADB56]">חינם</span>
+                                                    {!isMounted ? (
+                                                        <span className="text-slate-400 font-bold opacity-10">...</span>
+                                                    ) : shippingFee === 0 ? (
+                                                        <span className="text-[#AADB56]">חינם</span>
+                                                    ) : (
+                                                        <span className="text-[#112a1e]">₪20.00</span>
+                                                    )}
                                                 </div>
+                                                {appliedCoupon && (
+                                                    <div className="flex justify-between items-center text-sm font-bold text-red-500">
+                                                        <span>הנחה ({appliedCoupon.code})</span>
+                                                        <span>-₪{calculateDiscount().toFixed(2)}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </AccordionContent>
                                     </AccordionItem>
@@ -450,30 +607,30 @@ export default function CheckoutPage() {
                                     </div>
 
                                     <div
-                                        onClick={() => setPaymentMethod('bit')}
+                                        onClick={() => setPaymentMethod('paybox')}
                                         className={cn(
                                             "cursor-pointer p-5 rounded-3xl border-2 transition-all relative overflow-hidden",
-                                            paymentMethod === 'bit' ? "border-[#0083DA] bg-blue-50/50" : "border-slate-100 hover:bg-slate-50"
+                                            paymentMethod === 'paybox' ? "border-[#0083DA] bg-blue-50/50" : "border-slate-100 hover:bg-slate-50"
                                         )}
                                     >
                                         <div className="flex items-center gap-4 mb-4">
                                             <div className={cn(
                                                 "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
-                                                paymentMethod === 'bit' ? "border-[#0083DA] bg-[#0083DA]" : "border-slate-300"
+                                                paymentMethod === 'paybox' ? "border-[#0083DA] bg-[#0083DA]" : "border-slate-300"
                                             )}>
-                                                {paymentMethod === 'bit' && <div className="w-2 h-2 rounded-full bg-white" />}
+                                                {paymentMethod === 'paybox' && <div className="w-2 h-2 rounded-full bg-white" />}
                                             </div>
                                             <div>
-                                                <p className="font-black text-[#112a1e]">Bit (ביט) - העברה מהירה</p>
+                                                <p className="font-black text-[#112a1e]">PayBox (פייבוקס) - העברה מהירה</p>
                                                 <p className="text-[13px] text-slate-500 font-bold">העברה נוחה ומאובטחת</p>
                                             </div>
                                         </div>
 
-                                        {paymentMethod === 'bit' && (
+                                        {paymentMethod === 'paybox' && (
                                             <div className="mr-10 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
                                                 <div className="bg-white p-4 rounded-2xl border border-blue-200/50 shadow-sm">
-                                                    <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-1.5">מספר העסק לביט</p>
-                                                    <p className="font-black text-[22px] text-[#0083DA] tracking-widest leading-none pr-0.5">054-663-7558</p>
+                                                    <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest mb-1.5">מספר העסק לפייבוקס</p>
+                                                    <p className="font-black text-[22px] text-[#0083DA] tracking-widest leading-none pr-0.5">{process.env.NEXT_PUBLIC_PAYBOX_NUMBER || "054-663-7558"}</p>
                                                 </div>
                                                 <Button
                                                     type="button"
@@ -482,17 +639,19 @@ export default function CheckoutPage() {
                                                         e.stopPropagation();
                                                         const total = totalPriceEstimated().toFixed(2);
                                                         navigator.clipboard.writeText(total);
-                                                        import("sonner").then(({ toast }) => toast.success("הסכום הועתק! עובר לביט..."));
+                                                        import("sonner").then(({ toast }) => toast.success("הסכום הועתק! עובר לפייבוקס..."));
                                                         setTimeout(() => {
-                                                            window.location.href = "https://bitpay.co.il/app/me/0546637558";
+                                                            const payboxNumber = process.env.NEXT_PUBLIC_PAYBOX_NUMBER || "0546637558";
+                                                            const message = encodeURIComponent(`תשלום עבור הזמנה`);
+                                                            window.location.href = `https://payboxapp.page.link/?link=https://payboxapp.com/pay?amount=${total}&phone=${payboxNumber}&description=${message}`;
                                                         }, 1200);
                                                     }}
                                                     className="w-full bg-[#0083DA] hover:bg-[#0070bb] text-white font-black h-14 rounded-2xl shadow-lg transition-transform active:scale-95"
                                                 >
-                                                    העתק סכום (₪{totalPriceEstimated().toFixed(2)}) ופתח ביט
+                                                    העתק סכום (₪{totalPriceEstimated().toFixed(2)}) ופתח פייבוקס
                                                 </Button>
                                                 <p className="text-xs text-slate-500 text-center font-bold px-4 leading-normal">
-                                                    * לאחר ביצוע ההעברה בביט, יש לחזור לכאן וללחוץ על "שלח הזמנה" למטה
+                                                    * לאחר ביצוע ההעברה בפייבוקס, יש לחזור לכאן וללחוץ על "שלח הזמנה" למטה
                                                 </p>
                                             </div>
                                         )}
@@ -605,9 +764,83 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-[14px] font-bold text-slate-500 uppercase tracking-widest">משלוח</span>
-                                    <div className="bg-[#AADB56]/10 px-3 py-1 rounded-full border border-[#AADB56]/20">
-                                        <span className="text-[#AADB56] font-black text-xs uppercase tracking-widest">משלוח חינם</span>
+                                    {!isMounted ? (
+                                        <span className="font-black text-[#112a1e] tracking-tighter opacity-10">₪...</span>
+                                    ) : shippingFee === 0 ? (
+                                        <div className="bg-[#AADB56]/10 px-3 py-1 rounded-full border border-[#AADB56]/20">
+                                            <span className="text-[#AADB56] font-black text-xs uppercase tracking-widest">משלוח חינם</span>
+                                        </div>
+                                    ) : (
+                                        <span className="font-black text-[#112a1e] tracking-tighter">₪20.00</span>
+                                    )}
+                                </div>
+
+                                {appliedCoupon && (
+                                    <div className="flex justify-between items-center animate-in fade-in slide-in-from-right-2">
+                                        <span className="text-[14px] font-bold text-red-500 uppercase tracking-widest flex items-center gap-2">
+                                            קופון: {appliedCoupon.code}
+                                            <button onClick={() => setAppliedCoupon(null)} className="text-red-300 hover:text-red-500"><X className="w-3 h-3" /></button>
+                                        </span>
+                                        <span className="font-black text-red-500 text-lg">-₪{calculateDiscount().toFixed(2)}</span>
                                     </div>
+                                )}
+
+                                <div className="pt-4">
+                                    {!appliedCoupon ? (
+                                        <div className="relative group">
+                                            <div className="flex gap-2">
+                                                <Input 
+                                                    placeholder="קוד קופון" 
+                                                    value={promoCode}
+                                                    onChange={(e) => setPromoCode(e.target.value)}
+                                                    disabled={!isMounted || !user}
+                                                    className={cn(
+                                                        "h-12 rounded-xl border-slate-200 focus:border-[#AADB56] font-bold uppercase transition-all",
+                                                        (!isMounted || !user) && "opacity-50 cursor-not-allowed bg-slate-50"
+                                                    )}
+                                                />
+                                                <Button 
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (!user) {
+                                                            toast.error("מימוש קופונים אפשרי למשתמשים רשומים בלבד", {
+                                                                description: "התחברו כדי ליהנות מהנחות ומבצעים",
+                                                                action: {
+                                                                    label: "להתחברות",
+                                                                    onClick: () => setAuthOpen(true)
+                                                                }
+                                                            });
+                                                            return;
+                                                        }
+                                                        handleApplyCoupon();
+                                                    }}
+                                                    disabled={isValidating || (!user && !promoCode)}
+                                                    className="h-12 px-6 rounded-xl bg-[#1b3626] text-white font-bold hover:bg-[#2c533c]"
+                                                >
+                                                    {isValidating ? <Loader2 className="w-4 h-4 animate-spin" /> : "החל"}
+                                                </Button>
+                                            </div>
+                                            {!user && (
+                                                <div 
+                                                    className="absolute inset-0 cursor-pointer z-10" 
+                                                    onClick={() => {
+                                                        toast.info("מימוש קופונים אפשרי למשתמשים רשומים בלבד", {
+                                                            action: {
+                                                                label: "התחברות",
+                                                                onClick: () => setAuthOpen(true)
+                                                            }
+                                                        });
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="bg-emerald-50 text-emerald-700 px-4 py-3 rounded-xl border border-emerald-100 flex items-center gap-2 text-sm font-bold">
+                                            <Check className="w-4 h-4" />
+                                            הקופון הופעל בהצלחה!
+                                        </div>
+                                    )}
+                                    {couponError && <p className="text-red-500 text-[11px] font-black mt-2 pr-1">{couponError}</p>}
                                 </div>
 
                                 <div className="pt-6 mt-6 border-t border-slate-100">
@@ -616,7 +849,7 @@ export default function CheckoutPage() {
                                         <div className="flex items-baseline text-[#112a1e]">
                                             <span className="text-xl ml-1 font-black leading-none opacity-60">₪</span>
                                             <span className="text-4xl md:text-5xl font-black tracking-tighter leading-none pr-0.5">
-                                                {isMounted ? totalPriceEstimated().toFixed(2) : "..."}
+                                                {isMounted ? finalTotal.toFixed(2) : "..."}
                                             </span>
                                         </div>
                                     </div>
@@ -645,6 +878,7 @@ export default function CheckoutPage() {
                     </div>
                 </div>
             </main>
+            <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
         </div>
     );
 }

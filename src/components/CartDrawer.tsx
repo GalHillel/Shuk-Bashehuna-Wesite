@@ -101,10 +101,10 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                         <div className="grid grid-cols-2 gap-4 w-full">
                             {promoCategories.map((cat, i) => {
                                 return (
-                                    <Link 
-                                        key={cat.id} 
-                                        href={`/category/${cat.id}`} 
-                                        onClick={() => setOpen(false)} 
+                                    <Link
+                                        key={cat.id}
+                                        href={`/category/${cat.id}`}
+                                        onClick={() => setOpen(false)}
                                         className="bg-[#f8faf7] border border-slate-100 rounded-3xl h-[120px] flex flex-col items-center justify-center gap-2 p-3 group transition-all hover:bg-[#AADB56]/10 hover:border-[#AADB56]/30 active:scale-95 shadow-sm"
                                     >
                                         <div className="relative w-12 h-12 rounded-full overflow-hidden bg-white shadow-sm ring-2 ring-transparent group-hover:ring-[#AADB56] transition-all">
@@ -167,24 +167,24 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                 <div className="bg-white/50 backdrop-blur-sm px-6 py-4 z-10">
                     <div className={cn(
                         "rounded-[20px] p-4 flex flex-col gap-3 transition-all border shadow-sm",
-                        total < 180 ? "bg-white border-yellow-200" : "bg-[#AADB56]/10 border-[#AADB56]/30 shadow-[#AADB56]/10"
+                        total < 150 ? "bg-white border-yellow-200" : "bg-[#AADB56]/10 border-[#AADB56]/30 shadow-[#AADB56]/10"
                     )}>
-                         <div className="flex items-center justify-between text-[15px] font-black text-[#112a1e]">
-                             <span className="flex items-center gap-2">
-                                <Heart className={cn("h-5 w-5", total >= 180 ? "fill-[#AADB56] text-[#AADB56]" : "text-yellow-500")} />
-                                {total < 180 ? `חסר לכם ₪${(180 - total).toFixed(2)} למשלוח` : "מינימום קנייה הושלם!"}
-                             </span>
-                             <span>{Math.min(100, (total / 180) * 100).toFixed(0)}%</span>
-                         </div>
-                         <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                             <div 
+                        <div className="flex items-center justify-between text-[15px] font-black text-[#112a1e]">
+                            <span className="flex items-center gap-2">
+                                <Heart className={cn("h-5 w-5", total >= 150 ? "fill-[#AADB56] text-[#AADB56]" : "text-yellow-500")} />
+                                {total < 150 ? `חסר לכם ₪${(150 - total).toFixed(2)} למשלוח חינם!` : "מינימום קנייה הושלם!"}
+                            </span>
+                            <span>{Math.min(100, (total / 150) * 100).toFixed(0)}%</span>
+                        </div>
+                        <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                            <div
                                 className={cn(
                                     "h-full transition-all duration-700 ease-out rounded-full shadow-[0_0_10px_rgba(0,0,0,0.1)]",
-                                    total < 180 ? "bg-yellow-400" : "bg-[#AADB56]"
+                                    total < 150 ? "bg-yellow-400" : "bg-[#AADB56]"
                                 )}
-                                style={{ width: `${Math.min(100, (total / 180) * 100)}%` }}
-                             />
-                         </div>
+                                style={{ width: `${Math.min(100, (total / 150) * 100)}%` }}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -197,7 +197,7 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
 
                             return (
                                 <div key={item.product.id} className="bg-white rounded-[28px] p-4 shadow-sm flex items-center justify-between relative group border border-transparent hover:border-[#AADB56]/20 transition-all hover:shadow-md">
-                                    
+
                                     {/* Product Details Section - Right Align (RTL) */}
                                     <div className="flex items-center gap-4 flex-1">
                                         <div className="relative w-20 h-20 shrink-0 bg-slate-50 rounded-2xl overflow-hidden flex items-center justify-center p-2 group-hover:bg-white transition-colors">
@@ -217,7 +217,7 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                                             <p className="text-slate-400 font-bold text-[13px] mb-2 uppercase">
                                                 ₪{itemPrice.toFixed(2)} / {UNIT_LABELS[item.product.unit_type] || "יח'"}
                                             </p>
-                                            
+
                                             {/* Tactile Quantity Pill */}
                                             <div className="flex items-center bg-[#f7f8f7] rounded-full p-1 border border-slate-100 shadow-inner overflow-hidden h-9">
                                                 <button
@@ -247,7 +247,7 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                                         <div className="text-[22px] font-black text-[#112a1e] tracking-tighter">
                                             <span className="text-sm ml-1 opacity-70">₪</span>{itemTotal.toFixed(2)}
                                         </div>
-                                        <button 
+                                        <button
                                             onClick={() => removeItem(item.product.id)}
                                             className="mt-2 text-slate-300 hover:text-red-400 transition-colors p-1"
                                         >
@@ -262,7 +262,7 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
 
                 {/* Footer Section - Immersive Deep Forest Background */}
                 <div className="bg-[#112a1e] px-6 pt-8 pb-10 flex flex-col items-center gap-6 relative shrink-0 shadow-[0_-20px_40px_rgba(0,0,0,0.1)] rounded-t-[40px] mt-auto">
-                    
+
                     {/* Summary Info */}
                     <div className="flex items-center justify-between w-full px-2 text-white/90">
                         <div className="flex flex-col items-start leading-none">
@@ -306,17 +306,17 @@ export function CartDrawer({ trigger }: CartDrawerProps) {
                             </div>
                             <h2 className="text-[32px] font-black text-[#1b3626] mb-3 tracking-tighter leading-none">לרוקן את הסל?</h2>
                             <p className="text-slate-500 font-bold text-[17px] mb-10 leading-snug">
-                                אולי כדאי לשמור את המוצרים? <br/> מדובר במחיקה של כל ההתקדמות שלך.
+                                אולי כדאי לשמור את המוצרים? <br /> מדובר במחיקה של כל ההתקדמות שלך.
                             </p>
-                            
+
                             <div className="grid grid-cols-2 gap-4 w-full">
-                                <Button 
+                                <Button
                                     onClick={() => setShowClearConfirm(false)}
                                     className="h-16 rounded-[24px] bg-slate-50 hover:bg-slate-100 text-slate-700 font-black text-lg border border-slate-200"
                                 >
                                     אופס, בטל
                                 </Button>
-                                <Button 
+                                <Button
                                     onClick={handleClearCart}
                                     className="h-16 rounded-[24px] bg-[#112a1e] hover:bg-red-600 text-white font-black text-lg shadow-lg transition-colors border-b-4 border-black/20"
                                 >

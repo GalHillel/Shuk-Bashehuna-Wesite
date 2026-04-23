@@ -2,8 +2,10 @@
 
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState, useCallback } from "react";
-import { Package, ShoppingCart, FolderTree, TrendingUp, AlertCircle, FileText } from "lucide-react";
+import { Package, ShoppingCart, FolderTree, TrendingUp, AlertCircle, FileText, Plus } from "lucide-react";
 import Link from "next/link";
+
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 interface DashboardStats {
     totalProducts: number;
@@ -42,13 +44,17 @@ export default function AdminDashboard() {
 
     if (loading) {
         return (
-            <div className="space-y-6">
-                <h1 className="text-3xl font-bold">לוח בקרה</h1>
-                <div className="flex flex-wrap justify-center gap-6">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="bg-white p-6 rounded-xl border shadow-sm animate-pulse w-[240px]">
-                            <div className="h-4 bg-slate-200 rounded w-24 mb-4" />
-                            <div className="h-8 bg-slate-200 rounded w-16" />
+            <div className="space-y-8 animate-in fade-in duration-500">
+                <AdminHeader 
+                    title="לוח בקרה" 
+                    description="שוק בשכונה - סקירה כללית" 
+                />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm animate-pulse h-48">
+                            <div className="h-4 bg-slate-100 rounded-full w-24 mb-6" />
+                            <div className="h-12 bg-slate-100 rounded-2xl w-20 mb-4" />
+                            <div className="h-3 bg-slate-100 rounded-full w-32" />
                         </div>
                     ))}
                 </div>
@@ -60,52 +66,52 @@ export default function AdminDashboard() {
         {
             label: "מוצרים",
             value: stats?.totalProducts || 0,
-            sub: `${stats?.activeProducts || 0} פעילים`,
+            sub: `${stats?.activeProducts || 0} פעילים במערכת`,
             icon: Package,
-            color: "text-blue-600 bg-blue-50",
+            color: "text-blue-600 bg-blue-50/50",
             href: "/admin/products",
         },
         {
             label: "קטגוריות",
             value: stats?.totalCategories || 0,
-            sub: "קטגוריות פעילות",
+            sub: "ניהול קטגוריות ותפריטים",
             icon: FolderTree,
-            color: "text-green-600 bg-green-50",
+            color: "text-green-600 bg-green-50/50",
             href: "/admin/categories",
         },
         {
             label: "הזמנות",
             value: stats?.totalOrders || 0,
-            sub: `${stats?.pendingOrders || 0} ממתינות`,
+            sub: `${stats?.pendingOrders || 0} ממתינות לטיפול`,
             icon: ShoppingCart,
-            color: "text-purple-600 bg-purple-50",
+            color: "text-purple-600 bg-purple-50/50",
             href: "/admin/orders",
         },
     ];
 
     return (
-        <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold">לוח בקרה</h1>
-                <p className="text-muted-foreground mt-1">שוק בשכונה - סקירה כללית</p>
-            </div>
+        <div className="space-y-10 animate-in fade-in duration-700">
+            <AdminHeader 
+                title="לוח בקרה" 
+                description="ברוך הבא! הנה סקירה מהירה של מה שקורה בחנות שלך היום." 
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {cards.map((card) => {
                     const Icon = card.icon;
                     return (
                         <Link key={card.label} href={card.href} className="w-full">
-                            <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:border-[#AADB56]/30 transition-all cursor-pointer group relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-[#AADB56]/5 rounded-bl-[100px] -mr-8 -mt-8 group-hover:bg-[#AADB56]/10 transition-colors" />
-                                <div className="flex items-center justify-between mb-6">
-                                    <span className="text-sm font-black text-slate-400 uppercase tracking-wider">{card.label}</span>
-                                    <div className={`p-3 rounded-2xl ${card.color} shadow-sm group-hover:scale-110 transition-transform`}>
+                            <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/30 hover:shadow-2xl hover:scale-[1.01] transition-all cursor-pointer group relative overflow-hidden h-full">
+                                <div className="absolute top-0 left-0 w-32 h-32 bg-[#AADB56]/5 rounded-br-[100px] -ml-8 -mt-8 group-hover:bg-[#AADB56]/10 transition-colors" />
+                                <div className="flex items-center justify-between mb-8 relative z-10">
+                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{card.label}</span>
+                                    <div className={`p-4 rounded-2xl ${card.color} shadow-sm group-hover:rotate-12 transition-transform`}>
                                         <Icon className="h-6 w-6" />
                                     </div>
                                 </div>
-                                <p className="text-5xl font-black text-slate-800 tracking-tight">{card.value}</p>
-                                <p className="text-sm font-bold text-slate-400 mt-2 flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-[#AADB56]" />
+                                <p className="text-6xl font-black text-slate-800 tracking-tighter mb-2 relative z-10">{card.value}</p>
+                                <p className="text-xs font-bold text-slate-400 flex items-center gap-2 relative z-10">
+                                    <span className="w-2 h-2 rounded-full bg-[#AADB56] animate-pulse" />
                                     {card.sub}
                                 </p>
                             </div>
@@ -114,27 +120,35 @@ export default function AdminDashboard() {
                 })}
             </div>
 
-
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Link href="/admin/products/new" className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:scale-[1.02] transition-all text-center flex flex-col items-center justify-center gap-2 group">
-                    <div className="bg-[#AADB56]/10 p-4 rounded-2xl group-hover:bg-[#AADB56]/20 transition-colors">
-                        <Package className="h-8 w-8 text-[#6c9b29]" />
-                    </div>
-                    <p className="font-black text-slate-800">הוסף מוצר חדש</p>
-                </Link>
-                <Link href="/admin/content" className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:scale-[1.02] transition-all text-center flex flex-col items-center justify-center gap-2 group">
-                    <div className="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-100 transition-colors">
-                        <TrendingUp className="h-8 w-8 text-blue-600" />
-                    </div>
-                    <p className="font-black text-slate-800">ערוך דף הבית</p>
-                </Link>
-                <Link href="/admin/orders" className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 hover:scale-[1.02] transition-all text-center flex flex-col items-center justify-center gap-2 group">
-                    <div className="bg-purple-50 p-4 rounded-2xl group-hover:bg-purple-100 transition-colors">
-                        <ShoppingCart className="h-8 w-8 text-purple-600" />
-                    </div>
-                    <p className="font-black text-slate-800">ניהול הזמנות</p>
-                </Link>
+            <div className="space-y-6">
+                <h2 className="text-xl font-black text-slate-800 mr-2">פעולות מהירות</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Link href="/admin/products/new" className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm hover:border-[#AADB56] hover:bg-[#AADB56]/5 transition-all text-center flex flex-col items-center justify-center gap-4 group">
+                        <div className="bg-slate-50 p-4 rounded-2xl group-hover:bg-white transition-colors">
+                            <Plus className="h-6 w-6 text-[#6c9b29]" />
+                        </div>
+                        <p className="font-black text-slate-700 text-sm">הוסף מוצר</p>
+                    </Link>
+                    <Link href="/admin/orders" className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm hover:border-purple-200 hover:bg-purple-50/30 transition-all text-center flex flex-col items-center justify-center gap-4 group">
+                        <div className="bg-slate-50 p-4 rounded-2xl group-hover:bg-white transition-colors">
+                            <ShoppingCart className="h-6 w-6 text-purple-500" />
+                        </div>
+                        <p className="font-black text-slate-700 text-sm">טפל בהזמנות</p>
+                    </Link>
+                    <Link href="/admin/coupons" className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm hover:border-orange-200 hover:bg-orange-50/30 transition-all text-center flex flex-col items-center justify-center gap-4 group">
+                        <div className="bg-slate-50 p-4 rounded-2xl group-hover:bg-white transition-colors">
+                            <TrendingUp className="h-6 w-6 text-orange-500" />
+                        </div>
+                        <p className="font-black text-slate-700 text-sm">צור קופון</p>
+                    </Link>
+                    <Link href="/admin/content" className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm hover:border-blue-200 hover:bg-blue-50/30 transition-all text-center flex flex-col items-center justify-center gap-4 group">
+                        <div className="bg-slate-50 p-4 rounded-2xl group-hover:bg-white transition-colors">
+                            <FileText className="h-6 w-6 text-blue-500" />
+                        </div>
+                        <p className="font-black text-slate-700 text-sm">עריכת תוכן</p>
+                    </Link>
+                </div>
             </div>
         </div>
     );

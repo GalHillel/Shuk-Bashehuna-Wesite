@@ -11,6 +11,7 @@ import { Save, Loader2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { FeaturesJSONEditor } from "@/components/admin/FeaturesJSONEditor";
 import { toast } from "sonner";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default function SettingsPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,22 +68,21 @@ export default function SettingsPage() {
 
     return (
         <div className="space-y-6 max-w-5xl" dir="rtl">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold">הגדרות אתר</h1>
-                    <p className="text-muted-foreground">ניהול תוכן האתר, פרטי עסק ורשתות חברתיות</p>
-                </div>
-                <Button onClick={handleSave} disabled={saving} className="gap-2 bg-slate-900">
-                    {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            <AdminHeader 
+                title="הגדרות אתר" 
+                description="ניהול תוכן האתר, פרטי עסק ורשתות חברתיות"
+            >
+                <Button onClick={handleSave} disabled={saving} className="gap-2 bg-[#112a1e] hover:bg-[#112a1e]/90 text-white font-black h-14 px-8 rounded-2xl w-full md:w-auto shadow-xl transition-all">
+                    {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
                     {saving ? "שומר..." : "שמור שינויים"}
                 </Button>
-            </div>
+            </AdminHeader>
 
             <Tabs defaultValue="general" dir="rtl" className="w-full">
-                <TabsList className="bg-slate-100 p-1 rounded-2xl h-auto flex flex-wrap justify-start border border-slate-200 shadow-sm overflow-hidden mb-2">
-                    <TabsTrigger value="general" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-bold transition-all">כללי (Header)</TabsTrigger>
-                    <TabsTrigger value="about" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-bold transition-all">אודות (About)</TabsTrigger>
-                    <TabsTrigger value="contact" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-bold transition-all">יצירת קשר</TabsTrigger>
+                <TabsList className="bg-slate-100/50 p-1.5 rounded-[20px] h-auto flex flex-wrap justify-start border border-slate-100 shadow-sm overflow-hidden mb-8">
+                    <TabsTrigger value="general" className="rounded-xl px-8 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-black transition-all text-sm tracking-tight">כללי (Header)</TabsTrigger>
+                    <TabsTrigger value="about" className="rounded-xl px-8 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-black transition-all text-sm tracking-tight md:mx-1">אודות (About)</TabsTrigger>
+                    <TabsTrigger value="contact" className="rounded-xl px-8 py-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-[#112a1e] font-black transition-all text-sm tracking-tight">יצירת קשר</TabsTrigger>
                 </TabsList>
 
                 {/* GENERAL / HEADER */}
@@ -112,6 +112,24 @@ export default function SettingsPage() {
                                         className="h-14 rounded-2xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-[#AADB56] focus:border-[#AADB56] transition-all"
                                     />
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="rounded-[32px] overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40">
+                        <CardHeader className="bg-slate-50/50 pb-8 border-b border-slate-50">
+                            <CardTitle className="text-xl font-black text-slate-800">טיקר רץ (Marquee)</CardTitle>
+                            <CardDescription className="text-slate-500">הטקסט הרץ בפס הכהה מעל ההדר. הפרידו בין הודעות עם הסימן •</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6 pt-8">
+                            <div className="space-y-3">
+                                <label className="text-sm font-black text-slate-700">טקסט הטיקר</label>
+                                <Input
+                                    placeholder="🚚 משלוח חינם בקנייה מעל 150 ₪ • התוצרת הטרייה ביותר מהשדה אליכם • שוק בשכונה"
+                                    value={settings.ticker_text || ""}
+                                    onChange={(e) => handleChange("ticker_text", e.target.value)}
+                                    className="h-14 rounded-2xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-[#AADB56] focus:border-[#AADB56] transition-all"
+                                />
                             </div>
                         </CardContent>
                     </Card>

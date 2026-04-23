@@ -12,7 +12,15 @@ export const revalidate = 0;
 
 
 interface HeroSliderData {
-  slides: { image_url: string; title: string; subtitle: string; button_text: string; link: string }[];
+  slides: { 
+    image_url: string; 
+    desktop_image_url?: string; 
+    mobile_image_url?: string; 
+    title: string; 
+    subtitle: string; 
+    button_text: string; 
+    link: string 
+  }[];
 }
 
 interface BannersGridData {
@@ -62,28 +70,34 @@ export default async function Home() {
         }}
     >
       <main className="flex-1 relative z-10">
-        {blocks.map((block: ContentBlock, index: number) => {
+        {blocks.map((block: ContentBlock) => {
           let content = null;
+          
+          // Ensure data is an object even if returned as a string from DB
+          const blockData = typeof block.data === 'string' 
+            ? JSON.parse(block.data) 
+            : (block.data || {});
+
           switch (block.type) {
             case 'hero_slider':
-              content = <HeroSlider data={block.data as unknown as HeroSliderData} />;
+              content = <HeroSlider data={blockData as unknown as HeroSliderData} />;
               break;
             case 'category_grid':
               content = <CategoryCircles />;
               break;
             case 'banners_grid':
-              content = <BannersGrid data={block.data as unknown as BannersGridData} />;
+              content = <BannersGrid data={blockData as unknown as BannersGridData} />;
               break;
             case 'product_carousel':
               content = (
                 <ProductCarousel
                   title={block.title || 'מוצרים נבחרים'}
-                  data={block.data as unknown as ProductCarouselData}
+                  data={blockData as unknown as ProductCarouselData}
                 />
               );
               break;
             case 'text_banner': {
-              const bannerData = block.data as unknown as { text?: string; bg_color?: string };
+              const bannerData = blockData as unknown as { text?: string; bg_color?: string };
               content = (
                 <div className="py-6 px-4 text-center text-lg font-medium" style={{ backgroundColor: bannerData.bg_color || '#f0fdf4' }}>
                   {bannerData.text || ''}
@@ -95,12 +109,10 @@ export default async function Home() {
           
           if (!content) return null;
 
-          // Hero, Category Grid, Product Carousel and Banners Grid shouldn't have artificial wrapper padding/bg if they're supposed to be edge-to-edge
           if (block.type === 'hero_slider' || block.type === 'category_grid' || block.type === 'product_carousel' || block.type === 'banners_grid' || block.type === 'text_banner') {
             return <div key={block.id}>{content}</div>;
           }
 
-          // Uniform background handles the styling now
           return (
              <div key={block.id} className="py-2 md:py-3 px-4 md:px-6">
                  {content}

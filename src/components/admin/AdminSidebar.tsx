@@ -11,7 +11,8 @@ import {
     Settings,
     LogOut,
     Home,
-    Percent
+    Percent,
+    User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,8 @@ export function AdminSidebarContent({ onClose }: AdminSidebarContentProps) {
         { href: "/admin/products", label: "מוצרים", icon: Package },
         { href: "/admin/categories", label: "קטגוריות", icon: FolderTree },
         { href: "/admin/orders", label: "הזמנות", icon: ShoppingCart },
-        { href: "/admin/promotions", label: "מבצעים", icon: Percent }, // Added Promotions link
+        { href: "/admin/coupons", label: "קופונים", icon: Percent },
+        { href: "/admin/customers", label: "לקוחות", icon: User },
         { href: "/admin/content", label: "דף הבית", icon: LayoutDashboard },
         { href: "/admin/settings", label: "הגדרות", icon: Settings },
     ];
@@ -41,14 +43,16 @@ export function AdminSidebarContent({ onClose }: AdminSidebarContentProps) {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white">
-            <div className="p-6 border-b flex items-center gap-3">
-                <div className="bg-green-600 p-2 rounded-lg">
-                    <Settings className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                    <h1 className="font-bold text-lg">שוק בשכונה</h1>
-                    <p className="text-xs text-muted-foreground">פאנל ניהול</p>
+        <div className="flex flex-col h-full bg-white font-sans" dir="rtl">
+            <div className="p-8 border-b border-slate-50 flex flex-col gap-4 bg-slate-50/50">
+                <div className="flex items-center gap-4">
+                    <div className="bg-[#AADB56] p-2.5 rounded-2xl shadow-lg shadow-[#AADB56]/20 border border-white/20">
+                        <LayoutDashboard className="h-6 w-6 text-[#112a1e]" />
+                    </div>
+                    <div>
+                        <h1 className="font-black text-xl text-slate-800 tracking-tighter leading-none">שוק בשכונה</h1>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">פאנל ניהול פרימיום</p>
+                    </div>
                 </div>
             </div>
 
@@ -58,14 +62,21 @@ export function AdminSidebarContent({ onClose }: AdminSidebarContentProps) {
                     const isActive = pathname === link.href;
 
                     return (
-                        <Link key={link.href} href={link.href} onClick={onClose}>
+                        <Link 
+                            key={link.href} 
+                            href={link.href} 
+                            onClick={(e) => {
+                                // Ensure the sheet closes immediately on mobile
+                                onClose?.();
+                            }}
+                        >
                             <div className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+                                "flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all cursor-pointer",
                                 isActive
-                                    ? "bg-green-50 text-green-700 font-medium shadow-sm border border-green-100"
+                                    ? "bg-[#AADB56]/20 text-[#112a1e] font-extrabold shadow-sm border border-[#AADB56]/30"
                                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                             )}>
-                                <Icon className={cn("h-5 w-5", isActive && "text-green-600")} />
+                                <Icon className={cn("h-5 w-5", isActive && "text-[#112a1e]")} />
                                 <span>{link.label}</span>
                             </div>
                         </Link>
@@ -96,7 +107,7 @@ export function AdminSidebarContent({ onClose }: AdminSidebarContentProps) {
 
 export function AdminSidebar() {
     return (
-        <aside className="w-64 bg-white border-l h-screen flex flex-col fixed right-0 top-0 z-40 hidden md:flex shadow-sm">
+        <aside className="w-64 bg-white border-l border-slate-100 h-screen flex flex-col fixed right-0 top-0 z-40 hidden md:flex shadow-sm">
             <AdminSidebarContent />
         </aside>
     );

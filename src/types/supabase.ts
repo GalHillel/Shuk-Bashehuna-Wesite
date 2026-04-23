@@ -104,7 +104,7 @@ export interface Database {
                     delivery_slot_start: string | null
                     delivery_slot_end: string | null
                     delivery_method?: 'delivery' | 'pickup'
-                    payment_method?: 'cash' | 'bit'
+                    payment_method?: 'cash' | 'bit' | 'paybox'
                     order_number?: string
                     shipping_address: Json
                     notes: string | null
@@ -121,7 +121,7 @@ export interface Database {
                     delivery_slot_start?: string | null
                     delivery_slot_end?: string | null
                     delivery_method?: 'delivery' | 'pickup'
-                    payment_method?: 'cash' | 'bit'
+                    payment_method?: 'cash' | 'bit' | 'paybox'
                     shipping_address: Json
                     notes?: string | null
                     created_at?: string
@@ -242,6 +242,42 @@ export interface Database {
                     referencedColumns: ["id"]
                 }]
             }
+            coupons: {
+                Row: {
+                    id: string
+                    code: string
+                    discount_amount: number
+                    discount_type: 'fixed' | 'percentage'
+                    is_active: boolean
+                    usage_limit: number | null
+                    usage_limit_per_user: number | null
+                    used_count: number
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    code: string
+                    discount_amount: number
+                    discount_type: 'fixed' | 'percentage'
+                    is_active?: boolean
+                    usage_limit?: number | null
+                    usage_limit_per_user?: number | null
+                    used_count?: number
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    code?: string
+                    discount_amount?: number
+                    discount_type?: 'fixed' | 'percentage'
+                    is_active?: boolean
+                    usage_limit?: number | null
+                    usage_limit_per_user?: number | null
+                    used_count?: number
+                    created_at?: string
+                }
+                Relationships: []
+            }
             profiles: {
                 Row: {
                     id: string
@@ -249,6 +285,7 @@ export interface Database {
                     phone: string | null
                     default_address: Json | null
                     is_admin: boolean
+                    marketing_opt_in: boolean
                     created_at: string
                 }
                 Insert: {
@@ -257,6 +294,7 @@ export interface Database {
                     phone?: string | null
                     default_address?: Json | null
                     is_admin?: boolean
+                    marketing_opt_in?: boolean
                     created_at?: string
                 }
                 Update: {
@@ -265,6 +303,7 @@ export interface Database {
                     phone?: string | null
                     default_address?: Json | null
                     is_admin?: boolean
+                    marketing_opt_in?: boolean
                     created_at?: string
                 }
                 Relationships: []
@@ -293,3 +332,4 @@ export type Order = Database['public']['Tables']['orders']['Row'];
 export type OrderItem = Database['public']['Tables']['order_items']['Row'];
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type SiteSetting = Database['public']['Tables']['site_settings']['Row'];
+export type Coupon = Database['public']['Tables']['coupons']['Row'];

@@ -10,10 +10,11 @@ const rubik = Rubik({
 });
 
 export const metadata: Metadata = {
-  title: "שוק בשכונה - פירות וירקות טריים מהחקלאי",
-  description: "הזמינו אונליין פירות וירקות טריים, מוצרי מעדנייה ומאפים. משלוחים עד הבית.",
+  title: "שוק בשכונה - פירות וירקות טריים",
+  description: "הכי טרי • הכי קרוב • הכי טעים",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon-pure.png",
+    apple: "/favicon-pure.png",
   },
 };
 

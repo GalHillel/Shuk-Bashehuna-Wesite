@@ -63,7 +63,7 @@ export default function PrivacyPage() {
                             <p className="font-black text-red-600 text-lg leading-snug">
                                 שימו לב: אנו לא אוספים ולא שומרים פרטי כרטיס אשראי.
                                 <br />
-                                התשלום מתבצע ישירות מול בית העסק, השליח או באפליקציות צד ג&apos; (כגון Bit).
+                                התשלום מתבצע ישירות מול בית העסק, השליח או באפליקציות צד ג&apos; (כגון PayBox).
                             </p>
                         </div>
                     </section>

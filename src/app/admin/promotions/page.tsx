@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Percent, Tag, RotateCcw, CheckCircle2 } from "lucide-react";
 import { Category, Product } from "@/types/supabase";
 import { toast } from "sonner";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default function PromotionsPage() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -152,15 +153,14 @@ export default function PromotionsPage() {
 
     return (
         <div className="space-y-8 max-w-5xl mx-auto pb-20 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center gap-6">
-                <div className="h-20 w-20 bg-[#AADB56]/10 rounded-[28px] flex items-center justify-center text-[#6c9b29] shadow-inner">
-                    <Percent className="h-10 w-10" />
+            <AdminHeader 
+                title="ניהול מבצעים" 
+                description="החל הנחות גורפות בלחיצת כפתור אחת — חכם, מהיר ויוקרתי"
+            >
+                <div className="h-14 w-14 bg-[#AADB56]/10 rounded-2xl flex items-center justify-center text-[#112a1e] shadow-sm border border-[#AADB56]/20">
+                    <Percent className="h-7 w-7" />
                 </div>
-                <div>
-                    <h1 className="text-4xl font-black text-slate-800 tracking-tight">ניהול מבצעים</h1>
-                    <p className="text-slate-500 mt-1 font-medium">החל הנחות גורפות בלחיצת כפתור אחת — חכם, מהיר ויוקרתי.</p>
-                </div>
-            </div>
+            </AdminHeader>
 
             <Card className="rounded-[40px] border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
                 <div className="bg-slate-50/50 p-8 md:p-12 border-b border-slate-50">
